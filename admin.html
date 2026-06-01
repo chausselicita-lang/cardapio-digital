@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin — Cardápio Digital</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="admin.css"/>
+</head>
+<body>
+
+  <!-- LOGIN -->
+  <div class="login-screen" id="loginScreen">
+    <div class="login-card">
+      <div class="login-logo">⚙️</div>
+      <h1>Painel Admin</h1>
+      <p>Cardápio Digital</p>
+      <form id="loginForm">
+        <div class="field">
+          <label>Senha</label>
+          <input type="password" id="loginSenha" placeholder="Digite a senha" autocomplete="current-password"/>
+        </div>
+        <div class="login-erro" id="loginErro" style="display:none;">Senha incorreta</div>
+        <button type="submit" class="btn-primary w100">Entrar</button>
+      </form>
+      <a href="index.html" class="btn-link">← Voltar ao Cardápio</a>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="dashboard" id="dashboard" style="display:none;">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <span>⚙️</span>
+        <div>
+          <strong>Admin</strong>
+          <small>Cardápio Digital</small>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="nav-btn active" data-panel="pratos">🍽️ Pratos</button>
+        <button class="nav-btn" data-panel="config">⚙️ Configurações</button>
+        <button class="nav-btn" data-panel="senha">🔒 Alterar Senha</button>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="index.html" class="btn-link-sm" target="_blank">🔗 Ver Cardápio</a>
+        <button class="btn-link-sm danger" id="btnLogout">Sair</button>
+      </div>
+    </aside>
+
+    <!-- Conteúdo -->
+    <main class="content">
+
+      <!-- PAINEL: PRATOS -->
+      <div class="panel active" id="panel-pratos">
+        <div class="panel-header">
+          <div>
+            <h2>🍽️ Gerenciar Pratos</h2>
+            <p>Adicione, edite ou remova itens do cardápio</p>
+          </div>
+          <button class="btn-primary" id="btnNovoPrato">+ Novo Prato</button>
+        </div>
+
+        <div class="filtro-bar">
+          <input type="text" id="filtroNome" placeholder="🔍 Filtrar por nome..." class="input-filtro"/>
+          <select id="filtroCat" class="input-filtro">
+            <option value="">Todas as categorias</option>
+          </select>
+        </div>
+
+        <div class="table-wrap">
+          <table class="table" id="tabelaPratos">
+            <thead>
+              <tr>
+                <th>Foto</th>
+                <th>Nome</th>
+                <th>Categoria</th>
+                <th>Preço</th>
+                <th>Tag</th>
+                <th>Ativo</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PAINEL: CONFIGURAÇÕES -->
+      <div class="panel" id="panel-config">
+        <div class="panel-header">
+          <div>
+            <h2>⚙️ Configurações da Loja</h2>
+            <p>Personalize as informações do seu estabelecimento</p>
+          </div>
+        </div>
+        <form id="formConfig" class="form-config">
+          <div class="form-section">
+            <h3>Identidade</h3>
+            <div class="form-row">
+              <div class="field">
+                <label>Nome do Estabelecimento</label>
+                <input type="text" id="cfg-nome" placeholder="Ex: Sabor & Arte"/>
+              </div>
+              <div class="field">
+                <label>Subtítulo</label>
+                <input type="text" id="cfg-sub" placeholder="Ex: Bar & Restaurante"/>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="field field-sm">
+                <label>Emoji / Ícone</label>
+                <input type="text" id="cfg-emoji" placeholder="🍽️" maxlength="4"/>
+              </div>
+              <div class="field field-sm">
+                <label>Cor Principal</label>
+                <div class="color-wrap">
+                  <input type="color" id="cfg-cor" value="#E8420A"/>
+                  <input type="text" id="cfg-cor-hex" placeholder="#E8420A" maxlength="7"/>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Contato & Funcionamento</h3>
+            <div class="form-row">
+              <div class="field">
+                <label>WhatsApp (só números, com DDD e DDI)</label>
+                <input type="text" id="cfg-whats" placeholder="5511999999999"/>
+              </div>
+              <div class="field">
+                <label>Telefone (exibição)</label>
+                <input type="text" id="cfg-tel" placeholder="(11) 99999-9999"/>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="field">
+                <label>Endereço</label>
+                <input type="text" id="cfg-end" placeholder="Rua das Flores, 123 — Centro"/>
+              </div>
+              <div class="field">
+                <label>Horário de Funcionamento</label>
+                <input type="text" id="cfg-hor" placeholder="Seg–Sex: 11h–23h | Sáb–Dom: 11h–00h"/>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Badges do Banner (textos no topo da página)</h3>
+            <div class="form-row">
+              <div class="field"><label>Badge 1</label><input type="text" id="cfg-b1" placeholder="⭐ 4.9 no Google"/></div>
+              <div class="field"><label>Badge 2</label><input type="text" id="cfg-b2" placeholder="🕐 Aberto agora"/></div>
+              <div class="field"><label>Badge 3</label><input type="text" id="cfg-b3" placeholder="🚗 Delivery disponível"/></div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-primary">💾 Salvar Configurações</button>
+            <button type="button" class="btn-outline" id="btnResetConfig">Restaurar padrão</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- PAINEL: SENHA -->
+      <div class="panel" id="panel-senha">
+        <div class="panel-header">
+          <div>
+            <h2>🔒 Alterar Senha</h2>
+            <p>Mude a senha de acesso ao painel admin</p>
+          </div>
+        </div>
+        <form id="formSenha" class="form-config">
+          <div class="form-section">
+            <div class="form-row">
+              <div class="field">
+                <label>Senha Atual</label>
+                <input type="password" id="senhaAtual" placeholder="Senha atual"/>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="field">
+                <label>Nova Senha</label>
+                <input type="password" id="senhaNova" placeholder="Nova senha (mín. 4 caracteres)"/>
+              </div>
+              <div class="field">
+                <label>Confirmar Nova Senha</label>
+                <input type="password" id="senhaConfirm" placeholder="Repita a nova senha"/>
+              </div>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn-primary">🔒 Alterar Senha</button>
+          </div>
+        </form>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- MODAL PRATO -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modalPrato">
+      <div class="modal-header">
+        <h3 id="modalTitulo">Novo Prato</h3>
+        <button class="btn-modal-close" id="btnModalClose">✕</button>
+      </div>
+      <form id="formPrato" class="modal-body">
+        <input type="hidden" id="pratoId"/>
+        <div class="form-row">
+          <div class="field">
+            <label>Nome do Prato *</label>
+            <input type="text" id="pNome" required placeholder="Ex: Bruschetta Italiana"/>
+          </div>
+          <div class="field field-sm">
+            <label>Preço (R$) *</label>
+            <input type="number" id="pPreco" required step="0.01" min="0" placeholder="29.90"/>
+          </div>
+        </div>
+        <div class="field">
+          <label>Descrição</label>
+          <textarea id="pDesc" rows="2" placeholder="Descreva os ingredientes e diferenciais..."></textarea>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label>Categoria *</label>
+            <select id="pCat" required></select>
+          </div>
+          <div class="field field-sm">
+            <label>Tag</label>
+            <select id="pTag">
+              <option value="">Nenhuma</option>
+              <option value="popular">Popular</option>
+              <option value="novo">Novo</option>
+              <option value="chef">Chef indica</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>URL da Foto (Unsplash ou outra)</label>
+          <input type="url" id="pFoto" placeholder="https://images.unsplash.com/photo-..."/>
+        </div>
+        <div id="fotoPreview" class="foto-preview" style="display:none;">
+          <img id="fotoPreviewImg" src="" alt="Preview" />
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label>Preço Original (riscado, para combos)</label>
+            <input type="number" id="pPrecoOld" step="0.01" min="0" placeholder="Deixe em branco se não tiver"/>
+          </div>
+          <div class="field field-sm">
+            <label>Destaque</label>
+            <select id="pDestaque">
+              <option value="false">Não</option>
+              <option value="true">Sim (borda colorida)</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Itens do Combo (um por linha, só para combos)</label>
+          <textarea id="pExtras" rows="3" placeholder="2 Pratos à escolha&#10;2 Refrigerantes&#10;🎉 Economia de R$ 30,00"></textarea>
+        </div>
+        <div class="field">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+            <input type="checkbox" id="pAtivo" checked style="width:auto;height:auto;accent-color:var(--primary)"/>
+            Prato ativo (visível no cardápio)
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn-primary" id="btnSalvarPrato">💾 Salvar Prato</button>
+          <button type="button" class="btn-outline" id="btnCancelarModal">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <script src="data.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
