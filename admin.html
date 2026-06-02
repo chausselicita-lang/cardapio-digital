@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Cardápio Digital</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --primary: #E8420A;
+      --primary-dark: #C13508;
+      --gold: #F0A500;
+      --dark: #1A0F00;
+      --surface: #FFFFFF;
+      --surface2: #FFF8F3;
+      --border: #F0E8DF;
+      --text: #1A0F00;
+      --text2: #5A4A3A;
+      --text3: #9A8A7A;
+      --success: #27ae60;
+      --font: 'Poppins', sans-serif;
+      --radius: 12px;
+    }
+    html { font-size: 16px; }
+    body {
+      font-family: var(--font);
+      background: var(--surface2);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 60px;
+    }
+
+    /* HEADER */
+    .admin-header {
+      background: var(--dark);
+      color: white;
+      padding: 0 24px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.3);
+    }
+    .admin-header-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .admin-header-logo span { font-size: 22px; }
+    .admin-header-sub { font-size: 11px; color: rgba(255,255,255,0.5); margin-left: 4px; }
+    .btn-ver-cardapio {
+      background: rgba(255,255,255,0.1);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: var(--font);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s;
+    }
+    .btn-ver-cardapio:hover { background: rgba(255,255,255,0.18); }
+
+    /* TABS */
+    .admin-tabs {
+      background: var(--surface);
+      border-bottom: 2px solid var(--border);
+      display: flex;
+      padding: 0 24px;
+      gap: 4px;
+      position: sticky;
+      top: 60px;
+      z-index: 99;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      padding: 14px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text3);
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all 0.2s;
+      margin-bottom: -2px;
+    }
+    .tab-btn:hover { color: var(--primary); }
+    .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+    /* CONTEÚDO */
+    .admin-content {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+    .admin-section {
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 28px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    }
+    .admin-section h2 {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .admin-section p.section-desc {
+      font-size: 13px;
+      color: var(--text3);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    /* FORMULÁRIO */
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text2);
+      margin-bottom: 6px;
+    }
+    .form-group input {
+      width: 100%;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-size: 14px;
+      font-family: var(--font);
+      color: var(--text);
+      background: var(--surface);
+      transition: border-color 0.2s;
+      outline: none;
+    }
+    .form-group input:focus { border-color: var(--primary); }
+    .form-group small {
+      display: block;
+      font-size: 12px;
+      color: var(--text3);
+      margin-top: 5px;
+    }
+    .form-row {
+      display: flex;
+      gap: 16px;
+      align-items: flex-end;
+    }
+    .form-row .form-group { flex: 1; margin-bottom: 0; }
+
+    /* BOTÕES */
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+    .btn-secondary {
+      background: var(--surface2);
+      color: var(--text2);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-secondary:hover { border-color: var(--primary); color: var(--primary); }
+
+    /* GERADOR QR */
+    .qr-actions {
+      display: flex;
+      gap: 12px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+    .btn-imprimir {
+      background: var(--dark);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-imprimir:hover { background: #333; }
+
+    .qr-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 16px;
+      margin-top: 8px;
+    }
+    .qr-card {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      transition: box-shadow 0.2s;
+    }
+    .qr-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+    .qr-code img, .qr-code canvas { width: 160px !important; height: 160px !important; }
+    .qr-card-info strong {
+      display: block;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--dark);
+    }
+    .qr-url {
+      display: block;
+      font-size: 10px;
+      color: var(--text3);
+      word-break: break-all;
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+
+    /* TOAST */
+    .admin-toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--dark);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: 500;
+      z-index: 999;
+      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s;
+      opacity: 0;
+      pointer-events: none;
+      border-left: 4px solid var(--success);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      white-space: nowrap;
+    }
+    .admin-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    /* INFO BOX */
+    .info-box {
+      background: rgba(240,165,0,0.1);
+      border: 1.5px solid var(--gold);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #7a5900;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    .info-box strong { font-weight: 700; }
+
+    /* IMPRESSÃO */
+    @media print {
+      body * { visibility: hidden; }
+      .qr-grid, .qr-grid * { visibility: visible; }
+      .qr-grid {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        padding: 12px;
+      }
+      .qr-card {
+        border: 1px dashed #ccc;
+        page-break-inside: avoid;
+        padding: 10px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .admin-content { padding: 20px 16px; }
+      .admin-section { padding: 20px; }
+      .form-row { flex-direction: column; }
+      .qr-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="admin-header">
+    <div class="admin-header-logo">
+      <span>🍽️</span>
+      Sabor & Arte
+      <span class="admin-header-sub">| Painel Admin</span>
+    </div>
+    <a href="index.html" class="btn-ver-cardapio">↗ Ver Cardápio</a>
+  </header>
+
+  <!-- TABS -->
+  <nav class="admin-tabs">
+    <button class="tab-btn active" data-tab="configuracoes">⚙️ Configurações</button>
+    <button class="tab-btn" data-tab="qrcodes">📱 QR Codes de Mesa</button>
+  </nav>
+
+  <!-- CONTEÚDO -->
+  <div class="admin-content">
+
+    <!-- TAB: Configurações -->
+    <div class="tab-content" id="tab-configuracoes">
+
+      <!-- Pagamento -->
+      <div class="admin-section">
+        <h2>💳 Pagamento</h2>
+        <p class="section-desc">Configure as formas de pagamento que aparecerão no checkout do cardápio.</p>
+
+        <div class="form-group">
+          <label>Chave PIX</label>
+          <input type="text" id="chavePix" placeholder="Ex: 12345678900 / email@email.com / (11) 99999-9999">
+          <small>Será exibida ao cliente quando ele escolher PIX no checkout.</small>
+        </div>
+
+        <div class="form-group">
+          <label>Link de Pagamento — Cartão (Mercado Pago)</label>
+          <input type="url" id="linkCartao" placeholder="https://mpago.la/...">
+          <small>Gere o link no painel do Mercado Pago e cole aqui. O cliente será redirecionado ao clicar em "Cartão".</small>
+        </div>
+
+        <div class="form-group">
+          <label>WhatsApp para receber pedidos</label>
+          <input type="text" id="whatsapp" placeholder="5511999999999" maxlength="15">
+          <small>DDI + DDD + número, sem espaços ou símbolos. Exemplo: 5511999999999</small>
+        </div>
+
+        <button class="btn-primary" id="btnSalvarConfig">💾 Salvar Configurações</button>
+      </div>
+
+    </div>
+
+    <!-- TAB: QR Codes -->
+    <div class="tab-content" id="tab-qrcodes" style="display:none;">
+
+      <div class="admin-section">
+        <h2>📱 Gerador de QR Code por Mesa</h2>
+        <p class="section-desc">Gere QR Codes para cada mesa. Ao escanear, o cliente abre o cardápio já identificado com o número da mesa.</p>
+
+        <div class="info-box">
+          <strong>Como funciona:</strong> Cada QR Code abre o cardápio com <code>?mesa=X</code> na URL. O número da mesa aparece no topo do cardápio e é enviado junto com o pedido no WhatsApp.
+        </div>
+
+        <div class="form-group">
+          <label>URL base do cardápio</label>
+          <input type="url" id="urlBase" placeholder="https://seusite.com/index.html">
+          <small>URL completa do cardápio digital. Os QR Codes serão gerados como: <em>[URL]?mesa=1</em>, <em>[URL]?mesa=2</em>, etc.</small>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Número de mesas</label>
+            <input type="number" id="numMesas" min="1" max="200" value="10">
+          </div>
+          <button class="btn-primary" id="btnGerarQR">▶ Gerar QR Codes</button>
+        </div>
+      </div>
+
+      <div id="qrActionsWrap" style="display:none;">
+        <div class="admin-section">
+          <div class="qr-actions">
+            <button class="btn-imprimir" id="btnImprimirQR">🖨️ Imprimir Todos os QR Codes</button>
+            <button class="btn-secondary" id="btnRegerar">↺ Gerar Novamente</button>
+          </div>
+          <div class="qr-grid" id="qrGrid"></div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- TOAST -->
+  <div class="admin-toast" id="adminToast"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
