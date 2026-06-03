@@ -12,6 +12,8 @@ CREATE TABLE IF NOT EXISTS restaurantes (
   endereco         TEXT,
   tipo             TEXT DEFAULT 'restaurante',
   horario          TEXT,
+  num_mesas        INTEGER,
+  plano            TEXT,
   senha_admin      TEXT NOT NULL,
   created_at       TIMESTAMPTZ DEFAULT NOW()
 );

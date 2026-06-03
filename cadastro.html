@@ -303,6 +303,132 @@
     }
     .btn-whats:hover { background: #1ebe5a; }
 
+    /* PLANOS */
+    .planos-section {
+      background: var(--surface);
+      padding: 64px 24px;
+      text-align: center;
+    }
+    .planos-titulo {
+      font-family: var(--font2);
+      font-size: clamp(24px, 4vw, 36px);
+      font-weight: 800;
+      color: var(--dark);
+      margin-bottom: 8px;
+    }
+    .planos-sub {
+      font-size: 15px;
+      color: var(--text3);
+      margin-bottom: 40px;
+    }
+    .planos-grid {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .plano-card {
+      background: var(--surface2);
+      border: 2px solid var(--border);
+      border-radius: 18px;
+      padding: 28px 22px;
+      width: 190px;
+      position: relative;
+      transition: transform 0.2s, box-shadow 0.2s;
+      flex-shrink: 0;
+    }
+    .plano-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.10);
+    }
+    .plano-card.popular {
+      background: var(--dark);
+      border-color: var(--primary);
+      transform: scale(1.05);
+      box-shadow: 0 12px 40px rgba(232,66,10,0.25);
+      z-index: 1;
+    }
+    .plano-card.popular:hover { transform: scale(1.05) translateY(-4px); }
+    .plano-popular-badge {
+      position: absolute;
+      top: -13px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--primary);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 14px;
+      border-radius: 50px;
+      white-space: nowrap;
+      letter-spacing: 0.3px;
+    }
+    .plano-icon { font-size: 30px; margin-bottom: 10px; }
+    .plano-mesas {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text2);
+      margin-bottom: 12px;
+    }
+    .plano-card.popular .plano-mesas { color: rgba(255,255,255,0.7); }
+    .plano-preco {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1;
+    }
+    .plano-card.popular .plano-preco { color: white; }
+    .plano-periodo {
+      font-size: 12px;
+      color: var(--text3);
+      margin-top: 2px;
+    }
+    .plano-card.popular .plano-periodo { color: rgba(255,255,255,0.5); }
+    .plano-features {
+      list-style: none;
+      margin-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .plano-features li {
+      font-size: 12px;
+      color: var(--text2);
+    }
+    .plano-card.popular .plano-features li { color: rgba(255,255,255,0.75); }
+
+    /* PLANO SELECIONADO NO FORM */
+    .plano-resultado {
+      background: rgba(232,66,10,0.07);
+      border: 2px solid var(--primary);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-top: 12px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .plano-resultado.show { display: flex; }
+    .plano-resultado-info strong {
+      display: block;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--dark);
+    }
+    .plano-resultado-info span {
+      font-size: 12px;
+      color: var(--text3);
+    }
+    .plano-resultado-preco {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--primary);
+      white-space: nowrap;
+    }
+
     /* SETUP BANNER */
     .setup-banner {
       background: #fff3cd;
@@ -355,14 +481,94 @@
   <div class="hero">
     <div class="hero-logo">🍽️</div>
     <h1>Crie seu Cardápio Digital<br/>em minutos</h1>
-    <p>Cardápio online com QR Code por mesa, pagamento integrado e painel de administração. Grátis para começar.</p>
+    <p>Cardápio online com QR Code por mesa, pagamento integrado e painel de administração. Planos a partir de R$ 47/mês.</p>
     <div class="hero-badges">
-      <span class="hero-badge">✅ Sem mensalidade</span>
       <span class="hero-badge">📱 QR Code por mesa</span>
       <span class="hero-badge">💳 PIX e Cartão</span>
       <span class="hero-badge">📲 Pedidos pelo WhatsApp</span>
+      <span class="hero-badge">⚙️ Painel Admin</span>
     </div>
   </div>
+
+  <!-- PLANOS -->
+  <section class="planos-section">
+    <h2 class="planos-titulo">Planos por número de mesas</h2>
+    <p class="planos-sub">Escolha o plano ideal para o tamanho do seu estabelecimento</p>
+    <div class="planos-grid">
+
+      <div class="plano-card">
+        <div class="plano-icon">🍽️</div>
+        <div class="plano-mesas">Até 5 mesas</div>
+        <div class="plano-preco">R$ 47</div>
+        <div class="plano-periodo">/mês</div>
+        <ul class="plano-features">
+          <li>✅ Cardápio digital</li>
+          <li>✅ QR Code por mesa</li>
+          <li>✅ Pagamentos</li>
+          <li>✅ Painel admin</li>
+        </ul>
+      </div>
+
+      <div class="plano-card popular">
+        <div class="plano-popular-badge">⭐ Mais Popular</div>
+        <div class="plano-icon">🍽️</div>
+        <div class="plano-mesas">6 a 10 mesas</div>
+        <div class="plano-preco">R$ 77</div>
+        <div class="plano-periodo">/mês</div>
+        <ul class="plano-features">
+          <li>✅ Cardápio digital</li>
+          <li>✅ QR Code por mesa</li>
+          <li>✅ Pagamentos</li>
+          <li>✅ Painel admin</li>
+          <li>✅ Pedidos por mesa</li>
+        </ul>
+      </div>
+
+      <div class="plano-card">
+        <div class="plano-icon">🍽️</div>
+        <div class="plano-mesas">11 a 20 mesas</div>
+        <div class="plano-preco">R$ 117</div>
+        <div class="plano-periodo">/mês</div>
+        <ul class="plano-features">
+          <li>✅ Cardápio digital</li>
+          <li>✅ QR Code por mesa</li>
+          <li>✅ Pagamentos</li>
+          <li>✅ Painel admin</li>
+          <li>✅ Pedidos por mesa</li>
+        </ul>
+      </div>
+
+      <div class="plano-card">
+        <div class="plano-icon">🍽️</div>
+        <div class="plano-mesas">21 a 50 mesas</div>
+        <div class="plano-preco">R$ 177</div>
+        <div class="plano-periodo">/mês</div>
+        <ul class="plano-features">
+          <li>✅ Cardápio digital</li>
+          <li>✅ QR Code por mesa</li>
+          <li>✅ Pagamentos</li>
+          <li>✅ Painel admin</li>
+          <li>✅ Pedidos por mesa</li>
+        </ul>
+      </div>
+
+      <div class="plano-card">
+        <div class="plano-icon">🍽️</div>
+        <div class="plano-mesas">Acima de 50 mesas</div>
+        <div class="plano-preco">R$ 247</div>
+        <div class="plano-periodo">/mês</div>
+        <ul class="plano-features">
+          <li>✅ Cardápio digital</li>
+          <li>✅ QR Code por mesa</li>
+          <li>✅ Pagamentos</li>
+          <li>✅ Painel admin</li>
+          <li>✅ Pedidos por mesa</li>
+          <li>✅ Suporte prioritário</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
 
   <!-- FORM -->
   <div class="form-wrap">
@@ -418,6 +624,19 @@
         <div class="form-group">
           <label>Endereço</label>
           <input type="text" id="endereco" placeholder="Rua, número, bairro, cidade" />
+        </div>
+
+        <div class="form-group">
+          <label>Quantas mesas tem seu estabelecimento? <span>*</span></label>
+          <input type="number" id="numMesas" min="1" max="500" placeholder="Ex: 10" required />
+          <small>Usamos esse número para calcular seu plano automaticamente.</small>
+          <div class="plano-resultado" id="planoResultado">
+            <div class="plano-resultado-info">
+              <strong id="planoNome">—</strong>
+              <span id="planoDesc">—</span>
+            </div>
+            <div class="plano-resultado-preco" id="planoPreco">—</div>
+          </div>
         </div>
 
         <p class="form-section-title">Horário de Funcionamento</p>
@@ -524,6 +743,8 @@ CREATE TABLE IF NOT EXISTS restaurantes (
   endereco         TEXT,
   tipo             TEXT DEFAULT 'restaurante',
   horario          TEXT,
+  num_mesas        INTEGER,
+  plano            TEXT,
   senha_admin      TEXT NOT NULL,
   created_at       TIMESTAMPTZ DEFAULT NOW()
 );
@@ -581,6 +802,30 @@ CREATE POLICY "pedidos_all" ON cardapio_pedidos FOR ALL USING (true) WITH CHECK 
         .catch(() => { alert(SQL_SETUP); });
     });
 
+    // ===== PLANOS =====
+    const PLANOS = [
+      { max: 5,   nome: 'Starter',    mesas: 'Até 5 mesas',        preco: 47  },
+      { max: 10,  nome: 'Popular',    mesas: '6 a 10 mesas',       preco: 77  },
+      { max: 20,  nome: 'Pro',        mesas: '11 a 20 mesas',      preco: 117 },
+      { max: 50,  nome: 'Business',   mesas: '21 a 50 mesas',      preco: 177 },
+      { max: Infinity, nome: 'Enterprise', mesas: 'Acima de 50 mesas', preco: 247 },
+    ];
+
+    function calcularPlano(n) {
+      return PLANOS.find(p => n <= p.max) || PLANOS[PLANOS.length - 1];
+    }
+
+    document.getElementById('numMesas').addEventListener('input', function () {
+      const n = parseInt(this.value);
+      const resultado = document.getElementById('planoResultado');
+      if (!n || n < 1) { resultado.classList.remove('show'); return; }
+      const plano = calcularPlano(n);
+      document.getElementById('planoNome').textContent  = `Plano ${plano.nome}`;
+      document.getElementById('planoDesc').textContent  = plano.mesas;
+      document.getElementById('planoPreco').textContent = `R$ ${plano.preco}/mês`;
+      resultado.classList.add('show');
+    });
+
     // ===== TIPO DE ESTABELECIMENTO =====
     document.querySelectorAll('.tipo-btn').forEach(label => {
       label.addEventListener('click', () => {
@@ -611,6 +856,8 @@ CREATE POLICY "pedidos_all" ON cardapio_pedidos FOR ALL USING (true) WITH CHECK 
       const senhaAdmin      = document.getElementById('senhaAdmin').value;
       const tipoEl          = document.querySelector('input[name="tipo"]:checked');
       const tipo            = tipoEl ? tipoEl.value : 'Restaurante';
+      const numMesas        = parseInt(document.getElementById('numMesas').value) || 0;
+      const plano           = numMesas > 0 ? calcularPlano(numMesas) : null;
 
       const horario = [
         `Seg–Sex: ${document.getElementById('h1_open').value}–${document.getElementById('h1_close').value}`,
@@ -621,6 +868,7 @@ CREATE POLICY "pedidos_all" ON cardapio_pedidos FOR ALL USING (true) WITH CHECK 
       // Validação
       if (!nomeRestaurante) { mostrarErro('Informe o nome do restaurante.'); return; }
       if (!nomeResponsavel) { mostrarErro('Informe o nome do responsável.'); return; }
+      if (!numMesas || numMesas < 1) { mostrarErro('Informe o número de mesas do estabelecimento.'); return; }
       if (!telefone || telefone.length < 10) { mostrarErro('Informe um WhatsApp válido com DDD.'); return; }
       if (!senhaAdmin || senhaAdmin.length < 6) { mostrarErro('A senha deve ter pelo menos 6 caracteres.'); return; }
 
@@ -634,11 +882,13 @@ CREATE POLICY "pedidos_all" ON cardapio_pedidos FOR ALL USING (true) WITH CHECK 
           .insert({
             nome_restaurante: nomeRestaurante,
             nome_responsavel: nomeResponsavel,
-            telefone: telefone.length === 11 ? '55' + telefone : '55' + telefone,
+            telefone: '55' + telefone,
             email:    email    || null,
             endereco: endereco || null,
             tipo,
             horario,
+            num_mesas: numMesas,
+            plano:     plano ? plano.nome : null,
             senha_admin: senhaAdmin,
           })
           .select('id')
