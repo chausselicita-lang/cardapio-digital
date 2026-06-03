@@ -64,6 +64,7 @@ function verificarSessao() {
     if (sessionStorage.getItem('admin_auth') === '1' &&
         sessionStorage.getItem('admin_rid')   === rid) {
       carregarDadosRestaurante();
+      abrirTabCardapio();
       return; // autenticado — overlay permanece oculto
     }
   } else {
@@ -96,6 +97,7 @@ async function tentarLogin() {
       loginOverlay.style.display = 'none';
       senhaInput.value = '';
       carregarDadosRestaurante();
+      abrirTabCardapio();
 
     } catch {
       loginError.style.display = 'block';
@@ -112,6 +114,7 @@ async function tentarLogin() {
       loginOverlay.style.display = 'none';
       senhaInput.value = '';
       loginError.style.display = 'none';
+      abrirTabCardapio();
     } else {
       loginError.style.display = 'block';
       senhaInput.value = '';
@@ -242,6 +245,16 @@ $('#urlBase').value  = carregarConfig().urlBase  || (rid ? `${autoUrl}?rid=${rid
 $('#numMesas').value = carregarConfig().numMesas || 10;
 
 // ===== TABS =====
+function abrirTabCardapio() {
+  $$('.tab-btn').forEach(b => b.classList.remove('active'));
+  $$('.tab-content').forEach(t => t.style.display = 'none');
+  const btn = $('[data-tab="cardapio"]');
+  if (btn) btn.classList.add('active');
+  const tab = $('#tab-cardapio');
+  if (tab) tab.style.display = 'block';
+  carregarCardapio();
+}
+
 $$('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     $$('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -251,6 +264,12 @@ $$('.tab-btn').forEach(btn => {
     if (btn.dataset.tab === 'cardapio') carregarCardapio();
   });
 });
+
+// Atualiza link "Ver Cardápio" com o rid do restaurante
+if (rid) {
+  const linkCardapio = $('.btn-ver-cardapio');
+  if (linkCardapio) linkCardapio.href = `index.html?rid=${rid}`;
+}
 
 // ===== GERENCIAR CARDÁPIO =====
 const PRATOS_LS_KEY = 'cardapio_pratos';
