@@ -303,11 +303,53 @@
     }
     .btn-whats:hover { background: #1ebe5a; }
 
+    /* SETUP BANNER */
+    .setup-banner {
+      background: #fff3cd;
+      border-bottom: 3px solid #f0a500;
+      padding: 14px 20px;
+      text-align: center;
+      font-size: 13px;
+      color: #7a5900;
+      display: none;
+    }
+    .setup-banner.show { display: block; }
+    .setup-banner strong { font-weight: 700; }
+    .btn-setup {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #f0a500;
+      color: #1A0F00;
+      border: none;
+      border-radius: 8px;
+      padding: 7px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: var(--font);
+      margin-top: 8px;
+      text-decoration: none;
+    }
+
     /* FOOTER */
     .page-footer { text-align: center; padding: 24px; font-size: 12px; color: var(--text3); }
   </style>
 </head>
 <body>
+
+  <!-- BANNER SETUP -->
+  <div class="setup-banner" id="setupBanner">
+    ⚠️ <strong>Configuração necessária:</strong> As tabelas do Supabase ainda não foram criadas.
+    <br/>
+    <a class="btn-setup" href="https://supabase.com/dashboard/project/zigghtvlmftgjlohuhla/sql/new" target="_blank">
+      🔧 Abrir SQL Editor do Supabase
+    </a>
+    &nbsp;
+    <button class="btn-setup" id="btnCopiarSQL" style="background:#1A0F00;color:white;">
+      📋 Copiar SQL
+    </button>
+  </div>
 
   <!-- HERO -->
   <div class="hero">
@@ -471,6 +513,74 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script>
+    const SQL_SETUP = `-- Cole este SQL no Supabase SQL Editor e clique em Run
+
+CREATE TABLE IF NOT EXISTS restaurantes (
+  id               UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  nome_restaurante TEXT NOT NULL,
+  nome_responsavel TEXT NOT NULL,
+  telefone         TEXT NOT NULL,
+  email            TEXT,
+  endereco         TEXT,
+  tipo             TEXT DEFAULT 'restaurante',
+  horario          TEXT,
+  senha_admin      TEXT NOT NULL,
+  created_at       TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS cardapio_items (
+  id             UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  restaurante_id UUID REFERENCES restaurantes(id) ON DELETE CASCADE,
+  categoria      TEXT NOT NULL,
+  nome           TEXT NOT NULL,
+  descricao      TEXT,
+  preco          DECIMAL(10,2) NOT NULL,
+  foto_url       TEXT,
+  disponivel     BOOLEAN DEFAULT true,
+  ordem          INTEGER DEFAULT 0,
+  created_at     TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS cardapio_pedidos (
+  id              UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  restaurante_id  UUID REFERENCES restaurantes(id) ON DELETE CASCADE,
+  mesa            TEXT,
+  itens           JSONB NOT NULL,
+  total           DECIMAL(10,2) NOT NULL,
+  forma_pagamento TEXT,
+  status          TEXT DEFAULT 'novo',
+  created_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE restaurantes     ENABLE ROW LEVEL SECURITY;
+ALTER TABLE cardapio_items   ENABLE ROW LEVEL SECURITY;
+ALTER TABLE cardapio_pedidos ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "restaurantes_insert" ON restaurantes;
+DROP POLICY IF EXISTS "restaurantes_select" ON restaurantes;
+DROP POLICY IF EXISTS "items_all"           ON cardapio_items;
+DROP POLICY IF EXISTS "pedidos_all"         ON cardapio_pedidos;
+
+CREATE POLICY "restaurantes_insert" ON restaurantes FOR INSERT WITH CHECK (true);
+CREATE POLICY "restaurantes_select" ON restaurantes FOR SELECT USING (true);
+CREATE POLICY "items_all"   ON cardapio_items   FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "pedidos_all" ON cardapio_pedidos FOR ALL USING (true) WITH CHECK (true);`;
+
+    // ===== VERIFICAÇÃO AUTOMÁTICA DO SUPABASE =====
+    (async () => {
+      const { error } = await db.from('restaurantes').select('id').limit(1);
+      if (error && (error.code === 'PGRST205' || error.message?.includes('restaurantes'))) {
+        document.getElementById('setupBanner').classList.add('show');
+      }
+    })();
+
+    // ===== COPIAR SQL =====
+    document.getElementById('btnCopiarSQL').addEventListener('click', () => {
+      navigator.clipboard.writeText(SQL_SETUP)
+        .then(() => { document.getElementById('btnCopiarSQL').textContent = '✅ Copiado!'; })
+        .catch(() => { alert(SQL_SETUP); });
+    });
+
     // ===== TIPO DE ESTABELECIMENTO =====
     document.querySelectorAll('.tipo-btn').forEach(label => {
       label.addEventListener('click', () => {
@@ -490,10 +600,9 @@
 
     document.getElementById('formCadastro').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const erroMsg = document.getElementById('erroMsg');
-      erroMsg.style.display = 'none';
+      const erroEl = document.getElementById('erroMsg');
+      erroEl.style.display = 'none';
 
-      // Coleta valores
       const nomeRestaurante = document.getElementById('nomeRestaurante').value.trim();
       const nomeResponsavel = document.getElementById('nomeResponsavel').value.trim();
       const telefone        = document.getElementById('telefone').value.trim().replace(/\D/g, '');
@@ -501,9 +610,8 @@
       const endereco        = document.getElementById('endereco').value.trim();
       const senhaAdmin      = document.getElementById('senhaAdmin').value;
       const tipoEl          = document.querySelector('input[name="tipo"]:checked');
-      const tipo            = tipoEl ? tipoEl.value : '';
+      const tipo            = tipoEl ? tipoEl.value : 'Restaurante';
 
-      // Horário
       const horario = [
         `Seg–Sex: ${document.getElementById('h1_open').value}–${document.getElementById('h1_close').value}`,
         `Sáb: ${document.getElementById('h2_open').value}–${document.getElementById('h2_close').value}`,
@@ -513,40 +621,55 @@
       // Validação
       if (!nomeRestaurante) { mostrarErro('Informe o nome do restaurante.'); return; }
       if (!nomeResponsavel) { mostrarErro('Informe o nome do responsável.'); return; }
-      if (!telefone || telefone.length < 10) { mostrarErro('Informe um WhatsApp válido.'); return; }
+      if (!telefone || telefone.length < 10) { mostrarErro('Informe um WhatsApp válido com DDD.'); return; }
       if (!senhaAdmin || senhaAdmin.length < 6) { mostrarErro('A senha deve ter pelo menos 6 caracteres.'); return; }
 
-      // Loading
       const btn = document.getElementById('btnSubmit');
       btn.disabled = true;
       btn.classList.add('loading');
 
       try {
-        const { data, error } = await db.from('restaurantes').insert([{
-          nome_restaurante: nomeRestaurante,
-          nome_responsavel: nomeResponsavel,
-          telefone: '55' + telefone,
-          email: email || null,
-          endereco: endereco || null,
-          tipo: tipo || 'Restaurante',
-          horario,
-          senha_admin: senhaAdmin,
-        }]).select('id').single();
+        const { data, error } = await db
+          .from('restaurantes')
+          .insert({
+            nome_restaurante: nomeRestaurante,
+            nome_responsavel: nomeResponsavel,
+            telefone: telefone.length === 11 ? '55' + telefone : '55' + telefone,
+            email:    email    || null,
+            endereco: endereco || null,
+            tipo,
+            horario,
+            senha_admin: senhaAdmin,
+          })
+          .select('id')
+          .single();
 
         if (error) throw error;
 
-        const rid = data.id;
+        const rid          = data.id;
         const linkCardapio = `${BASE_URL}/index.html?rid=${rid}`;
         const linkAdmin    = `${BASE_URL}/admin.html?rid=${rid}`;
 
-        dadosCadastro = { nomeRestaurante, nomeResponsavel, telefone: '55' + telefone, senhaAdmin, linkCardapio, linkAdmin };
+        dadosCadastro = {
+          nomeResponsavel,
+          telefone: '55' + telefone,
+          senhaAdmin,
+          linkCardapio,
+          linkAdmin,
+        };
 
         document.getElementById('linkCardapio').textContent = linkCardapio;
         document.getElementById('linkAdmin').textContent    = linkAdmin;
         document.getElementById('successOverlay').classList.add('show');
 
       } catch (err) {
-        mostrarErro('Erro ao cadastrar: ' + (err.message || 'Tente novamente.'));
+        let msg = err.message || 'Tente novamente.';
+        if (err.code === 'PGRST205' || msg.includes('restaurantes')) {
+          msg = 'Tabelas não encontradas no Supabase. Clique no banner amarelo acima e rode o SQL.';
+          document.getElementById('setupBanner').classList.add('show');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        mostrarErro(msg);
         btn.disabled = false;
         btn.classList.remove('loading');
       }
