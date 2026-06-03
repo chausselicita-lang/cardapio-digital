@@ -148,11 +148,6 @@ async function carregarDadosRestaurante() {
     const sub = document.querySelector('.admin-header-sub');
     if (sub) sub.textContent = `| ${data.nome_restaurante}`;
 
-    // Preenche campos de configuração
-    $('#chavePix').value   = carregarConfig().chavePix  || '';
-    $('#linkCartao').value = carregarConfig().linkCartao || '';
-    $('#whatsapp').value   = (data.telefone || '').replace(/^55/, '');
-
     // Configura limite de QR por plano
     atualizarBadgePlano(data.num_mesas || 0, data.plano);
 
@@ -162,15 +157,89 @@ async function carregarDadosRestaurante() {
 // Verifica sessão ao carregar
 verificarSessao();
 
-// ===== FORMULÁRIO DE CONFIGURAÇÕES =====
-const config = carregarConfig();
-$('#chavePix').value   = config.chavePix   || '';
-$('#linkCartao').value = config.linkCartao  || '';
-$('#whatsapp').value   = config.whatsapp    || '';
-
+// ===== CONFIGURAÇÕES EM LISTA =====
 const autoUrl = window.location.href.replace(/[?#].*$/, '').replace(/admin\.html$/, 'index.html');
-$('#urlBase').value   = config.urlBase   || (rid ? `${autoUrl}?rid=${rid}` : autoUrl);
-$('#numMesas').value  = config.numMesas  || 10;
+
+// Mapeamento: chave interna → { storageKey, inputId, valId, itemId, label }
+const CONFIG_MAP = {
+  pix:      { key: 'chavePix',   inputId: 'inp-pix',      valId: 'val-pix',      itemId: 'ci-pix'      },
+  cartao:   { key: 'linkCartao', inputId: 'inp-cartao',   valId: 'val-cartao',   itemId: 'ci-cartao'   },
+  whatsapp: { key: 'whatsapp',   inputId: 'inp-whatsapp', valId: 'val-whatsapp', itemId: 'ci-whatsapp' },
+  senha:    { key: 'senhaAdmin', inputId: 'inp-senha',    valId: 'val-senha',    itemId: 'ci-senha'    },
+};
+
+function renderConfigList() {
+  const cfg = carregarConfig();
+  Object.entries(CONFIG_MAP).forEach(([name, { key, valId }]) => {
+    const el  = document.getElementById(valId);
+    if (!el) return;
+    const val = cfg[key] || '';
+    if (name === 'senha') {
+      el.textContent = val ? '••••••  (configurada)' : '••••••  (padrão: admin123)';
+      el.className   = 'config-item-val' + (val ? ' set' : '');
+    } else if (val) {
+      el.textContent = val.length > 40 ? val.slice(0, 40) + '…' : val;
+      el.className   = 'config-item-val set';
+    } else {
+      el.textContent = 'Não configurado';
+      el.className   = 'config-item-val';
+    }
+  });
+}
+
+function toggleConfig(name) {
+  const { inputId, itemId, key } = CONFIG_MAP[name];
+  const item = document.getElementById(itemId);
+  const isOpen = item.classList.contains('open');
+
+  // Fecha todos
+  Object.values(CONFIG_MAP).forEach(({ itemId: id }) =>
+    document.getElementById(id).classList.remove('open')
+  );
+
+  if (!isOpen) {
+    item.classList.add('open');
+    const cfg = carregarConfig();
+    const inp = document.getElementById(inputId);
+    inp.value = name === 'senha' ? '' : (cfg[key] || '');
+    setTimeout(() => inp.focus(), 50);
+  }
+}
+
+function fecharConfig(name) {
+  document.getElementById(CONFIG_MAP[name].itemId).classList.remove('open');
+}
+
+async function salvarConfigItem(name) {
+  const { key, inputId, itemId } = CONFIG_MAP[name];
+  const inp = document.getElementById(inputId);
+  let val   = inp.value.trim();
+
+  if (name === 'senha') {
+    if (!val) { mostrarToast('⚠️ Digite a nova senha'); inp.focus(); return; }
+    if (val.length < 6) { mostrarToast('⚠️ Mínimo 6 caracteres'); inp.focus(); return; }
+  }
+  if (name === 'whatsapp') val = val.replace(/\D/g, '');
+
+  const cfg = { ...carregarConfig(), [key]: val };
+  salvarConfig(cfg);
+
+  // Senha também no Supabase
+  if (name === 'senha' && modo === 'supabase') {
+    await db.from('restaurantes').update({ senha_admin: val }).eq('id', rid);
+  }
+
+  document.getElementById(itemId).classList.remove('open');
+  renderConfigList();
+  mostrarToast('✅ ' + ({ pix:'Chave PIX', cartao:'Link do Cartão', whatsapp:'WhatsApp', senha:'Senha' }[name]) + ' salvo!');
+}
+
+// Inicializa lista ao carregar
+renderConfigList();
+
+// URL base e num mesas para o tab de QR
+$('#urlBase').value  = carregarConfig().urlBase  || (rid ? `${autoUrl}?rid=${rid}` : autoUrl);
+$('#numMesas').value = carregarConfig().numMesas || 10;
 
 // ===== TABS =====
 $$('.tab-btn').forEach(btn => {
@@ -427,26 +496,6 @@ $('#btnConfirmDel').addEventListener('click', async () => {
   }
 });
 
-// ===== SALVAR CONFIGURAÇÕES =====
-$('#btnSalvarConfig').addEventListener('click', async () => {
-  const novaSenha = $('#senhaAdminNova').value;
-  const cfg = {
-    ...carregarConfig(),
-    chavePix:   $('#chavePix').value.trim(),
-    linkCartao: $('#linkCartao').value.trim(),
-    whatsapp:   $('#whatsapp').value.trim().replace(/\D/g, ''),
-  };
-  if (novaSenha) cfg.senhaAdmin = novaSenha;
-  salvarConfig(cfg);
-
-  // Se modo Supabase, salva senha também no banco
-  if (modo === 'supabase' && novaSenha) {
-    await db.from('restaurantes').update({ senha_admin: novaSenha }).eq('id', rid);
-  }
-
-  if (novaSenha) $('#senhaAdminNova').value = '';
-  mostrarToast(novaSenha ? '✅ Configurações e senha salvos!' : '✅ Configurações salvas!');
-});
 
 // ===== GERAR QR CODES =====
 $('#btnGerarQR').addEventListener('click', gerarQRCodes);

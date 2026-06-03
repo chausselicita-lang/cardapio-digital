@@ -294,6 +294,103 @@
     }
     .info-box strong { font-weight: 700; }
 
+    /* ── LISTA DE CONFIGURAÇÕES ── */
+    .config-list { display: flex; flex-direction: column; gap: 0; }
+    .config-item {
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .config-item:last-child { border-bottom: none; }
+    .config-item-main {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 0;
+      cursor: pointer;
+    }
+    .config-item-main:hover .config-item-label { color: var(--primary); }
+    .config-item-icon {
+      font-size: 24px;
+      width: 44px;
+      height: 44px;
+      background: var(--surface2);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      border: 1.5px solid var(--border);
+    }
+    .config-item-body { flex: 1; min-width: 0; }
+    .config-item-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--dark);
+      transition: color 0.15s;
+    }
+    .config-item-val {
+      font-size: 12px;
+      color: var(--text3);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .config-item-val.set { color: var(--success); font-weight: 600; }
+    .btn-config-edit {
+      flex-shrink: 0;
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text2);
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all 0.15s;
+    }
+    .btn-config-edit:hover,
+    .config-item.open .btn-config-edit {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: #fff5ee;
+    }
+    .config-edit-panel {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      padding: 0 0 18px 58px;
+    }
+    .config-item.open .config-edit-panel { display: flex; }
+    .config-edit-panel input,
+    .config-edit-panel textarea {
+      width: 100%;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-family: var(--font);
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .config-edit-panel input:focus,
+    .config-edit-panel textarea:focus { border-color: var(--primary); }
+    .config-edit-panel small {
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: -4px;
+    }
+    .config-edit-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-sm {
+      padding: 8px 18px;
+      font-size: 13px;
+    }
+
     /* IMPRESSÃO */
     @media print {
       body * { visibility: hidden; }
@@ -818,36 +915,93 @@
     <!-- TAB: Configurações -->
     <div class="tab-content" id="tab-configuracoes">
 
-      <!-- Pagamento -->
       <div class="admin-section">
-        <h2>💳 Pagamento</h2>
-        <p class="section-desc">Configure as formas de pagamento que aparecerão no checkout do cardápio.</p>
+        <h2>⚙️ Configurações</h2>
+        <p class="section-desc">Toque em um item para editar.</p>
 
-        <div class="form-group">
-          <label>Chave PIX</label>
-          <input type="text" id="chavePix" placeholder="Ex: 12345678900 / email@email.com / (11) 99999-9999">
-          <small>Será exibida ao cliente quando ele escolher PIX no checkout.</small>
+        <div class="config-list">
+
+          <!-- PIX -->
+          <div class="config-item" id="ci-pix">
+            <div class="config-item-main" onclick="toggleConfig('pix')">
+              <div class="config-item-icon">💳</div>
+              <div class="config-item-body">
+                <div class="config-item-label">Chave PIX</div>
+                <div class="config-item-val" id="val-pix">Não configurado</div>
+              </div>
+              <button class="btn-config-edit">✏️ Editar</button>
+            </div>
+            <div class="config-edit-panel">
+              <input type="text" id="inp-pix" placeholder="CPF, e-mail, telefone ou chave aleatória" />
+              <small>Exibida ao cliente quando escolher PIX no checkout.</small>
+              <div class="config-edit-actions">
+                <button class="btn-secondary btn-sm" onclick="fecharConfig('pix')">Cancelar</button>
+                <button class="btn-primary btn-sm" onclick="salvarConfigItem('pix')">💾 Salvar</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARTÃO -->
+          <div class="config-item" id="ci-cartao">
+            <div class="config-item-main" onclick="toggleConfig('cartao')">
+              <div class="config-item-icon">💳</div>
+              <div class="config-item-body">
+                <div class="config-item-label">Link do Cartão (Mercado Pago)</div>
+                <div class="config-item-val" id="val-cartao">Não configurado</div>
+              </div>
+              <button class="btn-config-edit">✏️ Editar</button>
+            </div>
+            <div class="config-edit-panel">
+              <input type="url" id="inp-cartao" placeholder="https://mpago.la/..." />
+              <small>Gere o link no painel do Mercado Pago e cole aqui.</small>
+              <div class="config-edit-actions">
+                <button class="btn-secondary btn-sm" onclick="fecharConfig('cartao')">Cancelar</button>
+                <button class="btn-primary btn-sm" onclick="salvarConfigItem('cartao')">💾 Salvar</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- WHATSAPP -->
+          <div class="config-item" id="ci-whatsapp">
+            <div class="config-item-main" onclick="toggleConfig('whatsapp')">
+              <div class="config-item-icon">💬</div>
+              <div class="config-item-body">
+                <div class="config-item-label">WhatsApp para pedidos</div>
+                <div class="config-item-val" id="val-whatsapp">Não configurado</div>
+              </div>
+              <button class="btn-config-edit">✏️ Editar</button>
+            </div>
+            <div class="config-edit-panel">
+              <input type="tel" id="inp-whatsapp" placeholder="5511999999999" maxlength="15" />
+              <small>DDI + DDD + número, sem espaços. Ex: 5511999999999</small>
+              <div class="config-edit-actions">
+                <button class="btn-secondary btn-sm" onclick="fecharConfig('whatsapp')">Cancelar</button>
+                <button class="btn-primary btn-sm" onclick="salvarConfigItem('whatsapp')">💾 Salvar</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- SENHA -->
+          <div class="config-item" id="ci-senha">
+            <div class="config-item-main" onclick="toggleConfig('senha')">
+              <div class="config-item-icon">🔒</div>
+              <div class="config-item-body">
+                <div class="config-item-label">Senha do Admin</div>
+                <div class="config-item-val" id="val-senha">••••••</div>
+              </div>
+              <button class="btn-config-edit">✏️ Editar</button>
+            </div>
+            <div class="config-edit-panel">
+              <input type="password" id="inp-senha" placeholder="Nova senha (mín. 6 caracteres)" autocomplete="new-password" />
+              <small>Ao salvar, a senha antiga deixa de funcionar.</small>
+              <div class="config-edit-actions">
+                <button class="btn-secondary btn-sm" onclick="fecharConfig('senha')">Cancelar</button>
+                <button class="btn-primary btn-sm" onclick="salvarConfigItem('senha')">💾 Salvar</button>
+              </div>
+            </div>
+          </div>
+
         </div>
-
-        <div class="form-group">
-          <label>Link de Pagamento — Cartão (Mercado Pago)</label>
-          <input type="url" id="linkCartao" placeholder="https://mpago.la/...">
-          <small>Gere o link no painel do Mercado Pago e cole aqui. O cliente será redirecionado ao clicar em "Cartão".</small>
-        </div>
-
-        <div class="form-group">
-          <label>WhatsApp para receber pedidos</label>
-          <input type="text" id="whatsapp" placeholder="5511999999999" maxlength="15">
-          <small>DDI + DDD + número, sem espaços ou símbolos. Exemplo: 5511999999999</small>
-        </div>
-
-        <div class="form-group" style="margin-top:28px;padding-top:24px;border-top:2px solid var(--border);">
-          <label>🔒 Alterar Senha do Admin</label>
-          <input type="password" id="senhaAdminNova" placeholder="Nova senha (deixe vazio para não alterar)" autocomplete="new-password">
-          <small>Senha padrão inicial: <strong>admin123</strong></small>
-        </div>
-
-        <button class="btn-primary" id="btnSalvarConfig">💾 Salvar Configurações</button>
       </div>
 
     </div>
@@ -1039,6 +1193,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script src="admin.js?v=7"></script>
+  <script src="admin.js?v=8"></script>
 </body>
 </html>
