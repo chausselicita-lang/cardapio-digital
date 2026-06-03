@@ -139,17 +139,36 @@ function filtrarConteudo() {
 }
 
 // ===== CARRINHO =====
+let cartHistoryPushed = false;
+
 function abrirCarrinho() {
   cartPanel.classList.add('open');
   cartOverlay.classList.add('open');
   document.body.style.overflow = 'hidden';
+  history.pushState({ cart: true }, '');
+  cartHistoryPushed = true;
 }
 
 function fecharCarrinho() {
+  if (!cartPanel.classList.contains('open')) return;
   cartPanel.classList.remove('open');
   cartOverlay.classList.remove('open');
   document.body.style.overflow = '';
+  if (cartHistoryPushed) {
+    cartHistoryPushed = false;
+    history.back();
+  }
 }
+
+// Seta "voltar" do browser fecha o carrinho em vez de sair da página
+window.addEventListener('popstate', () => {
+  if (cartPanel.classList.contains('open')) {
+    cartPanel.classList.remove('open');
+    cartOverlay.classList.remove('open');
+    document.body.style.overflow = '';
+    cartHistoryPushed = false;
+  }
+});
 
 btnCart.addEventListener('click', abrirCarrinho);
 btnCloseCart.addEventListener('click', fecharCarrinho);
