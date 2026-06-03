@@ -336,12 +336,20 @@
       padding: 28px 22px;
       width: 190px;
       position: relative;
-      transition: transform 0.2s, box-shadow 0.2s;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
       flex-shrink: 0;
+      cursor: pointer;
+      user-select: none;
     }
     .plano-card:hover {
       transform: translateY(-4px);
       box-shadow: 0 8px 28px rgba(0,0,0,0.10);
+    }
+    .plano-card.selected {
+      border-color: var(--primary);
+      background: rgba(232,66,10,0.05);
+      box-shadow: 0 0 0 4px rgba(232,66,10,0.15), 0 8px 28px rgba(232,66,10,0.15);
+      transform: translateY(-4px);
     }
     .plano-card.popular {
       background: var(--dark);
@@ -351,6 +359,10 @@
       z-index: 1;
     }
     .plano-card.popular:hover { transform: scale(1.05) translateY(-4px); }
+    .plano-card.popular.selected {
+      box-shadow: 0 0 0 4px rgba(232,66,10,0.5), 0 12px 40px rgba(232,66,10,0.4);
+      transform: scale(1.05) translateY(-4px);
+    }
     .plano-popular-badge {
       position: absolute;
       top: -13px;
@@ -496,7 +508,7 @@
     <p class="planos-sub">Escolha o plano ideal para o tamanho do seu estabelecimento</p>
     <div class="planos-grid">
 
-      <div class="plano-card">
+      <div class="plano-card" data-mesas="5">
         <div class="plano-icon">🍽️</div>
         <div class="plano-mesas">Até 5 mesas</div>
         <div class="plano-preco">R$ 47</div>
@@ -509,7 +521,7 @@
         </ul>
       </div>
 
-      <div class="plano-card popular">
+      <div class="plano-card popular" data-mesas="8">
         <div class="plano-popular-badge">⭐ Mais Popular</div>
         <div class="plano-icon">🍽️</div>
         <div class="plano-mesas">6 a 10 mesas</div>
@@ -524,7 +536,7 @@
         </ul>
       </div>
 
-      <div class="plano-card">
+      <div class="plano-card" data-mesas="15">
         <div class="plano-icon">🍽️</div>
         <div class="plano-mesas">11 a 20 mesas</div>
         <div class="plano-preco">R$ 117</div>
@@ -538,7 +550,7 @@
         </ul>
       </div>
 
-      <div class="plano-card">
+      <div class="plano-card" data-mesas="30">
         <div class="plano-icon">🍽️</div>
         <div class="plano-mesas">21 a 50 mesas</div>
         <div class="plano-preco">R$ 177</div>
@@ -552,7 +564,7 @@
         </ul>
       </div>
 
-      <div class="plano-card">
+      <div class="plano-card" data-mesas="60">
         <div class="plano-icon">🍽️</div>
         <div class="plano-mesas">Acima de 50 mesas</div>
         <div class="plano-preco">R$ 247</div>
@@ -815,15 +827,46 @@ CREATE POLICY "pedidos_all" ON cardapio_pedidos FOR ALL USING (true) WITH CHECK 
       return PLANOS.find(p => n <= p.max) || PLANOS[PLANOS.length - 1];
     }
 
-    document.getElementById('numMesas').addEventListener('input', function () {
-      const n = parseInt(this.value);
+    const inputMesas   = document.getElementById('numMesas');
+    const btnSubmitEl  = document.getElementById('btnSubmit');
+    const btnTextEl    = btnSubmitEl.querySelector('.btn-text');
+
+    function atualizarPlanoUI(n) {
       const resultado = document.getElementById('planoResultado');
-      if (!n || n < 1) { resultado.classList.remove('show'); return; }
+      if (!n || n < 1) {
+        resultado.classList.remove('show');
+        btnTextEl.textContent = '🚀 Criar Meu Cardápio Digital';
+        // remove selected dos cards
+        document.querySelectorAll('.plano-card').forEach(c => c.classList.remove('selected'));
+        return;
+      }
       const plano = calcularPlano(n);
       document.getElementById('planoNome').textContent  = `Plano ${plano.nome}`;
       document.getElementById('planoDesc').textContent  = plano.mesas;
       document.getElementById('planoPreco').textContent = `R$ ${plano.preco}/mês`;
       resultado.classList.add('show');
+      btnTextEl.textContent = `🚀 Cadastrar — R$ ${plano.preco}/mês`;
+      // destaca o card cujo data-mesas cai no mesmo plano
+      document.querySelectorAll('.plano-card').forEach(card => {
+        const cardPlano = calcularPlano(parseInt(card.dataset.mesas));
+        card.classList.toggle('selected', cardPlano.nome === plano.nome);
+      });
+    }
+
+    inputMesas.addEventListener('input', function () {
+      atualizarPlanoUI(parseInt(this.value));
+    });
+
+    // Clique nos cards de plano
+    document.querySelectorAll('.plano-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const mesas = parseInt(card.dataset.mesas);
+        inputMesas.value = mesas;
+        atualizarPlanoUI(mesas);
+        // Scroll suave até o campo de mesas
+        inputMesas.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        inputMesas.focus();
+      });
     });
 
     // ===== TIPO DE ESTABELECIMENTO =====
