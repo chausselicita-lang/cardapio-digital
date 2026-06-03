@@ -1,380 +1,1014 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Criar Meu Cardápio Digital</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CardápioPro – Digitalize seu restaurante em 5 minutos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --primary: #E8420A;
-      --primary-dark: #C13508;
-      --primary-light: rgba(232,66,10,0.1);
-      --success: #0EA654;
-      --success-light: rgba(14,166,84,0.12);
-      --pix: #32bcad;
-      --pix-light: rgba(50,188,173,0.1);
-      --mp: #009EE3;
-      --bg: #F4F6F9;
+      --primary: #FF6B00;
+      --primary-dark: #E05A00;
+      --primary-light: #FF8C35;
+      --primary-glow: rgba(255,107,0,0.30);
+      --gold: #FFB800;
+      --dark: #080400;
+      --dark2: #120800;
+      --dark3: #1C1008;
       --surface: #FFFFFF;
-      --text: #1A1A2E;
-      --text2: #5A5A7A;
-      --text3: #9A9AB0;
-      --border: #E8EAF0;
-      --radius: 16px;
+      --surface2: #FFF8F2;
+      --surface3: #FFF3E8;
+      --border: #F0E4D4;
+      --text: #1A0F00;
+      --text2: #5A4030;
+      --text3: #9A8070;
+      --success: #22c55e;
       --font: 'Poppins', sans-serif;
+      --font2: 'Playfair Display', serif;
+      --radius: 16px;
+      --shadow: 0 8px 40px rgba(0,0,0,0.10);
+      --shadow-lg: 0 20px 60px rgba(0,0,0,0.15);
     }
+    html { font-size: 16px; scroll-behavior: smooth; }
+    body { font-family: var(--font); background: var(--dark); color: var(--text); min-height: 100vh; }
 
-    body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; }
-
-    /* ===== HEADER ===== */
-    .header {
-      background: #1A0F00;
-      padding: 0 24px;
+    /* ─── NAVBAR ─── */
+    .navbar {
       position: sticky;
       top: 0;
       z-index: 100;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.3);
-    }
-    .header-inner {
-      max-width: 900px;
-      margin: 0 auto;
+      background: rgba(15,7,0,0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,107,0,0.15);
+      padding: 0 24px;
       height: 64px;
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
-    .logo { display: flex; align-items: center; gap: 10px; }
-    .logo-icon { font-size: 28px; }
-    .logo-title { display: block; font-size: 15px; font-weight: 700; color: white; }
-    .logo-sub { display: block; font-size: 11px; color: rgba(255,255,255,0.45); }
-    .btn-back {
-      color: rgba(255,255,255,0.55);
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
       text-decoration: none;
-      font-size: 13px;
-      font-weight: 500;
-      transition: color 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 4px;
     }
-    .btn-back:hover { color: white; }
-
-    /* ===== MAIN ===== */
-    .main { max-width: 880px; margin: 0 auto; padding: 40px 20px 80px; }
-
-    /* ===== PROGRESS ===== */
-    .progress-wrap { margin-bottom: 40px; }
-    .steps {
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-    }
-    .step-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      min-width: 72px;
-    }
-    .step-num {
+    .nav-logo-icon {
       width: 38px;
       height: 38px;
-      border-radius: 50%;
-      background: var(--border);
-      color: var(--text3);
+      background: linear-gradient(135deg, #FF6B00, #FFB800);
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
-      font-weight: 700;
-      transition: all 0.35s;
-      flex-shrink: 0;
+      font-size: 20px;
+      box-shadow: 0 4px 12px rgba(255,107,0,0.4);
     }
-    .step-item.active .step-num {
-      background: var(--primary);
+    .nav-logo-text {
+      font-size: 20px;
+      font-weight: 800;
       color: white;
-      box-shadow: 0 0 0 5px var(--primary-light);
+      letter-spacing: -0.5px;
     }
-    .step-item.done .step-num {
-      background: var(--success);
-      color: white;
-    }
-    .step-label {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text3);
-      text-align: center;
-      white-space: nowrap;
-      transition: color 0.3s;
-    }
-    .step-item.active .step-label { color: var(--primary); }
-    .step-item.done .step-label { color: var(--success); }
-    .step-connector {
-      flex: 1;
-      height: 2px;
-      background: var(--border);
-      margin: 18px 8px 0;
-      transition: background 0.35s;
-      min-width: 40px;
-    }
-    .step-connector.done { background: var(--success); }
-
-    /* ===== CARD ===== */
-    .card {
-      background: var(--surface);
-      border-radius: var(--radius);
-      padding: 36px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
-    }
-    .card-title { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
-    .card-sub { font-size: 14px; color: var(--text3); margin-bottom: 28px; }
-
-    /* ===== STEP VISIBILITY ===== */
-    .step-content { display: none; }
-    .step-content.active { display: block; animation: fadeUp 0.35s ease; }
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
-
-    /* ===== FORM ===== */
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-    .form-row:last-of-type { margin-bottom: 0; }
-    .field { display: flex; flex-direction: column; gap: 6px; }
-    label { font-size: 12px; font-weight: 600; color: var(--text2); }
-    input, select {
-      background: var(--bg);
-      border: 2px solid var(--border);
-      border-radius: 10px;
-      padding: 12px 14px;
-      font-size: 14px;
-      font-family: var(--font);
-      color: var(--text);
-      outline: none;
-      transition: border-color 0.2s, background 0.2s;
-      width: 100%;
-    }
-    input:focus, select:focus { border-color: var(--primary); background: white; }
-    input.err, select.err { border-color: #e74c3c; }
-
-    /* ===== BUTTONS ===== */
-    .btn-wrap {
-      display: flex;
-      gap: 12px;
-      justify-content: flex-end;
-      margin-top: 28px;
-      padding-top: 24px;
-      border-top: 2px solid var(--border);
-    }
-    .btn-primary {
+    .nav-logo-text span { color: var(--primary); }
+    .nav-cta {
       background: var(--primary);
       color: white;
       border: none;
-      border-radius: 12px;
-      padding: 14px 28px;
-      font-size: 15px;
+      border-radius: 8px;
+      padding: 8px 20px;
+      font-size: 13px;
       font-weight: 700;
       cursor: pointer;
       font-family: var(--font);
-      transition: all 0.2s;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .nav-cta:hover { background: var(--primary-dark); transform: translateY(-1px); }
+
+    /* ─── HERO ─── */
+    .hero {
+      position: relative;
+      overflow: hidden;
+      background:
+        linear-gradient(160deg, rgba(4,2,0,0.97) 0%, rgba(255,107,0,0.18) 40%, rgba(4,2,0,0.98) 100%),
+        url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1400&q=85') center/cover no-repeat;
+      padding: 100px 24px 130px;
+      text-align: center;
+      color: white;
+      border-bottom: 1px solid rgba(255,107,0,0.1);
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      right: 0;
+      height: 100px;
+      background: linear-gradient(to bottom, transparent, var(--dark));
+    }
+
+    .hero-eyebrow {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
+      background: rgba(255,107,0,0.12);
+      border: 1px solid rgba(255,107,0,0.4);
+      color: #FFAA60;
+      padding: 7px 18px;
+      border-radius: 50px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+      box-shadow: 0 0 20px rgba(255,107,0,0.15);
     }
-    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(232,66,10,0.25); }
-    .btn-outline {
-      background: none;
-      border: 2px solid var(--border);
-      color: var(--text2);
-      border-radius: 12px;
-      padding: 14px 24px;
+    .hero-brand {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+    .hero-brand-icon {
+      width: 72px;
+      height: 72px;
+      background: linear-gradient(135deg, #FF6B00, #FFB800);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 32px rgba(255,107,0,0.5);
+    }
+    .hero-brand-icon svg {
+      width: 40px;
+      height: 40px;
+      fill: white;
+    }
+    .hero-brand-name {
+      text-align: left;
+    }
+    .hero-brand-name h2 {
+      font-size: 36px;
+      font-weight: 900;
+      color: white;
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+    .hero-brand-name h2 span { color: var(--primary); }
+    .hero-brand-name p {
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+    .hero h1 {
+      font-family: var(--font2);
+      font-size: clamp(34px, 5.5vw, 62px);
+      font-weight: 900;
+      line-height: 1.08;
+      margin-bottom: 22px;
+      max-width: 720px;
+      margin-left: auto;
+      margin-right: auto;
+      text-shadow: 0 2px 40px rgba(0,0,0,0.8);
+      letter-spacing: -0.5px;
+    }
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(90deg, #FF8C35, #FFD060);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 20px rgba(255,107,0,0.5));
+    }
+    .hero-sub {
+      font-size: 17px;
+      color: rgba(255,255,255,0.65);
+      max-width: 520px;
+      margin: 0 auto 40px;
+      line-height: 1.8;
+      text-shadow: 0 1px 12px rgba(0,0,0,0.6);
+    }
+    .hero-cta-group {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+    }
+    .btn-hero-primary {
+      background: linear-gradient(135deg, #FF6B00, #FF9A35);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      padding: 18px 36px;
+      font-size: 16px;
+      font-weight: 900;
+      cursor: pointer;
+      font-family: var(--font);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 8px 40px rgba(255,107,0,0.6), 0 0 0 1px rgba(255,107,0,0.3);
+      transition: all 0.2s;
+      letter-spacing: 0.3px;
+    }
+    .btn-hero-primary:hover { transform: translateY(-3px); box-shadow: 0 16px 50px rgba(255,107,0,0.7), 0 0 0 1px rgba(255,107,0,0.4); }
+    .btn-hero-secondary {
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.9);
+      border: 1.5px solid rgba(255,255,255,0.2);
+      border-radius: 14px;
+      padding: 16px 30px;
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
       font-family: var(--font);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
       transition: all 0.2s;
+      backdrop-filter: blur(4px);
     }
-    .btn-outline:hover { border-color: var(--text2); color: var(--text); }
+    .btn-hero-secondary:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.4); transform: translateY(-2px); }
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+    .hero-stat {
+      text-align: center;
+    }
+    .hero-stat-num {
+      font-size: 28px;
+      font-weight: 900;
+      color: white;
+      line-height: 1;
+    }
+    .hero-stat-num span { color: var(--primary); }
+    .hero-stat-label {
+      font-size: 11px;
+      color: rgba(255,255,255,0.5);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 2px;
+    }
 
-    /* ===== PLANOS ===== */
+    /* ─── COMO FUNCIONA ─── */
+    .como-funciona {
+      padding: 90px 24px;
+      text-align: center;
+      background: var(--dark2);
+      border-top: 1px solid rgba(255,107,0,0.08);
+      border-bottom: 1px solid rgba(255,107,0,0.08);
+    }
+    .section-tag {
+      display: inline-block;
+      background: rgba(255,107,0,0.1);
+      color: #FF9A4D;
+      border: 1.5px solid rgba(255,107,0,0.25);
+      padding: 5px 16px;
+      border-radius: 50px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 14px;
+    }
+    .section-title {
+      font-family: var(--font2);
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 900;
+      color: #FFFFFF;
+      margin-bottom: 12px;
+      line-height: 1.12;
+      text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+    }
+    .section-sub {
+      font-size: 15px;
+      color: rgba(255,255,255,0.45);
+      max-width: 480px;
+      margin: 0 auto 56px;
+      line-height: 1.7;
+    }
+    .steps-grid {
+      display: flex;
+      gap: 0;
+      justify-content: center;
+      max-width: 900px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .steps-grid::before {
+      content: '';
+      position: absolute;
+      top: 44px;
+      left: 16%;
+      right: 16%;
+      height: 2px;
+      background: linear-gradient(90deg, var(--primary), var(--gold));
+      z-index: 0;
+    }
+    @media (max-width: 700px) { .steps-grid::before { display: none; } .steps-grid { flex-direction: column; gap: 32px; align-items: center; } }
+    .step {
+      flex: 1;
+      max-width: 260px;
+      position: relative;
+      z-index: 1;
+      padding: 0 16px;
+    }
+    .step-num {
+      width: 88px;
+      height: 88px;
+      background: linear-gradient(135deg, var(--primary), var(--gold));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 32px;
+      box-shadow: 0 8px 28px rgba(255,107,0,0.35);
+      border: 4px solid white;
+    }
+    .step h3 {
+      font-size: 17px;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-bottom: 8px;
+    }
+    .step p {
+      font-size: 13px;
+      color: rgba(255,255,255,0.45);
+      line-height: 1.7;
+    }
+
+    /* ─── PLANOS ─── */
+    .planos-section {
+      background: var(--dark);
+      padding: 90px 24px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255,107,0,0.08);
+    }
     .planos-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin-bottom: 4px;
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      max-width: 1100px;
+      margin: 0 auto;
     }
     .plano-card {
-      border: 2px solid var(--border);
-      border-radius: 16px;
-      padding: 24px 18px 20px;
-      cursor: pointer;
-      transition: all 0.25s;
+      background: #160C02;
+      border: 1.5px solid rgba(255,107,0,0.12);
+      border-radius: 20px;
+      padding: 28px 20px;
+      width: 188px;
       position: relative;
-      text-align: center;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+      flex-shrink: 0;
+      cursor: pointer;
       user-select: none;
     }
-    .plano-card:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(232,66,10,0.1); }
-    .plano-card.selected { border-color: var(--primary); background: rgba(232,66,10,0.03); box-shadow: 0 4px 20px rgba(232,66,10,0.14); }
-    .plano-card.destaque { background: linear-gradient(135deg, rgba(232,66,10,0.05), rgba(232,66,10,0.02)); }
-    .badge-destaque {
+    .plano-card:hover { transform: translateY(-5px); box-shadow: 0 12px 40px rgba(255,107,0,0.12); border-color: rgba(255,107,0,0.25); }
+    .plano-card.selected {
+      border-color: var(--primary);
+      background: #1E0E02;
+      box-shadow: 0 0 0 3px rgba(255,107,0,0.15), 0 12px 40px rgba(255,107,0,0.2);
+      transform: translateY(-5px);
+    }
+    .plano-card.popular {
+      background: linear-gradient(160deg, #2A1400, #1A0A00);
+      border-color: var(--primary);
+      border-width: 2px;
+      transform: scale(1.06);
+      box-shadow: 0 16px 56px rgba(255,107,0,0.35), 0 0 0 1px rgba(255,107,0,0.2);
+      z-index: 1;
+    }
+    .plano-card.popular:hover { transform: scale(1.06) translateY(-5px); }
+    .plano-card.popular.selected {
+      box-shadow: 0 0 0 4px rgba(255,107,0,0.45), 0 16px 56px rgba(255,107,0,0.45);
+      transform: scale(1.06) translateY(-5px);
+    }
+    .plano-popular-badge {
       position: absolute;
       top: -13px;
       left: 50%;
       transform: translateX(-50%);
-      background: var(--primary);
+      background: linear-gradient(90deg, var(--primary), var(--gold));
       color: white;
       font-size: 10px;
       font-weight: 800;
-      padding: 3px 14px;
+      padding: 4px 14px;
       border-radius: 50px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
       white-space: nowrap;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      box-shadow: 0 4px 14px rgba(255,107,0,0.5);
     }
-    .check-circle {
+    .plano-icon { font-size: 28px; margin-bottom: 10px; }
+    .plano-mesas { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4); margin-bottom: 12px; }
+    .plano-preco { font-size: 34px; font-weight: 900; color: var(--primary); line-height: 1; text-shadow: 0 0 20px rgba(255,107,0,0.3); }
+    .plano-periodo { font-size: 11px; color: rgba(255,255,255,0.25); margin-top: 2px; }
+    .plano-features { list-style: none; margin-top: 16px; display: flex; flex-direction: column; gap: 5px; }
+    .plano-features li { font-size: 11px; color: rgba(255,255,255,0.4); }
+
+    /* ─── DEPOIMENTOS ─── */
+    .depoimentos {
+      background: var(--dark2);
+      padding: 90px 24px;
+      text-align: center;
+      border-top: 1px solid rgba(255,107,0,0.08);
+      border-bottom: 1px solid rgba(255,107,0,0.08);
+    }
+    .depoimentos-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      max-width: 960px;
+      margin: 0 auto;
+      text-align: left;
+    }
+    @media (max-width: 800px) { .depoimentos-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 1100px) and (min-width: 801px) { .depoimentos-grid { grid-template-columns: repeat(2, 1fr); } }
+    .depoimento-card {
+      background: #160C02;
+      border: 1.5px solid rgba(255,107,0,0.1);
+      border-radius: 18px;
+      padding: 24px 22px;
+      position: relative;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .depoimento-card:hover {
+      border-color: rgba(255,107,0,0.25);
+      box-shadow: 0 8px 32px rgba(255,107,0,0.08);
+    }
+    .depoimento-card::before {
+      content: '"';
       position: absolute;
-      top: 13px;
-      right: 13px;
-      width: 24px;
-      height: 24px;
+      top: 12px;
+      right: 18px;
+      font-family: var(--font2);
+      font-size: 72px;
+      color: rgba(255,107,0,0.12);
+      line-height: 1;
+    }
+    .depoimento-stars {
+      color: var(--gold);
+      font-size: 14px;
+      letter-spacing: 2px;
+      margin-bottom: 12px;
+      text-shadow: 0 0 10px rgba(255,184,0,0.4);
+    }
+    .depoimento-texto {
+      font-size: 13px;
+      color: rgba(255,255,255,0.55);
+      line-height: 1.75;
+      margin-bottom: 18px;
+    }
+    .depoimento-autor {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .depoimento-avatar {
+      width: 60px;
+      height: 60px;
       border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
       border: 2px solid var(--border);
+    }
+    .depoimento-info strong {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: #FFFFFF;
+    }
+    .depoimento-info span {
+      font-size: 11px;
+      color: rgba(255,255,255,0.35);
+    }
+
+    /* ─── FORM CONTAINER ─── */
+    .form-wrap {
+      max-width: 700px;
+      margin: -50px auto 0;
+      padding: 0 20px 80px;
+      position: relative;
+      z-index: 10;
+      background: var(--dark);
+    }
+    .form-card {
+      background: var(--surface);
+      border-radius: 24px;
+      padding: 44px 40px;
+      box-shadow: 0 12px 60px rgba(0,0,0,0.13);
+      border: 1.5px solid var(--border);
+    }
+    @media (max-width: 600px) { .form-card { padding: 28px 20px; } }
+
+    .form-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 8px;
+    }
+    .form-header-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--primary), var(--gold));
+      border-radius: 13px;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.2s;
-      background: var(--bg);
-    }
-    .plano-card.selected .check-circle {
-      background: var(--primary);
-      border-color: var(--primary);
-    }
-    .plano-card.selected .check-circle::after {
-      content: '';
-      width: 10px;
-      height: 6px;
-      border-left: 2.5px solid white;
-      border-bottom: 2.5px solid white;
-      transform: rotate(-45deg) translateY(-1px);
-      display: block;
-    }
-    .plano-nome { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
-    .plano-preco { margin: 14px 0 16px; }
-    .plano-valor { font-size: 32px; font-weight: 800; color: var(--primary); line-height: 1; }
-    .plano-periodo { font-size: 12px; color: var(--text3); margin-top: 2px; }
-    .plano-features {
-      list-style: none;
-      text-align: left;
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-    }
-    .plano-features li {
-      font-size: 12px;
-      color: var(--text2);
-      display: flex;
-      align-items: flex-start;
-      gap: 7px;
-      line-height: 1.4;
-    }
-    .plano-features li::before {
-      content: '✓';
-      color: var(--success);
-      font-weight: 800;
-      font-size: 11px;
+      font-size: 22px;
       flex-shrink: 0;
-      margin-top: 1px;
     }
+    .form-title { font-size: 22px; font-weight: 800; color: var(--dark); }
+    .form-subtitle { font-size: 13px; color: var(--text3); margin-bottom: 32px; margin-top: 4px; }
 
-    /* ===== PAGAMENTO ===== */
-    .pagto-ok {
-      text-align: center;
-      padding: 16px 0 32px;
-      border-bottom: 2px solid var(--border);
-      margin-bottom: 28px;
-    }
-    .pagto-ok-icon { font-size: 54px; display: block; margin-bottom: 10px; }
-    .pagto-ok h2 { font-size: 24px; font-weight: 800; color: var(--success); margin-bottom: 6px; }
-    .pagto-ok p { font-size: 14px; color: var(--text2); }
-
-    .resumo-plano {
-      background: var(--success-light);
-      border: 2px solid rgba(14,166,84,0.2);
-      border-radius: 14px;
-      padding: 18px 22px;
+    .form-section-title {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--primary);
+      margin: 32px 0 16px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      margin-bottom: 28px;
-      gap: 12px;
-      flex-wrap: wrap;
+      gap: 8px;
     }
-    .resumo-info h3 { font-size: 16px; font-weight: 700; color: var(--text); }
-    .resumo-info p { font-size: 13px; color: var(--text2); margin-top: 3px; }
-    .resumo-preco { font-size: 28px; font-weight: 800; color: var(--success); white-space: nowrap; }
-    .resumo-preco small { font-size: 13px; font-weight: 500; color: var(--text3); }
-
-    /* TABS */
-    .tabs {
-      display: flex;
-      border: 2px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
-      margin-bottom: 24px;
-    }
-    .tab-btn {
+    .form-section-title::after {
+      content: '';
       flex: 1;
-      padding: 12px 16px;
-      background: none;
-      border: none;
-      font-family: var(--font);
-      font-size: 14px;
+      height: 1px;
+      background: var(--border);
+    }
+    .form-section-title:first-of-type { margin-top: 0; }
+
+    .form-group { margin-bottom: 18px; }
+    .form-group label {
+      display: block;
+      font-size: 13px;
       font-weight: 600;
-      color: var(--text3);
+      color: var(--text2);
+      margin-bottom: 7px;
+    }
+    .form-group label span { color: var(--primary); }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      border: 2px solid var(--border);
+      border-radius: 11px;
+      padding: 12px 14px;
+      font-size: 14px;
+      font-family: var(--font);
+      color: var(--text);
+      background: var(--surface);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(255,107,0,0.1);
+    }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    .form-group small { display: block; font-size: 11px; color: var(--text3); margin-top: 5px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 500px) { .form-row { grid-template-columns: 1fr; } }
+
+    .tipos-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    @media (max-width: 500px) { .tipos-grid { grid-template-columns: repeat(2, 1fr); } }
+    .tipo-btn {
+      border: 2px solid var(--border);
+      background: var(--surface2);
+      border-radius: 12px;
+      padding: 12px 8px;
+      text-align: center;
       cursor: pointer;
       transition: all 0.2s;
+      font-family: var(--font);
     }
-    .tab-btn:not(:last-child) { border-right: 2px solid var(--border); }
-    .tab-btn.active { background: var(--primary); color: white; }
-    .tab-pane { display: none; }
-    .tab-pane.active { display: block; animation: fadeUp 0.3s; }
+    .tipo-btn:hover { border-color: var(--primary-light); background: #FFF5EE; }
+    .tipo-btn.selected { border-color: var(--primary); background: #FFF5EE; box-shadow: 0 0 0 3px rgba(255,107,0,0.1); }
+    .tipo-btn input { display: none; }
+    .tipo-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 12px;
+      object-fit: cover;
+      display: block;
+      margin: 0 auto 8px;
+      border: 2px solid transparent;
+      transition: border-color 0.2s;
+    }
+    .tipo-btn.selected .tipo-icon { border-color: var(--primary); }
+    .tipo-label { font-size: 11px; font-weight: 600; color: var(--text2); }
+    .tipo-btn.selected .tipo-label { color: var(--primary); }
 
-    /* PIX */
-    .pix-box {
-      background: var(--bg);
-      border: 2px dashed rgba(50,188,173,0.4);
-      border-radius: 14px;
+    .horario-grid { display: flex; flex-direction: column; gap: 8px; }
+    .horario-row {
+      display: grid;
+      grid-template-columns: 100px 1fr 1fr;
+      gap: 8px;
+      align-items: center;
+    }
+    .horario-dia { font-size: 12px; font-weight: 600; color: var(--text2); }
+    .horario-row input[type="time"] { padding: 8px 10px; font-size: 13px; }
+    @media (max-width: 500px) { .horario-row { grid-template-columns: 80px 1fr 1fr; } }
+
+    .senha-wrap { position: relative; }
+    .senha-wrap input { padding-right: 44px; }
+    .btn-toggle-senha {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      color: var(--text3);
+      padding: 4px;
+    }
+
+    .plano-resultado {
+      background: linear-gradient(135deg, #FFF5EE, #FFF8F2);
+      border: 2px solid var(--primary);
+      border-radius: 13px;
+      padding: 14px 16px;
+      margin-top: 12px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .plano-resultado.show { display: flex; }
+    .plano-resultado-info strong { display: block; font-size: 15px; font-weight: 800; color: var(--dark); }
+    .plano-resultado-info span { font-size: 12px; color: var(--text3); }
+    .plano-resultado-preco { font-size: 24px; font-weight: 900; color: var(--primary); white-space: nowrap; }
+
+    .btn-submit {
+      width: 100%;
+      background: linear-gradient(135deg, #FF6B00, #FF9A35);
+      color: white;
+      border: none;
+      border-radius: 13px;
+      padding: 18px;
+      font-size: 16px;
+      font-weight: 900;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all 0.25s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 32px;
+      box-shadow: 0 8px 32px rgba(255,107,0,0.55), 0 0 0 1px rgba(255,107,0,0.2);
+      letter-spacing: 0.3px;
+    }
+    .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 14px 44px rgba(255,107,0,0.65), 0 0 0 1px rgba(255,107,0,0.3); }
+    .btn-submit:disabled { background: #ddd; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-submit .spinner {
+      width: 20px; height: 20px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+    .btn-submit.loading .spinner { display: block; }
+    .btn-submit.loading .btn-text { display: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .ja-tem-conta {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 13px;
+      color: var(--text3);
+    }
+    .ja-tem-conta a { color: var(--primary); font-weight: 700; text-decoration: none; }
+    .ja-tem-conta a:hover { text-decoration: underline; }
+
+    /* ─── FORM TRUST ─── */
+    .form-trust {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      margin-top: 22px;
+      flex-wrap: wrap;
+    }
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      color: var(--text3);
+      font-weight: 500;
+    }
+
+    /* ─── SUCCESS OVERLAY ─── */
+    .success-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15,7,0,0.94);
+      z-index: 999;
+      display: none;
+      align-items: center;
+      justify-content: center;
       padding: 24px;
     }
-    .pix-label {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--pix);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      margin-bottom: 12px;
+    .success-overlay.show { display: flex; }
+    .success-box {
+      background: var(--surface);
+      border-radius: 24px;
+      padding: 44px 36px;
+      max-width: 480px;
+      width: 100%;
       text-align: center;
     }
-    .pix-chave-wrap {
-      background: white;
-      border: 2px solid var(--border);
-      border-radius: 10px;
-      padding: 14px 16px;
+    .success-icon { font-size: 64px; margin-bottom: 16px; }
+    .success-box h2 { font-size: 24px; font-weight: 800; color: var(--dark); margin-bottom: 8px; }
+    .success-box p { font-size: 14px; color: var(--text2); line-height: 1.7; margin-bottom: 24px; }
+    .success-links { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+    .success-link {
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      text-align: left;
+    }
+    .success-link label { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 3px; }
+    .success-link span { font-size: 12px; color: var(--primary); word-break: break-all; font-weight: 600; }
+    .btn-whats {
+      width: 100%;
+      background: #25D366;
+      color: white;
+      border: none;
+      border-radius: 13px;
+      padding: 15px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: var(--font);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 6px 20px rgba(37,211,102,0.35);
+      transition: background 0.2s;
+    }
+    .btn-whats:hover { background: #1ebe5a; }
+
+    /* ─── SETUP BANNER ─── */
+    .setup-banner {
+      background: #fff3cd;
+      border-bottom: 3px solid #f0a500;
+      padding: 14px 20px;
+      text-align: center;
+      font-size: 13px;
+      color: #7a5900;
+      display: none;
+    }
+    .setup-banner.show { display: block; }
+    .setup-banner strong { font-weight: 700; }
+    .btn-setup {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #f0a500;
+      color: #1A0F00;
+      border: none;
+      border-radius: 8px;
+      padding: 7px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: var(--font);
+      margin-top: 8px;
+      text-decoration: none;
+    }
+
+    /* ─── FOOTER ─── */
+    .site-footer {
+      background: #040200;
+      color: rgba(255,255,255,0.6);
+      padding: 56px 24px 32px;
+      border-top: 1px solid rgba(255,107,0,0.1);
+    }
+    .footer-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .footer-top {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 44px;
+    }
+    @media (max-width: 720px) { .footer-top { grid-template-columns: 1fr; gap: 28px; } }
+    .footer-brand {}
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .footer-logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #FF6B00, #FFB800);
+      border-radius: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .footer-logo-text {
+      font-size: 21px;
+      font-weight: 900;
+      color: white;
+    }
+    .footer-logo-text span { color: var(--primary); }
+    .footer-desc {
+      font-size: 13px;
+      line-height: 1.7;
+      max-width: 280px;
+      margin-bottom: 20px;
+    }
+    .footer-social {
+      display: flex;
+      gap: 10px;
+    }
+    .footer-social a {
+      width: 36px;
+      height: 36px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .footer-social a:hover { background: rgba(255,107,0,0.25); }
+    .footer-col h4 {
+      font-size: 12px;
+      font-weight: 800;
+      color: white;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 16px;
+    }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-col ul li a {
+      font-size: 13px;
+      color: rgba(255,255,255,0.55);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-col ul li a:hover { color: var(--primary); }
+    .footer-whats {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(37,211,102,0.12);
+      border: 1px solid rgba(37,211,102,0.25);
+      color: #25D366;
+      padding: 9px 16px;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      margin-bottom: 12px;
+      transition: background 0.2s;
+      display: flex;
+    }
+    .footer-whats:hover { background: rgba(37,211,102,0.22); }
+    .footer-contact-item {
+      font-size: 12px;
+      color: rgba(255,255,255,0.45);
+      margin-top: 8px;
+    }
+    .footer-divider {
+      border: none;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 22px;
+    }
+    .footer-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .footer-copy {
+      font-size: 12px;
+      color: rgba(255,255,255,0.3);
+    }
+    .footer-badges {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .footer-badge {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.35);
+      padding: 4px 10px;
+      border-radius: 5px;
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    /* ─── PAYMENT OVERLAY ─── */
+    .payment-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15,7,0,0.96);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .payment-overlay.show { display: flex; }
+    .payment-box {
+      background: var(--surface);
+      border-radius: 24px;
+      padding: 40px 36px;
+      max-width: 460px;
+      width: 100%;
+      text-align: center;
+    }
+    @media (max-width: 500px) { .payment-box { padding: 28px 20px; } }
+    .payment-icon { font-size: 52px; margin-bottom: 12px; }
+    .payment-box h2 { font-size: 22px; font-weight: 800; color: var(--dark); margin-bottom: 6px; }
+    .payment-box > p { font-size: 14px; color: var(--text2); line-height: 1.6; margin-bottom: 24px; }
+
+    .payment-resumo {
+      background: linear-gradient(135deg, #FFF5EE, #FFF8F2);
+      border: 2px solid var(--primary);
+      border-radius: 14px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
+      text-align: left;
+    }
+    .payment-resumo-nome { font-size: 15px; font-weight: 800; color: var(--dark); }
+    .payment-resumo-desc { font-size: 12px; color: var(--text3); margin-top: 2px; }
+    .payment-resumo-preco { font-size: 26px; font-weight: 900; color: var(--primary); white-space: nowrap; }
+    .payment-resumo-preco small { font-size: 12px; font-weight: 500; color: var(--text3); }
+
+    .payment-pix-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 1px;
       margin-bottom: 10px;
     }
-    .pix-chave-val {
+    .payment-pix-box {
+      background: var(--surface2);
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .payment-pix-chave {
+      flex: 1;
       font-size: 15px;
       font-weight: 700;
-      color: var(--text);
+      color: var(--dark);
       word-break: break-all;
-      flex: 1;
+      text-align: left;
     }
-    .btn-copy {
+    .btn-copy-pix {
       background: var(--primary);
       color: white;
       border: none;
@@ -385,511 +1019,829 @@
       cursor: pointer;
       font-family: var(--font);
       flex-shrink: 0;
-      transition: all 0.2s;
+      transition: background 0.2s;
       white-space: nowrap;
     }
-    .btn-copy:hover { background: var(--primary-dark); }
-    .btn-copy.copied { background: var(--success); }
-    .pix-nome { font-size: 13px; color: var(--text2); text-align: center; }
-
-    /* CARTÃO */
-    .cartao-box { text-align: center; padding: 28px 20px; }
-    .cartao-box p { font-size: 14px; color: var(--text2); margin-bottom: 20px; line-height: 1.6; }
-    .btn-mp {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      background: var(--mp);
-      color: white;
-      border: none;
-      border-radius: 12px;
-      padding: 15px 32px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: var(--font);
-      text-decoration: none;
-      transition: all 0.2s;
-    }
-    .btn-mp:hover { background: #007BB5; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,158,227,0.3); }
-
-    /* INSTRUÇÃO */
-    .instrucao {
-      background: rgba(232,66,10,0.05);
-      border: 2px solid rgba(232,66,10,0.15);
-      border-radius: 14px;
-      padding: 18px 22px;
-      margin-top: 24px;
+    .btn-copy-pix:hover { background: var(--primary-dark); }
+    .btn-copy-pix.copied { background: var(--success); }
+    .payment-pix-nome {
+      font-size: 12px;
+      color: var(--text3);
       margin-bottom: 24px;
     }
-    .instrucao h4 { font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 6px; }
-    .instrucao p { font-size: 13px; color: var(--text2); line-height: 1.65; }
 
-    /* BTN WHATSAPP */
-    .btn-whatsapp {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
+    .payment-instrucao {
+      background: #FFF5EE;
+      border: 1.5px solid rgba(255,107,0,0.2);
+      border-radius: 11px;
+      padding: 14px 16px;
+      font-size: 13px;
+      color: var(--text2);
+      line-height: 1.6;
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .btn-payment-whats {
       width: 100%;
       background: #25D366;
       color: white;
       border: none;
-      border-radius: 14px;
-      padding: 18px 24px;
-      font-size: 17px;
-      font-weight: 700;
+      border-radius: 13px;
+      padding: 16px;
+      font-size: 15px;
+      font-weight: 800;
       cursor: pointer;
       font-family: var(--font);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 6px 20px rgba(37,211,102,0.35);
+      transition: background 0.2s;
       text-decoration: none;
-      transition: all 0.2s;
     }
-    .btn-whatsapp:hover { background: #1AAD55; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(37,211,102,0.3); }
-
-    /* TOAST */
-    .toast {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      background: #1A1A2E;
-      color: white;
-      padding: 12px 22px;
-      border-radius: 50px;
-      font-size: 14px;
-      font-weight: 500;
-      z-index: 500;
-      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s;
-      opacity: 0;
-      pointer-events: none;
-      white-space: nowrap;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-      border-left: 4px solid var(--primary);
-    }
-    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-
-    /* ===== RESPONSIVO ===== */
-    @media (max-width: 640px) {
-      .form-row { grid-template-columns: 1fr; }
-      .planos-grid { grid-template-columns: 1fr; }
-      .card { padding: 24px 18px; }
-      .main { padding: 24px 14px 60px; }
-      .btn-wrap { flex-direction: column-reverse; }
-      .btn-primary, .btn-outline { width: 100%; justify-content: center; text-align: center; }
-      .steps { gap: 0; }
-      .step-connector { min-width: 20px; }
-    }
+    .btn-payment-whats:hover { background: #1ebe5a; }
   </style>
 </head>
 <body>
 
-  <!-- ===== HEADER ===== -->
-  <header class="header">
-    <div class="header-inner">
-      <div class="logo">
-        <span class="logo-icon">🍽️</span>
+  <!-- BANNER SETUP -->
+  <div class="setup-banner" id="setupBanner">
+    ⚠️ <strong>Configuração necessária:</strong> As tabelas do Supabase ainda não foram criadas.
+    <br/>
+    <a class="btn-setup" href="https://supabase.com/dashboard/project/zigghtvlmftgjlohuhla/sql/new" target="_blank">
+      🔧 Abrir SQL Editor do Supabase
+    </a>
+    &nbsp;
+    <button class="btn-setup" id="btnCopiarSQL" style="background:#1A0F00;color:white;">
+      📋 Copiar SQL
+    </button>
+  </div>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a class="nav-logo" href="#">
+      <div class="nav-logo-icon">🍴</div>
+      <span class="nav-logo-text">Cardápio<span>Pro</span></span>
+    </a>
+    <a class="nav-cta" href="#form-section">Criar Cardápio →</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-eyebrow">
+      ⚡ Mais de 800 restaurantes ativos
+    </div>
+    <div class="hero-brand">
+      <div class="hero-brand-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18.06 22.99h1.66c.84 0 1.53-.64 1.63-1.46L23 5.05h-5V1h-1.97v4.05h-4.97l.3 2.34c1.71.47 3.31 1.32 4.27 2.26 1.44 1.42 2.43 2.89 2.43 5.29v8.05zM1 21.99V21h15.03v.99c0 .55-.45 1-1.01 1H2.01c-.56 0-1.01-.45-1.01-1zm15.03-7c0-8-15.03-8-15.03 0h15.03zM1.02 17h15v2h-15z"/>
+        </svg>
+      </div>
+      <div class="hero-brand-name">
+        <h2>Cardápio<span>Pro</span></h2>
+        <p>Cardápio digital para restaurantes</p>
+      </div>
+    </div>
+
+    <h1>Digitalize seu restaurante<br/><em>em 5 minutos</em></h1>
+    <p class="hero-sub">Cardápio online com QR Code por mesa, pedidos pelo WhatsApp, pagamentos integrados e painel de gestão completo. Sem mensalidade alta, sem contrato.</p>
+
+    <div class="hero-cta-group">
+      <a class="btn-hero-primary" href="#form-section">
+        🚀 Criar Meu Cardápio Agora
+      </a>
+      <a class="btn-hero-secondary" href="#como-funciona">
+        ▶ Ver como funciona
+      </a>
+    </div>
+
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-num"><span>+</span>800</div>
+        <div class="hero-stat-label">Restaurantes</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num"><span>R$</span>47</div>
+        <div class="hero-stat-label">A partir de/mês</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">5<span>min</span></div>
+        <div class="hero-stat-label">Para publicar</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">4.9<span>★</span></div>
+        <div class="hero-stat-label">Avaliação</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMO FUNCIONA -->
+  <section class="como-funciona" id="como-funciona">
+    <div class="section-tag">Como funciona</div>
+    <h2 class="section-title">Simples assim em 3 passos</h2>
+    <p class="section-sub">Do cadastro ao cardápio online em menos de 5 minutos. Sem precisar de técnico ou agência.</p>
+    <div class="steps-grid">
+      <div class="step">
+        <div class="step-num">📝</div>
+        <h3>Cadastre seu restaurante</h3>
+        <p>Preencha os dados do seu estabelecimento, escolha seu plano e crie sua senha de acesso.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">🍽️</div>
+        <h3>Adicione seu cardápio</h3>
+        <p>No painel admin, cadastre categorias, pratos, preços e fotos. Tudo de forma simples e rápida.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">📲</div>
+        <h3>Compartilhe o QR Code</h3>
+        <p>Imprima os QR Codes por mesa e comece a receber pedidos e pagamentos digitais imediatamente.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLANOS -->
+  <section class="planos-section">
+    <div class="section-tag">Planos e preços</div>
+    <h2 class="section-title">Escolha o plano ideal</h2>
+    <p class="section-sub">Por número de mesas. Sem taxa de setup, sem multa de saída.</p>
+    <div class="planos-grid">
+
+      <div class="plano-card" data-mesas="5">
+        <div class="plano-icon">🌱</div>
+        <div class="plano-mesas">Até 5 mesas</div>
+        <div class="plano-preco">R$ 47</div>
+        <div class="plano-periodo">/mês</div>
+        <ul class="plano-features">
+          <li>✅ Cardápio digital</li>
+          <li>✅ QR Code por mesa</li>
+          <li>✅ Pagamentos</li>
+          <li>✅ Painel admin</li>
+        </ul>
+      </div>
+
+      <div class="plano-card popular" data-mesas="8">
+        <div class="plano-popular-badge">⭐ MAIS POPULAR</div>
+        <div class="plano-icon">🔥</div>
+        <div class="plano-mesas">6 a 10 mesas</div>
+        <div class="plano-preco">R$ 77</div>
+        <div class="plano-periodo">/mês</div>
+        <ul class="plano-features">
+          <li>✅ Cardápio digital</li>
+          <li>✅ QR Code por mesa</li>
+          <li>✅ Pagamentos</li>
+          <li>✅ Painel admin</li>
+          <li>✅ Pedidos por mesa</li>
+        </ul>
+      </div>
+
+      <div class="plano-card" data-mesas="15">
+        <div class="plano-icon">🚀</div>
+        <div class="plano-mesas">11 a 20 mesas</div>
+        <div class="plano-preco">R$ 117</div>
+        <div class="plano-periodo">/mês</div>
+        <ul class="plano-features">
+          <li>✅ Cardápio digital</li>
+          <li>✅ QR Code por mesa</li>
+          <li>✅ Pagamentos</li>
+          <li>✅ Painel admin</li>
+          <li>✅ Pedidos por mesa</li>
+        </ul>
+      </div>
+
+      <div class="plano-card" data-mesas="30">
+        <div class="plano-icon">💼</div>
+        <div class="plano-mesas">21 a 50 mesas</div>
+        <div class="plano-preco">R$ 187</div>
+        <div class="plano-periodo">/mês</div>
+        <ul class="plano-features">
+          <li>✅ Cardápio digital</li>
+          <li>✅ QR Code por mesa</li>
+          <li>✅ Pagamentos</li>
+          <li>✅ Painel admin</li>
+          <li>✅ Pedidos por mesa</li>
+        </ul>
+      </div>
+
+      <div class="plano-card" data-mesas="60">
+        <div class="plano-icon">🏆</div>
+        <div class="plano-mesas">Acima de 50 mesas</div>
+        <div class="plano-preco">R$ 247</div>
+        <div class="plano-periodo">/mês</div>
+        <ul class="plano-features">
+          <li>✅ Cardápio digital</li>
+          <li>✅ QR Code por mesa</li>
+          <li>✅ Pagamentos</li>
+          <li>✅ Painel admin</li>
+          <li>✅ Pedidos por mesa</li>
+          <li>✅ Suporte prioritário</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- DEPOIMENTOS -->
+  <section class="depoimentos">
+    <div class="section-tag">Depoimentos</div>
+    <h2 class="section-title">Quem já usa CardápioPro</h2>
+    <p class="section-sub">Mais de 800 restaurantes em todo o Brasil confiam na nossa plataforma.</p>
+    <div class="depoimentos-grid">
+
+      <div class="depoimento-card">
+        <div class="depoimento-stars">★★★★★</div>
+        <p class="depoimento-texto">Em menos de 10 minutos meu cardápio já estava no ar. Os clientes adoraram poder pedir pelo celular diretamente na mesa. As vendas aumentaram 30% no primeiro mês!</p>
+        <div class="depoimento-autor">
+          <img class="depoimento-avatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop&auto=format&q=80" alt="Carlos Mendes" />
+          <div class="depoimento-info">
+            <strong>Carlos Mendes</strong>
+            <span>Restaurante Sabor da Terra · SP</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="depoimento-card">
+        <div class="depoimento-stars">★★★★★</div>
+        <p class="depoimento-texto">Tentei outras plataformas mas eram caras e complicadas. O CardápioPro é exatamente o que precisava: simples, bonito e com preço justo para o meu bar.</p>
+        <div class="depoimento-autor">
+          <img class="depoimento-avatar" src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=120&h=120&fit=crop&auto=format&q=80" alt="Fernanda Rocha" />
+          <div class="depoimento-info">
+            <strong>Fernanda Rocha</strong>
+            <span>Bar da Fernanda · RJ</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="depoimento-card">
+        <div class="depoimento-stars">★★★★★</div>
+        <p class="depoimento-texto">O painel admin é muito intuitivo. Consigo atualizar preços e disponibilidade dos pratos em tempo real, sem depender de ninguém. Recomendo demais!</p>
+        <div class="depoimento-autor">
+          <img class="depoimento-avatar" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&h=120&fit=crop&auto=format&q=80" alt="Rafael Lemos" />
+          <div class="depoimento-info">
+            <strong>Rafael Lemos</strong>
+            <span>Pizzaria Bella Vista · MG</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FORM -->
+  <div class="form-wrap" id="form-section">
+    <div class="form-card">
+
+      <div class="form-header">
+        <div class="form-header-icon">📋</div>
         <div>
-          <span class="logo-title">Cardápio Digital</span>
-          <span class="logo-sub">Crie o seu agora</span>
+          <h2 class="form-title">Cadastre seu estabelecimento</h2>
         </div>
       </div>
-      <a href="index.html" class="btn-back">← Voltar ao site</a>
-    </div>
-  </header>
+      <p class="form-subtitle">Preencha os dados abaixo e receba o link do seu cardápio na hora.</p>
 
-  <main class="main">
+      <form id="formCadastro" novalidate>
 
-    <!-- ===== PROGRESS ===== -->
-    <div class="progress-wrap">
-      <div class="steps">
-        <div class="step-item active" id="si-1">
-          <div class="step-num" id="sn-1">1</div>
-          <span class="step-label">Seus dados</span>
+        <p class="form-section-title">Dados do Estabelecimento</p>
+
+        <div class="form-group">
+          <label>Nome do restaurante <span>*</span></label>
+          <input type="text" id="nomeRestaurante" placeholder="Ex: Pizzaria do Zé" required />
         </div>
-        <div class="step-connector" id="sc-1"></div>
-        <div class="step-item" id="si-2">
-          <div class="step-num" id="sn-2">2</div>
-          <span class="step-label">Plano</span>
+
+        <div class="form-group">
+          <label>Tipo de estabelecimento <span>*</span></label>
+          <div class="tipos-grid" id="tiposGrid">
+            <label class="tipo-btn">
+              <input type="radio" name="tipo" value="Restaurante" />
+              <img class="tipo-icon" src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=120&h=120&fit=crop&auto=format&q=80" alt="Restaurante" />
+              <span class="tipo-label">Restaurante</span>
+            </label>
+            <label class="tipo-btn">
+              <input type="radio" name="tipo" value="Bar" />
+              <img class="tipo-icon" src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=120&h=120&fit=crop&auto=format&q=80" alt="Bar" />
+              <span class="tipo-label">Bar</span>
+            </label>
+            <label class="tipo-btn">
+              <input type="radio" name="tipo" value="Lanchonete" />
+              <img class="tipo-icon" src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=120&h=120&fit=crop&auto=format&q=80" alt="Lanchonete" />
+              <span class="tipo-label">Lanchonete</span>
+            </label>
+            <label class="tipo-btn">
+              <input type="radio" name="tipo" value="Pizzaria" />
+              <img class="tipo-icon" src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=120&h=120&fit=crop&auto=format&q=80" alt="Pizzaria" />
+              <span class="tipo-label">Pizzaria</span>
+            </label>
+            <label class="tipo-btn">
+              <input type="radio" name="tipo" value="Hamburgueria" />
+              <img class="tipo-icon" src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=120&h=120&fit=crop&auto=format&q=80" alt="Hamburgueria" />
+              <span class="tipo-label">Hamburgueria</span>
+            </label>
+            <label class="tipo-btn">
+              <input type="radio" name="tipo" value="Cafeteria" />
+              <img class="tipo-icon" src="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=120&h=120&fit=crop&auto=format&q=80" alt="Cafeteria" />
+              <span class="tipo-label">Cafeteria</span>
+            </label>
+          </div>
         </div>
-        <div class="step-connector" id="sc-2"></div>
-        <div class="step-item" id="si-3">
-          <div class="step-num" id="sn-3">3</div>
-          <span class="step-label">Pagamento</span>
+
+        <div class="form-group">
+          <label>Endereço</label>
+          <input type="text" id="endereco" placeholder="Rua, número, bairro, cidade" />
         </div>
+
+        <div class="form-group">
+          <label>Quantas mesas tem seu estabelecimento? <span>*</span></label>
+          <input type="number" id="numMesas" min="1" max="500" placeholder="Ex: 10" required />
+          <small>Usamos esse número para calcular seu plano automaticamente.</small>
+          <div class="plano-resultado" id="planoResultado">
+            <div class="plano-resultado-info">
+              <strong id="planoNome">—</strong>
+              <span id="planoDesc">—</span>
+            </div>
+            <div class="plano-resultado-preco" id="planoPreco">—</div>
+          </div>
+        </div>
+
+        <p class="form-section-title">Horário de Funcionamento</p>
+
+        <div class="form-group">
+          <div class="horario-grid" id="horarioGrid">
+            <div class="horario-row">
+              <span class="horario-dia">Seg – Sex</span>
+              <input type="time" id="h1_open" value="11:00" />
+              <input type="time" id="h1_close" value="23:00" />
+            </div>
+            <div class="horario-row">
+              <span class="horario-dia">Sábado</span>
+              <input type="time" id="h2_open" value="11:00" />
+              <input type="time" id="h2_close" value="00:00" />
+            </div>
+            <div class="horario-row">
+              <span class="horario-dia">Domingo</span>
+              <input type="time" id="h3_open" value="11:00" />
+              <input type="time" id="h3_close" value="22:00" />
+            </div>
+          </div>
+          <small>Horário de abertura e fechamento para cada período</small>
+        </div>
+
+        <p class="form-section-title">Dados do Responsável</p>
+
+        <div class="form-group">
+          <label>Nome do responsável <span>*</span></label>
+          <input type="text" id="nomeResponsavel" placeholder="Seu nome completo" required />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>WhatsApp <span>*</span></label>
+            <input type="tel" id="telefone" placeholder="(11) 99999-9999" required />
+            <small>Enviaremos o link por aqui</small>
+          </div>
+          <div class="form-group">
+            <label>E-mail</label>
+            <input type="email" id="email" placeholder="seu@email.com" />
+          </div>
+        </div>
+
+        <p class="form-section-title">Acesso ao Admin</p>
+
+        <div class="form-group">
+          <label>Senha de acesso ao painel <span>*</span></label>
+          <div class="senha-wrap">
+            <input type="password" id="senhaAdmin" placeholder="Crie uma senha forte" required />
+            <button type="button" class="btn-toggle-senha" id="btnToggleSenha">👁️</button>
+          </div>
+          <small>Mínimo 6 caracteres. Use essa senha para acessar o painel admin.</small>
+        </div>
+
+        <div id="erroMsg" style="color:#e74c3c;font-size:13px;font-weight:600;margin-top:8px;display:none;"></div>
+
+        <button type="submit" class="btn-submit" id="btnSubmit">
+          <div class="spinner"></div>
+          <span class="btn-text">🚀 Criar Meu Cardápio Digital Grátis</span>
+        </button>
+
+      </form>
+
+      <p class="ja-tem-conta">Já tem cadastro? <a href="login.html">Entrar no Admin</a></p>
+
+      <div class="form-trust">
+        <span class="trust-item">🔒 Dados protegidos</span>
+        <span class="trust-item">✅ Sem fidelidade</span>
+        <span class="trust-item">⚡ Ativação imediata</span>
+        <span class="trust-item">💬 Suporte via WhatsApp</span>
       </div>
     </div>
+  </div>
 
-    <!-- ===== ETAPA 1: DADOS ===== -->
-    <div class="step-content active" id="step-1">
-      <div class="card">
-        <h2 class="card-title">📋 Dados do Estabelecimento</h2>
-        <p class="card-sub">Preencha as informações do seu negócio para criar seu cardápio digital</p>
-        <form id="formDados" novalidate>
-          <div class="form-row">
-            <div class="field">
-              <label>Nome do Estabelecimento *</label>
-              <input type="text" id="d-nome" placeholder="Ex: Restaurante Sabor & Arte"/>
-            </div>
-            <div class="field">
-              <label>Segmento *</label>
-              <select id="d-segmento">
-                <option value="">Selecione...</option>
-                <option>Restaurante</option>
-                <option>Pizzaria</option>
-                <option>Lanchonete</option>
-                <option>Hamburgueria</option>
-                <option>Bar</option>
-                <option>Cafeteria</option>
-                <option>Padaria</option>
-                <option>Sorveteria</option>
-                <option>Açaí</option>
-                <option>Marmitaria</option>
-                <option>Outro</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="field">
-              <label>Nome do Responsável *</label>
-              <input type="text" id="d-responsavel" placeholder="Seu nome completo"/>
-            </div>
-            <div class="field">
-              <label>WhatsApp (com DDD) *</label>
-              <input type="tel" id="d-whatsapp" placeholder="(11) 99999-9999"/>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="field">
-              <label>E-mail *</label>
-              <input type="email" id="d-email" placeholder="seuemail@exemplo.com"/>
-            </div>
-            <div class="field">
-              <label>Cidade / Estado *</label>
-              <input type="text" id="d-cidade" placeholder="São Paulo - SP"/>
-            </div>
-          </div>
-          <div class="btn-wrap">
-            <button type="submit" class="btn-primary">Próximo — Escolher Plano →</button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- ===== ETAPA 2: PLANO ===== -->
-    <div class="step-content" id="step-2">
-      <div class="card">
-        <h2 class="card-title">💎 Escolha o Plano</h2>
-        <p class="card-sub">Selecione o plano ideal para o seu negócio. Sem fidelidade, cancele quando quiser.</p>
-        <div class="planos-grid" id="planosGrid"></div>
-        <div class="btn-wrap">
-          <button type="button" class="btn-outline" id="btnVoltarStep1">← Voltar</button>
-          <button type="button" class="btn-primary" id="btnCadastrar">Cadastrar e Ir para Pagamento →</button>
+  <!-- SUCCESS OVERLAY -->
+  <div class="success-overlay" id="successOverlay">
+    <div class="success-box">
+      <div class="success-icon">🎉</div>
+      <h2>Cardápio criado com sucesso!</h2>
+      <p>Salve os links abaixo. Enviamos também pelo WhatsApp para facilitar o acesso.</p>
+      <div class="success-links">
+        <div class="success-link">
+          <label>🔗 Link do Cardápio (para os clientes)</label>
+          <span id="linkCardapio">—</span>
+        </div>
+        <div class="success-link">
+          <label>⚙️ Link do Admin (só para você)</label>
+          <span id="linkAdmin">—</span>
         </div>
       </div>
+      <button class="btn-whats" id="btnWhatsSuccess">
+        💬 Abrir WhatsApp com os links
+      </button>
     </div>
+  </div>
 
-    <!-- ===== ETAPA 3: PAGAMENTO ===== -->
-    <div class="step-content" id="step-3">
-      <div class="card">
+  <!-- PAYMENT OVERLAY -->
+  <div class="payment-overlay" id="paymentOverlay">
+    <div class="payment-box">
+      <div class="payment-icon">💳</div>
+      <h2>Quase lá! Finalize o pagamento</h2>
+      <p>Seu cadastro foi criado. Agora realize o pagamento para ativar seu cardápio.</p>
 
-        <div class="pagto-ok">
-          <span class="pagto-ok-icon">🎉</span>
-          <h2>Cadastro Realizado!</h2>
-          <p>Agora finalize o pagamento para ativar seu cardápio digital</p>
+      <div class="payment-resumo">
+        <div>
+          <div class="payment-resumo-nome" id="pay-plano-nome">—</div>
+          <div class="payment-resumo-desc" id="pay-plano-desc">—</div>
         </div>
-
-        <!-- Resumo do plano -->
-        <div class="resumo-plano">
-          <div class="resumo-info">
-            <h3 id="resumo-plano-nome">Plano Pro</h3>
-            <p id="resumo-estabelecimento">Seu Estabelecimento</p>
-          </div>
-          <div class="resumo-preco" id="resumo-preco">R$ 59,90 <small>/mês</small></div>
-        </div>
-
-        <!-- Tabs PIX / Cartão -->
-        <div class="tabs">
-          <button class="tab-btn active" data-tab="pix">💚 PIX (Recomendado)</button>
-          <button class="tab-btn" data-tab="cartao">💳 Cartão de Crédito</button>
-        </div>
-
-        <!-- PIX -->
-        <div class="tab-pane active" id="tab-pix">
-          <div class="pix-box">
-            <div class="pix-label">🔑 Chave PIX</div>
-            <div class="pix-chave-wrap">
-              <span class="pix-chave-val" id="pixChaveValor">Carregando...</span>
-              <button class="btn-copy" id="btnCopyPix">📋 Copiar</button>
-            </div>
-            <div class="pix-nome" id="pixNomeValor">Beneficiário: —</div>
-          </div>
-        </div>
-
-        <!-- CARTÃO -->
-        <div class="tab-pane" id="tab-cartao">
-          <div class="cartao-box">
-            <p id="cartaoDesc">Pague com cartão de crédito em até 12x de forma segura através do Mercado Pago.</p>
-            <a href="#" class="btn-mp" id="btnMercadoPago" target="_blank" rel="noopener noreferrer">
-              💳 Pagar com Cartão — Mercado Pago
-            </a>
-          </div>
-        </div>
-
-        <!-- Instrução -->
-        <div class="instrucao">
-          <h4>📱 Como ativar seu cardápio?</h4>
-          <p>
-            Após realizar o pagamento, clique no botão abaixo e envie o comprovante pelo WhatsApp.
-            Nossa equipe ativará seu cardápio em até <strong>24 horas úteis</strong>.
-          </p>
-        </div>
-
-        <!-- Botão WhatsApp -->
-        <a href="#" class="btn-whatsapp" id="btnEnviarComprovante" target="_blank" rel="noopener noreferrer">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-          </svg>
-          ✅ Já paguei — Enviar Comprovante
-        </a>
-
+        <div class="payment-resumo-preco" id="pay-plano-preco">—<br/><small>/mês</small></div>
       </div>
+
+      <div class="payment-pix-label">🔑 Chave PIX para pagamento</div>
+      <div class="payment-pix-box">
+        <div class="payment-pix-chave" id="pay-pix-chave">—</div>
+        <button class="btn-copy-pix" id="btnCopyPix">📋 Copiar</button>
+      </div>
+      <div class="payment-pix-nome" id="pay-pix-nome"></div>
+
+      <div class="payment-instrucao">
+        📱 Após pagar, clique no botão abaixo e envie o comprovante pelo WhatsApp. Seu cardápio será ativado em até <strong>24h úteis</strong>.
+      </div>
+
+      <a href="#" class="btn-payment-whats" id="btnPaymentWhats" target="_blank" rel="noopener noreferrer">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+        Enviar comprovante no WhatsApp
+      </a>
     </div>
+  </div>
 
-  </main>
-
-  <div class="toast" id="toast"></div>
-
-  <script>
-    const PLANOS = [
-      {
-        id: 'basico',
-        nome: 'Básico',
-        preco: 39.90,
-        destaque: false,
-        features: [
-          'Cardápio digital completo',
-          'Até 50 itens no cardápio',
-          'QR Code personalizado',
-          'Pedidos via WhatsApp',
-          'Atualização dos itens'
-        ]
-      },
-      {
-        id: 'pro',
-        nome: 'Pro',
-        preco: 59.90,
-        destaque: true,
-        features: [
-          'Tudo do Básico',
-          'Itens ilimitados',
-          'Fotos dos pratos',
-          'Personalização de cores',
-          'Suporte por WhatsApp'
-        ]
-      },
-      {
-        id: 'premium',
-        nome: 'Premium',
-        preco: 89.90,
-        destaque: false,
-        features: [
-          'Tudo do Pro',
-          'Configuração feita por nós',
-          'Cadastro dos pratos incluso',
-          'Suporte prioritário',
-          'Atualizações mensais inclusas'
-        ]
-      }
-    ];
-
-    let planoSelecionado = 'pro';
-    let dadosCliente = {};
-
-    // ---- RENDER PLANOS ----
-    function renderPlanos() {
-      document.getElementById('planosGrid').innerHTML = PLANOS.map(p => `
-        <div class="plano-card ${p.destaque ? 'destaque' : ''} ${p.id === planoSelecionado ? 'selected' : ''}"
-             data-id="${p.id}" onclick="selecionarPlano('${p.id}')">
-          ${p.destaque ? '<div class="badge-destaque">Mais popular</div>' : ''}
-          <div class="check-circle"></div>
-          <div class="plano-nome">${p.nome}</div>
-          <div class="plano-preco">
-            <div class="plano-valor">R$ ${p.preco.toFixed(2).replace('.', ',')}</div>
-            <div class="plano-periodo">/mês</div>
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <div class="footer-logo-icon">🍴</div>
+            <span class="footer-logo-text">Cardápio<span>Pro</span></span>
           </div>
-          <ul class="plano-features">
-            ${p.features.map(f => `<li>${f}</li>`).join('')}
+          <p class="footer-desc">A plataforma mais simples para digitalizar o cardápio do seu restaurante. QR Code por mesa, pedidos e pagamentos online.</p>
+          <div class="footer-social">
+            <a href="#" title="Instagram">📸</a>
+            <a href="#" title="Facebook">👍</a>
+            <a href="#" title="YouTube">▶️</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Produto</h4>
+          <ul>
+            <li><a href="#como-funciona">Como funciona</a></li>
+            <li><a href="#planos">Planos e preços</a></li>
+            <li><a href="login.html">Acessar Admin</a></li>
+            <li><a href="cadastro.html">Criar conta</a></li>
           </ul>
         </div>
-      `).join('');
+        <div class="footer-col">
+          <h4>Contato</h4>
+          <a class="footer-whats" href="https://wa.me/5511999999999?text=Ol%C3%A1%2C+tenho+d%C3%BAvidas+sobre+o+Card%C3%A1pioPro" target="_blank">
+            💬 Falar no WhatsApp
+          </a>
+          <p class="footer-contact-item">📧 contato@cardapiopro.com.br</p>
+          <p class="footer-contact-item">🕐 Seg–Sex, 9h às 18h</p>
+        </div>
+      </div>
+      <hr class="footer-divider" />
+      <div class="footer-bottom">
+        <p class="footer-copy">© 2026 CardápioPro · Todos os direitos reservados</p>
+        <div class="footer-badges">
+          <span class="footer-badge">PIX</span>
+          <span class="footer-badge">CARTÃO</span>
+          <span class="footer-badge">QR CODE</span>
+          <span class="footer-badge">WHATSAPP</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script>
+    const SQL_SETUP = `-- Cole este SQL no Supabase SQL Editor e clique em Run
+
+CREATE TABLE IF NOT EXISTS restaurantes (
+  id               UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  nome_restaurante TEXT NOT NULL,
+  nome_responsavel TEXT NOT NULL,
+  telefone         TEXT NOT NULL,
+  email            TEXT,
+  endereco         TEXT,
+  tipo             TEXT DEFAULT 'restaurante',
+  horario          TEXT,
+  num_mesas        INTEGER,
+  plano            TEXT,
+  senha_admin      TEXT NOT NULL,
+  created_at       TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS cardapio_items (
+  id             UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  restaurante_id UUID REFERENCES restaurantes(id) ON DELETE CASCADE,
+  categoria      TEXT NOT NULL,
+  nome           TEXT NOT NULL,
+  descricao      TEXT,
+  preco          DECIMAL(10,2) NOT NULL,
+  foto_url       TEXT,
+  tag            TEXT DEFAULT '',
+  disponivel     BOOLEAN DEFAULT true,
+  ordem          INTEGER DEFAULT 0,
+  created_at     TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Adiciona coluna tag em bancos já existentes (sem erro se já existir)
+ALTER TABLE cardapio_items ADD COLUMN IF NOT EXISTS tag TEXT DEFAULT '';
+
+CREATE TABLE IF NOT EXISTS cardapio_pedidos (
+  id              UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  restaurante_id  UUID REFERENCES restaurantes(id) ON DELETE CASCADE,
+  mesa            TEXT,
+  itens           JSONB NOT NULL,
+  total           DECIMAL(10,2) NOT NULL,
+  forma_pagamento TEXT,
+  status          TEXT DEFAULT 'novo',
+  created_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE restaurantes     ENABLE ROW LEVEL SECURITY;
+ALTER TABLE cardapio_items   ENABLE ROW LEVEL SECURITY;
+ALTER TABLE cardapio_pedidos ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "restaurantes_insert" ON restaurantes;
+DROP POLICY IF EXISTS "restaurantes_select" ON restaurantes;
+DROP POLICY IF EXISTS "items_all"           ON cardapio_items;
+DROP POLICY IF EXISTS "pedidos_all"         ON cardapio_pedidos;
+
+CREATE POLICY "restaurantes_insert" ON restaurantes FOR INSERT WITH CHECK (true);
+CREATE POLICY "restaurantes_select" ON restaurantes FOR SELECT USING (true);
+CREATE POLICY "items_all"   ON cardapio_items   FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "pedidos_all" ON cardapio_pedidos FOR ALL USING (true) WITH CHECK (true);`;
+
+    // ===== VERIFICAÇÃO AUTOMÁTICA DO SUPABASE =====
+    function tabelaFaltando(error) {
+      if (!error) return false;
+      const msg = (error.message || '').toLowerCase();
+      // 42P01 = código PostgreSQL para "relation does not exist"
+      return error.code === '42P01' || msg.includes('does not exist');
     }
 
-    function selecionarPlano(id) {
-      planoSelecionado = id;
-      renderPlanos();
+    (async () => {
+      const { error } = await db.from('restaurantes').select('id').limit(1);
+      if (tabelaFaltando(error)) {
+        document.getElementById('setupBanner').classList.add('show');
+      }
+    })();
+
+    // ===== COPIAR SQL =====
+    document.getElementById('btnCopiarSQL').addEventListener('click', () => {
+      navigator.clipboard.writeText(SQL_SETUP)
+        .then(() => { document.getElementById('btnCopiarSQL').textContent = '✅ Copiado!'; })
+        .catch(() => { alert(SQL_SETUP); });
+    });
+
+    // ===== PLANOS =====
+    const PLANOS = [
+      { max: 5,        nome: 'Starter',    mesas: 'Até 5 mesas',        preco: 47  },
+      { max: 10,       nome: 'Popular',    mesas: '6 a 10 mesas',       preco: 77  },
+      { max: 20,       nome: 'Pro',        mesas: '11 a 20 mesas',      preco: 117 },
+      { max: 50,       nome: 'Business',   mesas: '21 a 50 mesas',      preco: 187 },
+      { max: Infinity, nome: 'Enterprise', mesas: 'Acima de 50 mesas',  preco: 247 },
+    ];
+
+    function calcularPlano(n) {
+      return PLANOS.find(p => n <= p.max) || PLANOS[PLANOS.length - 1];
     }
 
-    // ---- NAVEGAÇÃO ENTRE ETAPAS ----
-    function goToStep(n) {
-      document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
-      document.getElementById('step-' + n).classList.add('active');
+    const inputMesas  = document.getElementById('numMesas');
+    const btnSubmitEl = document.getElementById('btnSubmit');
+    const btnTextEl   = btnSubmitEl.querySelector('.btn-text');
 
-      [1, 2, 3].forEach(i => {
-        const si = document.getElementById('si-' + i);
-        const sn = document.getElementById('sn-' + i);
-        si.classList.remove('active', 'done');
-        if (i < n) { si.classList.add('done'); sn.textContent = '✓'; }
-        else { si.classList.add(i === n ? 'active' : ''); sn.textContent = i; }
+    function atualizarPlanoUI(n) {
+      const resultado = document.getElementById('planoResultado');
+      if (!n || n < 1) {
+        resultado.classList.remove('show');
+        btnTextEl.textContent = '🚀 Criar Meu Cardápio Digital Grátis';
+        document.querySelectorAll('.plano-card').forEach(c => c.classList.remove('selected'));
+        return;
+      }
+      const plano = calcularPlano(n);
+      document.getElementById('planoNome').textContent  = `Plano ${plano.nome}`;
+      document.getElementById('planoDesc').textContent  = plano.mesas;
+      document.getElementById('planoPreco').textContent = `R$ ${plano.preco}/mês`;
+      resultado.classList.add('show');
+      btnTextEl.textContent = `🚀 Cadastrar — R$ ${plano.preco}/mês`;
+      document.querySelectorAll('.plano-card').forEach(card => {
+        const cardPlano = calcularPlano(parseInt(card.dataset.mesas));
+        card.classList.toggle('selected', cardPlano.nome === plano.nome);
       });
-
-      [1, 2].forEach(i => {
-        document.getElementById('sc-' + i).classList.toggle('done', i < n);
-      });
-
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // ---- ETAPA 1: VALIDAR E AVANÇAR ----
-    document.getElementById('formDados').addEventListener('submit', e => {
+    inputMesas.addEventListener('input', function () {
+      atualizarPlanoUI(parseInt(this.value));
+    });
+
+    document.querySelectorAll('.plano-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const mesas = parseInt(card.dataset.mesas);
+        inputMesas.value = mesas;
+        atualizarPlanoUI(mesas);
+        inputMesas.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        inputMesas.focus();
+      });
+    });
+
+    // ===== TIPO DE ESTABELECIMENTO =====
+    document.querySelectorAll('.tipo-btn').forEach(label => {
+      label.addEventListener('click', () => {
+        document.querySelectorAll('.tipo-btn').forEach(l => l.classList.remove('selected'));
+        label.classList.add('selected');
+      });
+    });
+
+    // ===== TOGGLE SENHA =====
+    const senhaInput = document.getElementById('senhaAdmin');
+    document.getElementById('btnToggleSenha').addEventListener('click', () => {
+      senhaInput.type = senhaInput.type === 'password' ? 'text' : 'password';
+    });
+
+    // ===== SUBMIT =====
+    let dadosCadastro = {};
+
+    document.getElementById('formCadastro').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const campos = [
-        { id: 'd-nome', label: 'nome do estabelecimento' },
-        { id: 'd-segmento', label: 'segmento' },
-        { id: 'd-responsavel', label: 'nome do responsável' },
-        { id: 'd-whatsapp', label: 'WhatsApp' },
-        { id: 'd-email', label: 'e-mail' },
-        { id: 'd-cidade', label: 'cidade' }
-      ];
+      const erroEl = document.getElementById('erroMsg');
+      erroEl.style.display = 'none';
 
-      let ok = true;
-      campos.forEach(c => {
-        const el = document.getElementById(c.id);
-        el.classList.remove('err');
-        if (!el.value.trim()) { el.classList.add('err'); ok = false; }
-      });
+      const nomeRestaurante = document.getElementById('nomeRestaurante').value.trim();
+      const nomeResponsavel = document.getElementById('nomeResponsavel').value.trim();
+      const telefone        = document.getElementById('telefone').value.trim().replace(/\D/g, '');
+      const email           = document.getElementById('email').value.trim();
+      const endereco        = document.getElementById('endereco').value.trim();
+      const senhaAdmin      = document.getElementById('senhaAdmin').value;
+      const tipoEl          = document.querySelector('input[name="tipo"]:checked');
+      const tipo            = tipoEl ? tipoEl.value : 'Restaurante';
+      const numMesas        = parseInt(document.getElementById('numMesas').value) || 0;
+      const plano           = numMesas > 0 ? calcularPlano(numMesas) : null;
 
-      if (!ok) { toast('⚠️ Preencha todos os campos obrigatórios'); return; }
+      const horario = [
+        `Seg–Sex: ${document.getElementById('h1_open').value}–${document.getElementById('h1_close').value}`,
+        `Sáb: ${document.getElementById('h2_open').value}–${document.getElementById('h2_close').value}`,
+        `Dom: ${document.getElementById('h3_open').value}–${document.getElementById('h3_close').value}`,
+      ].join(' | ');
 
-      dadosCliente = {
-        nome: document.getElementById('d-nome').value.trim(),
-        segmento: document.getElementById('d-segmento').value,
-        responsavel: document.getElementById('d-responsavel').value.trim(),
-        whatsapp: document.getElementById('d-whatsapp').value.trim(),
-        email: document.getElementById('d-email').value.trim(),
-        cidade: document.getElementById('d-cidade').value.trim()
-      };
+      if (!nomeRestaurante) { mostrarErro('Informe o nome do restaurante.'); return; }
+      if (!nomeResponsavel) { mostrarErro('Informe o nome do responsável.'); return; }
+      if (!numMesas || numMesas < 1) { mostrarErro('Informe o número de mesas do estabelecimento.'); return; }
+      if (!telefone || telefone.length < 10) { mostrarErro('Informe um WhatsApp válido com DDD.'); return; }
+      if (!senhaAdmin || senhaAdmin.length < 6) { mostrarErro('A senha deve ter pelo menos 6 caracteres.'); return; }
 
-      renderPlanos();
-      goToStep(2);
+      const btn = document.getElementById('btnSubmit');
+      btn.disabled = true;
+      btn.classList.add('loading');
+
+      try {
+        const { data, error } = await db
+          .from('restaurantes')
+          .insert({
+            nome_restaurante: nomeRestaurante,
+            nome_responsavel: nomeResponsavel,
+            telefone: '55' + telefone,
+            email:    email    || null,
+            endereco: endereco || null,
+            tipo,
+            horario,
+            num_mesas: numMesas,
+            plano:     plano ? plano.nome : null,
+            senha_admin: senhaAdmin,
+          })
+          .select('id')
+          .single();
+
+        if (error) throw error;
+
+        const rid          = data.id;
+        const linkCardapio = `${BASE_URL}/index.html?rid=${rid}`;
+        const linkAdmin    = `${BASE_URL}/admin.html?rid=${rid}`;
+
+        dadosCadastro = { nomeResponsavel, telefone: '55' + telefone, senhaAdmin, linkCardapio, linkAdmin };
+
+        document.getElementById('linkCardapio').textContent = linkCardapio;
+        document.getElementById('linkAdmin').textContent    = linkAdmin;
+
+        // Mostra tela de pagamento antes do overlay de sucesso
+        mostrarPagamento(plano, nomeRestaurante, nomeResponsavel, '55' + telefone);
+
+      } catch (err) {
+        let msg = err.message || 'Tente novamente.';
+        if (tabelaFaltando(err)) {
+          msg = 'Tabelas não encontradas no Supabase. Clique no banner amarelo acima e rode o SQL.';
+          document.getElementById('setupBanner').classList.add('show');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        mostrarErro(msg);
+        btn.disabled = false;
+        btn.classList.remove('loading');
+      }
     });
 
-    // Remove marcação de erro ao digitar
-    document.querySelectorAll('input, select').forEach(el => {
-      el.addEventListener('input', () => el.classList.remove('err'));
-    });
+    function mostrarErro(msg) {
+      const el = document.getElementById('erroMsg');
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
 
-    // ---- ETAPA 2: VOLTAR / CADASTRAR ----
-    document.getElementById('btnVoltarStep1').addEventListener('click', () => goToStep(1));
+    // ===== PAGAMENTO =====
+    function mostrarPagamento(plano, nomeRestaurante, nomeResponsavel, telefone) {
+      // Preenche resumo do plano
+      document.getElementById('pay-plano-nome').textContent = plano ? `Plano ${plano.nome}` : 'Plano selecionado';
+      document.getElementById('pay-plano-desc').textContent = plano ? plano.mesas : '';
+      document.getElementById('pay-plano-preco').innerHTML  = plano ? `R$ ${plano.preco}<br/><small>/mês</small>` : '—';
 
-    document.getElementById('btnCadastrar').addEventListener('click', () => {
-      const plano = PLANOS.find(p => p.id === planoSelecionado);
-      if (!plano) { toast('⚠️ Selecione um plano para continuar'); return; }
+      // Lê chave PIX do config do admin (mesmo domínio = mesmo localStorage)
+      let pixChave = '', pixNome = '';
+      try {
+        const cfg = JSON.parse(localStorage.getItem('cardapio_data') || '{}').config || {};
+        pixChave = cfg.pixChave || '';
+        pixNome  = cfg.pixNome  || '';
+      } catch (_) {}
 
-      // Salvar no localStorage
-      const lista = JSON.parse(localStorage.getItem('cardapio_cadastros') || '[]');
-      const registro = {
-        id: 'cad-' + Date.now(),
-        ...dadosCliente,
-        plano: { id: plano.id, nome: plano.nome, preco: plano.preco },
-        status: 'aguardando_pagamento',
-        dataCadastro: new Date().toISOString(),
-        dataAtivacao: null
-      };
-      lista.push(registro);
-      localStorage.setItem('cardapio_cadastros', JSON.stringify(lista));
+      document.getElementById('pay-pix-chave').textContent = pixChave || 'Chave PIX não configurada — entre em contato pelo WhatsApp';
+      document.getElementById('pay-pix-nome').textContent  = pixNome ? `Beneficiário: ${pixNome}` : '';
 
-      // Preencher tela de pagamento
-      const cfg = getAdminConfig();
+      // Monta link do WhatsApp com mensagem automática
+      let whatsAdmin = '';
+      try {
+        const cfg = JSON.parse(localStorage.getItem('cardapio_data') || '{}').config || {};
+        whatsAdmin = (cfg.whatsappAdmin || cfg.whatsapp || '').replace(/\D/g, '');
+      } catch (_) {}
 
-      document.getElementById('resumo-plano-nome').textContent = 'Plano ' + plano.nome;
-      document.getElementById('resumo-estabelecimento').textContent = dadosCliente.nome + ' — ' + dadosCliente.segmento;
-      document.getElementById('resumo-preco').innerHTML = 'R$ ' + plano.preco.toFixed(2).replace('.', ',') + ' <small>/mês</small>';
-
-      // PIX
-      const pixChave = cfg.pixChave || '';
-      const pixNome = cfg.pixNome || '';
-      if (pixChave) {
-        document.getElementById('pixChaveValor').textContent = pixChave;
-        document.getElementById('pixNomeValor').textContent = pixNome ? 'Beneficiário: ' + pixNome : '';
-      } else {
-        document.getElementById('pixChaveValor').textContent = 'Chave PIX não configurada';
-        document.getElementById('pixNomeValor').textContent = 'Entre em contato pelo WhatsApp para obter a chave';
-      }
-
-      // Mercado Pago
-      const mpLink = cfg.mpLink || '';
-      const btnMp = document.getElementById('btnMercadoPago');
-      if (mpLink) {
-        btnMp.href = mpLink;
-        btnMp.style.display = 'inline-flex';
-        document.getElementById('cartaoDesc').textContent = 'Pague com cartão de crédito em até 12x de forma segura através do Mercado Pago.';
-      } else {
-        btnMp.style.display = 'none';
-        document.getElementById('cartaoDesc').textContent = 'Pagamento com cartão não disponível no momento. Use o PIX ou entre em contato pelo WhatsApp.';
-      }
-
-      // WhatsApp comprovante
-      const whatsAdmin = (cfg.whatsappAdmin || cfg.whatsapp || '').replace(/\D/g, '');
+      const precoStr = plano ? `R$ ${plano.preco}/mês` : '';
       const msg = encodeURIComponent(
-        `Olá! Segue meu cadastro para ativar o cardápio digital:\n\n` +
-        `🏠 *Estabelecimento:* ${dadosCliente.nome} (${dadosCliente.segmento})\n` +
-        `👤 *Responsável:* ${dadosCliente.responsavel}\n` +
-        `📍 *Cidade:* ${dadosCliente.cidade}\n` +
-        `📧 *E-mail:* ${dadosCliente.email}\n` +
-        `📱 *WhatsApp:* ${dadosCliente.whatsapp}\n\n` +
-        `💎 *Plano:* ${plano.nome} — R$ ${plano.preco.toFixed(2).replace('.', ',')}\/mês\n\n` +
-        `Segue o comprovante de pagamento em anexo. Aguardo a ativação! 🙏`
+        `Olá! Realizei o pagamento do *Plano ${plano ? plano.nome : ''}* (${precoStr}).\n\n` +
+        `🏠 *Restaurante:* ${nomeRestaurante}\n` +
+        `👤 *Responsável:* ${nomeResponsavel}\n\n` +
+        `Segue o comprovante em anexo para ativar meu cardápio. 🙏`
       );
-      document.getElementById('btnEnviarComprovante').href = whatsAdmin
+      const waLink = whatsAdmin
         ? `https://wa.me/${whatsAdmin}?text=${msg}`
         : `https://wa.me/?text=${msg}`;
 
-      goToStep(3);
-    });
+      const btnWa = document.getElementById('btnPaymentWhats');
+      btnWa.href = waLink;
 
-    // ---- TABS ----
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const tab = btn.dataset.tab;
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById('tab-' + tab).classList.add('active');
-      });
-    });
+      // Após clicar em enviar comprovante, exibe o overlay de sucesso também
+      btnWa.addEventListener('click', () => {
+        setTimeout(() => {
+          document.getElementById('paymentOverlay').classList.remove('show');
+          document.getElementById('successOverlay').classList.add('show');
+        }, 800);
+      }, { once: true });
 
-    // ---- COPIAR PIX ----
+      document.getElementById('paymentOverlay').classList.add('show');
+    }
+
+    // ===== COPIAR PIX =====
     document.getElementById('btnCopyPix').addEventListener('click', () => {
-      const chave = document.getElementById('pixChaveValor').textContent;
-      const btn = document.getElementById('btnCopyPix');
-      const copy = (txt) => {
+      const chave = document.getElementById('pay-pix-chave').textContent;
+      const btn   = document.getElementById('btnCopyPix');
+      const done  = () => {
         btn.textContent = '✅ Copiado!';
         btn.classList.add('copied');
-        toast('✅ Chave PIX copiada!');
         setTimeout(() => { btn.textContent = '📋 Copiar'; btn.classList.remove('copied'); }, 2500);
       };
       if (navigator.clipboard) {
-        navigator.clipboard.writeText(chave).then(copy).catch(() => fallbackCopy(chave, copy));
+        navigator.clipboard.writeText(chave).then(done).catch(() => fallbackCopy(chave, done));
       } else {
-        fallbackCopy(chave, copy);
+        fallbackCopy(chave, done);
       }
     });
 
     function fallbackCopy(txt, cb) {
-      const el = document.createElement('textarea');
-      el.value = txt;
-      el.style.position = 'fixed';
-      el.style.opacity = '0';
+      const el = Object.assign(document.createElement('textarea'), { value: txt });
+      el.style.cssText = 'position:fixed;opacity:0';
       document.body.appendChild(el);
       el.select();
       document.execCommand('copy');
@@ -897,26 +1849,19 @@
       cb();
     }
 
-    // ---- LER CONFIG DO ADMIN ----
-    function getAdminConfig() {
-      try {
-        const raw = localStorage.getItem('cardapio_data');
-        return raw ? (JSON.parse(raw).config || {}) : {};
-      } catch { return {}; }
-    }
-
-    // ---- TOAST ----
-    let toastTimer;
-    function toast(msg) {
-      const el = document.getElementById('toast');
-      el.textContent = msg;
-      el.classList.add('show');
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
-    }
-
-    // Init
-    renderPlanos();
+    // ===== WHATSAPP SUCCESS =====
+    document.getElementById('btnWhatsSuccess').addEventListener('click', () => {
+      const { nomeResponsavel, telefone, senhaAdmin, linkCardapio, linkAdmin } = dadosCadastro;
+      const msg = encodeURIComponent(
+        `🍴 *Seu CardápioPro foi criado!*\n\n` +
+        `Olá, ${nomeResponsavel}! Tudo pronto.\n\n` +
+        `🔗 *Cardápio (para os clientes):*\n${linkCardapio}\n\n` +
+        `⚙️ *Painel Admin (só para você):*\n${linkAdmin}\n\n` +
+        `🔑 *Sua senha de acesso:* ${senhaAdmin}\n\n` +
+        `Boas vendas! 🚀`
+      );
+      window.open(`https://wa.me/${telefone}?text=${msg}`, '_blank');
+    });
   </script>
 </body>
 </html>
