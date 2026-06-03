@@ -7,6 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css?v=4" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
 </head>
 <body>
 
@@ -767,7 +769,8 @@
     </div>
     <div class="footer-copy">
       © 2026 Sabor & Arte — Todos os direitos reservados
-      <a href="admin.html" class="footer-admin-link">⚙️ Admin</a>
+      <a href="cadastro.html" class="footer-admin-link">🆕 Cadastrar</a>
+      <a href="login.html" class="footer-admin-link">⚙️ Admin</a>
     </div>
   </footer>
 
@@ -873,5 +876,30 @@
   </div>
 
   <script src="app.js?v=4"></script>
+  <script>
+    // Carrega dados do restaurante se vier via ?rid=
+    (async () => {
+      const rid = new URLSearchParams(location.search).get('rid');
+      if (!rid) return;
+      try {
+        const { data } = await db.from('restaurantes')
+          .select('nome_restaurante, tipo, horario, endereco')
+          .eq('id', rid).single();
+        if (!data) return;
+        document.querySelector('.logo-nome').textContent = data.nome_restaurante;
+        document.querySelector('.logo-sub').textContent  = data.tipo || 'Bar & Restaurante';
+        document.title = `Cardápio — ${data.nome_restaurante}`;
+        document.querySelector('.hero-title').innerHTML =
+          `${data.nome_restaurante}<br/><span style="font-size:0.6em;font-weight:400;opacity:0.85">${data.tipo || ''}</span>`;
+        if (data.horario) {
+          document.querySelector('.footer-item:nth-child(3) span + *') &&
+            (document.querySelector('.footer-item:nth-child(3)').innerHTML = `<span>🕐</span> ${data.horario}`);
+        }
+        if (data.endereco) {
+          document.querySelector('.footer-item:first-child').innerHTML = `<span>📍</span> ${data.endereco}`;
+        }
+      } catch {}
+    })();
+  </script>
 </body>
 </html>

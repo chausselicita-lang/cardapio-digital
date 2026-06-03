@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Criar Meu Cardápio Digital</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --primary: #E8420A;
+      --primary-dark: #C13508;
+      --primary-light: #FF6B35;
+      --gold: #F0A500;
+      --dark: #1A0F00;
+      --surface: #FFFFFF;
+      --surface2: #FFF8F3;
+      --border: #F0E8DF;
+      --text: #1A0F00;
+      --text2: #5A4A3A;
+      --text3: #9A8A7A;
+      --success: #27ae60;
+      --font: 'Poppins', sans-serif;
+      --font2: 'Playfair Display', serif;
+      --radius: 14px;
+    }
+    html { font-size: 16px; scroll-behavior: smooth; }
+    body { font-family: var(--font); background: var(--surface2); color: var(--text); min-height: 100vh; }
+
+    /* HERO */
+    .hero {
+      background:
+        linear-gradient(160deg, rgba(26,15,0,0.88) 0%, rgba(232,66,10,0.6) 55%, rgba(26,15,0,0.92) 100%),
+        url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80') center/cover no-repeat;
+      padding: 60px 24px 80px;
+      text-align: center;
+      color: white;
+    }
+    .hero-logo { font-size: 48px; margin-bottom: 16px; }
+    .hero h1 {
+      font-family: var(--font2);
+      font-size: clamp(28px, 5vw, 48px);
+      font-weight: 800;
+      margin-bottom: 14px;
+      line-height: 1.15;
+    }
+    .hero p {
+      font-size: 16px;
+      color: rgba(255,255,255,0.8);
+      max-width: 520px;
+      margin: 0 auto 28px;
+      line-height: 1.6;
+    }
+    .hero-badges {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .hero-badge {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: white;
+      padding: 6px 14px;
+      border-radius: 50px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    /* FORM CONTAINER */
+    .form-wrap {
+      max-width: 680px;
+      margin: -40px auto 60px;
+      padding: 0 20px;
+    }
+    .form-card {
+      background: var(--surface);
+      border-radius: 20px;
+      padding: 40px 36px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+    }
+    @media (max-width: 600px) {
+      .form-card { padding: 28px 20px; }
+    }
+    .form-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 6px;
+    }
+    .form-subtitle {
+      font-size: 13px;
+      color: var(--text3);
+      margin-bottom: 32px;
+    }
+
+    /* CAMPOS */
+    .form-section-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--primary);
+      margin: 28px 0 16px;
+    }
+    .form-section-title:first-of-type { margin-top: 0; }
+
+    .form-group { margin-bottom: 18px; }
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text2);
+      margin-bottom: 6px;
+    }
+    .form-group label span { color: var(--primary); }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 14px;
+      font-family: var(--font);
+      color: var(--text);
+      background: var(--surface);
+      transition: border-color 0.2s;
+      outline: none;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus { border-color: var(--primary); }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    .form-group small {
+      display: block;
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 4px;
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 500px) { .form-row { grid-template-columns: 1fr; } }
+
+    /* TIPOS DE ESTABELECIMENTO */
+    .tipos-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    @media (max-width: 500px) { .tipos-grid { grid-template-columns: repeat(2, 1fr); } }
+    .tipo-btn {
+      border: 2px solid var(--border);
+      background: var(--surface2);
+      border-radius: 10px;
+      padding: 12px 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: var(--font);
+    }
+    .tipo-btn:hover { border-color: var(--primary-light); }
+    .tipo-btn.selected { border-color: var(--primary); background: rgba(232,66,10,0.06); }
+    .tipo-btn input { display: none; }
+    .tipo-icon { font-size: 24px; display: block; margin-bottom: 4px; }
+    .tipo-label { font-size: 11px; font-weight: 600; color: var(--text2); }
+    .tipo-btn.selected .tipo-label { color: var(--primary); }
+
+    /* HORÁRIOS */
+    .horario-grid { display: flex; flex-direction: column; gap: 8px; }
+    .horario-row {
+      display: grid;
+      grid-template-columns: 100px 1fr 1fr;
+      gap: 8px;
+      align-items: center;
+    }
+    .horario-dia {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text2);
+    }
+    .horario-row input[type="time"] {
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+    @media (max-width: 500px) {
+      .horario-row { grid-template-columns: 80px 1fr 1fr; }
+    }
+
+    /* SENHA */
+    .senha-wrap { position: relative; }
+    .senha-wrap input { padding-right: 44px; }
+    .btn-toggle-senha {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      color: var(--text3);
+      padding: 4px;
+    }
+
+    /* SUBMIT */
+    .btn-submit {
+      width: 100%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 32px;
+      box-shadow: 0 4px 16px rgba(232,66,10,0.3);
+    }
+    .btn-submit:hover { background: var(--primary-dark); transform: translateY(-1px); }
+    .btn-submit:disabled { background: #ccc; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-submit .spinner {
+      width: 20px; height: 20px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+    .btn-submit.loading .spinner { display: block; }
+    .btn-submit.loading .btn-text { display: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .ja-tem-conta {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 13px;
+      color: var(--text3);
+    }
+    .ja-tem-conta a {
+      color: var(--primary);
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .ja-tem-conta a:hover { text-decoration: underline; }
+
+    /* SUCCESS OVERLAY */
+    .success-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(26,15,0,0.92);
+      z-index: 999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .success-overlay.show { display: flex; }
+    .success-box {
+      background: var(--surface);
+      border-radius: 20px;
+      padding: 40px 32px;
+      max-width: 460px;
+      width: 100%;
+      text-align: center;
+    }
+    .success-icon { font-size: 60px; margin-bottom: 16px; }
+    .success-box h2 { font-size: 22px; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
+    .success-box p { font-size: 14px; color: var(--text2); line-height: 1.6; margin-bottom: 20px; }
+    .success-links { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+    .success-link {
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      text-align: left;
+    }
+    .success-link label { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 3px; }
+    .success-link span { font-size: 12px; color: var(--primary); word-break: break-all; font-weight: 600; }
+    .btn-whats {
+      width: 100%;
+      background: #25D366;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 15px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: var(--font);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px rgba(37,211,102,0.35);
+      transition: background 0.2s;
+    }
+    .btn-whats:hover { background: #1ebe5a; }
+
+    /* FOOTER */
+    .page-footer { text-align: center; padding: 24px; font-size: 12px; color: var(--text3); }
+  </style>
+</head>
+<body>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-logo">🍽️</div>
+    <h1>Crie seu Cardápio Digital<br/>em minutos</h1>
+    <p>Cardápio online com QR Code por mesa, pagamento integrado e painel de administração. Grátis para começar.</p>
+    <div class="hero-badges">
+      <span class="hero-badge">✅ Sem mensalidade</span>
+      <span class="hero-badge">📱 QR Code por mesa</span>
+      <span class="hero-badge">💳 PIX e Cartão</span>
+      <span class="hero-badge">📲 Pedidos pelo WhatsApp</span>
+    </div>
+  </div>
+
+  <!-- FORM -->
+  <div class="form-wrap">
+    <div class="form-card">
+      <h2 class="form-title">Cadastre seu estabelecimento</h2>
+      <p class="form-subtitle">Preencha os dados abaixo e receba o link do seu cardápio na hora.</p>
+
+      <form id="formCadastro" novalidate>
+
+        <p class="form-section-title">Dados do Estabelecimento</p>
+
+        <div class="form-group">
+          <label>Nome do restaurante <span>*</span></label>
+          <input type="text" id="nomeRestaurante" placeholder="Ex: Pizzaria do Zé" required />
+        </div>
+
+        <div class="form-group">
+          <label>Tipo de estabelecimento <span>*</span></label>
+          <div class="tipos-grid" id="tiposGrid">
+            <label class="tipo-btn">
+              <input type="radio" name="tipo" value="Restaurante" />
+              <span class="tipo-icon">🍽️</span>
+              <span class="tipo-label">Restaurante</span>
+            </label>
+            <label class="tipo-btn">
+              <input type="radio" name="tipo" value="Bar" />
+              <span class="tipo-icon">🍺</span>
+              <span class="tipo-label">Bar</span>
+            </label>
+            <label class="tipo-btn">
+              <input type="radio" name="tipo" value="Lanchonete" />
+              <span class="tipo-icon">🍔</span>
+              <span class="tipo-label">Lanchonete</span>
+            </label>
+            <label class="tipo-btn">
+              <input type="radio" name="tipo" value="Pizzaria" />
+              <span class="tipo-icon">🍕</span>
+              <span class="tipo-label">Pizzaria</span>
+            </label>
+            <label class="tipo-btn">
+              <input type="radio" name="tipo" value="Hamburgueria" />
+              <span class="tipo-icon">🥩</span>
+              <span class="tipo-label">Hamburgueria</span>
+            </label>
+            <label class="tipo-btn">
+              <input type="radio" name="tipo" value="Cafeteria" />
+              <span class="tipo-icon">☕</span>
+              <span class="tipo-label">Cafeteria</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Endereço</label>
+          <input type="text" id="endereco" placeholder="Rua, número, bairro, cidade" />
+        </div>
+
+        <p class="form-section-title">Horário de Funcionamento</p>
+
+        <div class="form-group">
+          <div class="horario-grid" id="horarioGrid">
+            <div class="horario-row">
+              <span class="horario-dia">Seg – Sex</span>
+              <input type="time" id="h1_open" value="11:00" />
+              <input type="time" id="h1_close" value="23:00" />
+            </div>
+            <div class="horario-row">
+              <span class="horario-dia">Sábado</span>
+              <input type="time" id="h2_open" value="11:00" />
+              <input type="time" id="h2_close" value="00:00" />
+            </div>
+            <div class="horario-row">
+              <span class="horario-dia">Domingo</span>
+              <input type="time" id="h3_open" value="11:00" />
+              <input type="time" id="h3_close" value="22:00" />
+            </div>
+          </div>
+          <small>Horário de abertura e fechamento para cada período</small>
+        </div>
+
+        <p class="form-section-title">Dados do Responsável</p>
+
+        <div class="form-group">
+          <label>Nome do responsável <span>*</span></label>
+          <input type="text" id="nomeResponsavel" placeholder="Seu nome completo" required />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>WhatsApp <span>*</span></label>
+            <input type="tel" id="telefone" placeholder="(11) 99999-9999" required />
+            <small>Enviaremos o link por aqui</small>
+          </div>
+          <div class="form-group">
+            <label>E-mail</label>
+            <input type="email" id="email" placeholder="seu@email.com" />
+          </div>
+        </div>
+
+        <p class="form-section-title">Acesso ao Admin</p>
+
+        <div class="form-group">
+          <label>Senha de acesso ao painel <span>*</span></label>
+          <div class="senha-wrap">
+            <input type="password" id="senhaAdmin" placeholder="Crie uma senha forte" required />
+            <button type="button" class="btn-toggle-senha" id="btnToggleSenha">👁️</button>
+          </div>
+          <small>Mínimo 6 caracteres. Use essa senha para acessar o painel admin.</small>
+        </div>
+
+        <div id="erroMsg" style="color:#e74c3c;font-size:13px;font-weight:600;margin-top:8px;display:none;"></div>
+
+        <button type="submit" class="btn-submit" id="btnSubmit">
+          <div class="spinner"></div>
+          <span class="btn-text">🚀 Criar Meu Cardápio Digital</span>
+        </button>
+
+      </form>
+
+      <p class="ja-tem-conta">Já tem cadastro? <a href="login.html">Entrar no Admin</a></p>
+    </div>
+  </div>
+
+  <div class="page-footer">© 2026 Cardápio Digital · Todos os direitos reservados</div>
+
+  <!-- SUCCESS OVERLAY -->
+  <div class="success-overlay" id="successOverlay">
+    <div class="success-box">
+      <div class="success-icon">🎉</div>
+      <h2>Cardápio criado com sucesso!</h2>
+      <p>Salve os links abaixo. Enviamos também pelo WhatsApp.</p>
+      <div class="success-links">
+        <div class="success-link">
+          <label>🔗 Link do Cardápio (para os clientes)</label>
+          <span id="linkCardapio">—</span>
+        </div>
+        <div class="success-link">
+          <label>⚙️ Link do Admin (só para você)</label>
+          <span id="linkAdmin">—</span>
+        </div>
+      </div>
+      <button class="btn-whats" id="btnWhatsSuccess">
+        💬 Abrir WhatsApp com os links
+      </button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script>
+    // ===== TIPO DE ESTABELECIMENTO =====
+    document.querySelectorAll('.tipo-btn').forEach(label => {
+      label.addEventListener('click', () => {
+        document.querySelectorAll('.tipo-btn').forEach(l => l.classList.remove('selected'));
+        label.classList.add('selected');
+      });
+    });
+
+    // ===== TOGGLE SENHA =====
+    const senhaInput = document.getElementById('senhaAdmin');
+    document.getElementById('btnToggleSenha').addEventListener('click', () => {
+      senhaInput.type = senhaInput.type === 'password' ? 'text' : 'password';
+    });
+
+    // ===== SUBMIT =====
+    let dadosCadastro = {};
+
+    document.getElementById('formCadastro').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const erroMsg = document.getElementById('erroMsg');
+      erroMsg.style.display = 'none';
+
+      // Coleta valores
+      const nomeRestaurante = document.getElementById('nomeRestaurante').value.trim();
+      const nomeResponsavel = document.getElementById('nomeResponsavel').value.trim();
+      const telefone        = document.getElementById('telefone').value.trim().replace(/\D/g, '');
+      const email           = document.getElementById('email').value.trim();
+      const endereco        = document.getElementById('endereco').value.trim();
+      const senhaAdmin      = document.getElementById('senhaAdmin').value;
+      const tipoEl          = document.querySelector('input[name="tipo"]:checked');
+      const tipo            = tipoEl ? tipoEl.value : '';
+
+      // Horário
+      const horario = [
+        `Seg–Sex: ${document.getElementById('h1_open').value}–${document.getElementById('h1_close').value}`,
+        `Sáb: ${document.getElementById('h2_open').value}–${document.getElementById('h2_close').value}`,
+        `Dom: ${document.getElementById('h3_open').value}–${document.getElementById('h3_close').value}`,
+      ].join(' | ');
+
+      // Validação
+      if (!nomeRestaurante) { mostrarErro('Informe o nome do restaurante.'); return; }
+      if (!nomeResponsavel) { mostrarErro('Informe o nome do responsável.'); return; }
+      if (!telefone || telefone.length < 10) { mostrarErro('Informe um WhatsApp válido.'); return; }
+      if (!senhaAdmin || senhaAdmin.length < 6) { mostrarErro('A senha deve ter pelo menos 6 caracteres.'); return; }
+
+      // Loading
+      const btn = document.getElementById('btnSubmit');
+      btn.disabled = true;
+      btn.classList.add('loading');
+
+      try {
+        const { data, error } = await db.from('restaurantes').insert([{
+          nome_restaurante: nomeRestaurante,
+          nome_responsavel: nomeResponsavel,
+          telefone: '55' + telefone,
+          email: email || null,
+          endereco: endereco || null,
+          tipo: tipo || 'Restaurante',
+          horario,
+          senha_admin: senhaAdmin,
+        }]).select('id').single();
+
+        if (error) throw error;
+
+        const rid = data.id;
+        const linkCardapio = `${BASE_URL}/index.html?rid=${rid}`;
+        const linkAdmin    = `${BASE_URL}/admin.html?rid=${rid}`;
+
+        dadosCadastro = { nomeRestaurante, nomeResponsavel, telefone: '55' + telefone, senhaAdmin, linkCardapio, linkAdmin };
+
+        document.getElementById('linkCardapio').textContent = linkCardapio;
+        document.getElementById('linkAdmin').textContent    = linkAdmin;
+        document.getElementById('successOverlay').classList.add('show');
+
+      } catch (err) {
+        mostrarErro('Erro ao cadastrar: ' + (err.message || 'Tente novamente.'));
+        btn.disabled = false;
+        btn.classList.remove('loading');
+      }
+    });
+
+    function mostrarErro(msg) {
+      const el = document.getElementById('erroMsg');
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+
+    // ===== WHATSAPP SUCCESS =====
+    document.getElementById('btnWhatsSuccess').addEventListener('click', () => {
+      const { nomeResponsavel, telefone, senhaAdmin, linkCardapio, linkAdmin } = dadosCadastro;
+      const msg = encodeURIComponent(
+        `🍽️ *Seu Cardápio Digital foi criado!*\n\n` +
+        `Olá, ${nomeResponsavel}! Tudo pronto.\n\n` +
+        `🔗 *Cardápio (para os clientes):*\n${linkCardapio}\n\n` +
+        `⚙️ *Painel Admin (só para você):*\n${linkAdmin}\n\n` +
+        `🔑 *Sua senha de acesso:* ${senhaAdmin}\n\n` +
+        `Boas vendas! 🚀`
+      );
+      window.open(`https://wa.me/${telefone}?text=${msg}`, '_blank');
+    });
+  </script>
+</body>
+</html>

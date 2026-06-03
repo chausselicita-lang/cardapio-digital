@@ -3,40 +3,83 @@
 const $ = sel => document.querySelector(sel);
 const $$ = sel => [...document.querySelectorAll(sel)];
 
-const CONFIG_KEY = 'cardapio_config';
-const SENHA_PADRAO = 'admin123';
+const CONFIG_KEY    = 'cardapio_config';
+const SENHA_PADRAO  = 'admin123';
+
+// Modo: 'supabase' se tiver ?rid na URL, 'local' caso contrário
+const rid  = new URLSearchParams(location.search).get('rid');
+const modo = rid ? 'supabase' : 'local';
 
 function carregarConfig() {
   try { return JSON.parse(localStorage.getItem(CONFIG_KEY) || '{}'); } catch { return {}; }
 }
-
 function salvarConfig(cfg) {
   localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg));
 }
 
 // ===== LOGIN =====
 const loginOverlay = $('#adminLoginOverlay');
-const senhaInput = $('#senhaInput');
-const loginError = $('#loginError');
+const senhaInput   = $('#senhaInput');
+const loginError   = $('#loginError');
 
-function verificarSessao() {
-  if (sessionStorage.getItem('admin_auth') === '1') {
-    loginOverlay.style.display = 'none';
+async function verificarSessao() {
+  if (modo === 'supabase') {
+    // Sessão via Supabase: verificar sessionStorage com rid correto
+    if (sessionStorage.getItem('admin_auth') === '1' &&
+        sessionStorage.getItem('admin_rid')   === rid) {
+      loginOverlay.style.display = 'none';
+      carregarDadosRestaurante();
+    }
+  } else {
+    // Modo local: sessionStorage simples
+    if (sessionStorage.getItem('admin_auth') === '1') {
+      loginOverlay.style.display = 'none';
+    }
   }
 }
 
-function tentarLogin() {
-  const config = carregarConfig();
-  const senhaCorreta = config.senhaAdmin || SENHA_PADRAO;
-  if (senhaInput.value === senhaCorreta) {
-    sessionStorage.setItem('admin_auth', '1');
-    loginOverlay.style.display = 'none';
-    senhaInput.value = '';
-    loginError.style.display = 'none';
+async function tentarLogin() {
+  const senha = senhaInput.value;
+  loginError.style.display = 'none';
+
+  if (modo === 'supabase') {
+    // Valida senha contra Supabase
+    try {
+      const { data, error } = await db
+        .from('restaurantes')
+        .select('id, nome_restaurante, senha_admin')
+        .eq('id', rid).single();
+
+      if (error || !data) throw new Error();
+      if (data.senha_admin !== senha) throw new Error('senha errada');
+
+      sessionStorage.setItem('admin_auth', '1');
+      sessionStorage.setItem('admin_rid',  rid);
+      sessionStorage.setItem('admin_nome', data.nome_restaurante);
+      loginOverlay.style.display = 'none';
+      senhaInput.value = '';
+      carregarDadosRestaurante();
+
+    } catch {
+      loginError.style.display = 'block';
+      senhaInput.value = '';
+      senhaInput.focus();
+    }
+
   } else {
-    loginError.style.display = 'block';
-    senhaInput.value = '';
-    senhaInput.focus();
+    // Modo local: compara com localStorage
+    const config = carregarConfig();
+    const correta = config.senhaAdmin || SENHA_PADRAO;
+    if (senha === correta) {
+      sessionStorage.setItem('admin_auth', '1');
+      loginOverlay.style.display = 'none';
+      senhaInput.value = '';
+      loginError.style.display = 'none';
+    } else {
+      loginError.style.display = 'block';
+      senhaInput.value = '';
+      senhaInput.focus();
+    }
   }
 }
 
@@ -45,25 +88,49 @@ senhaInput.addEventListener('keydown', e => { if (e.key === 'Enter') tentarLogin
 
 $('#btnSair').addEventListener('click', () => {
   sessionStorage.removeItem('admin_auth');
+  sessionStorage.removeItem('admin_rid');
+  sessionStorage.removeItem('admin_nome');
   loginOverlay.style.display = 'flex';
   senhaInput.value = '';
   loginError.style.display = 'none';
-  setTimeout(() => senhaInput.focus(), 100);
+  // Se veio via Supabase, redireciona para login
+  if (modo === 'supabase') window.location.href = 'login.html';
+  else setTimeout(() => senhaInput.focus(), 100);
 });
 
-// Verifica se já está autenticado ao carregar
+// ===== CARREGAR DADOS DO RESTAURANTE (modo Supabase) =====
+async function carregarDadosRestaurante() {
+  if (modo !== 'supabase' || !rid) return;
+  try {
+    const { data } = await db.from('restaurantes')
+      .select('nome_restaurante, tipo, telefone, email, endereco, horario, senha_admin')
+      .eq('id', rid).single();
+    if (!data) return;
+
+    // Atualiza header do admin
+    const sub = document.querySelector('.admin-header-sub');
+    if (sub) sub.textContent = `| ${data.nome_restaurante}`;
+
+    // Preenche campos de configuração
+    $('#chavePix').value   = carregarConfig().chavePix  || '';
+    $('#linkCartao').value = carregarConfig().linkCartao || '';
+    $('#whatsapp').value   = (data.telefone || '').replace(/^55/, '');
+
+  } catch {}
+}
+
+// Verifica sessão ao carregar
 verificarSessao();
 
-// ===== CARREGAR VALORES SALVOS NO FORMULÁRIO =====
+// ===== FORMULÁRIO DE CONFIGURAÇÕES =====
 const config = carregarConfig();
-$('#chavePix').value = config.chavePix || '';
-$('#linkCartao').value = config.linkCartao || '';
-$('#whatsapp').value = config.whatsapp || '';
+$('#chavePix').value   = config.chavePix   || '';
+$('#linkCartao').value = config.linkCartao  || '';
+$('#whatsapp').value   = config.whatsapp    || '';
 
-// Auto-detecta URL base (troca admin.html por index.html)
 const autoUrl = window.location.href.replace(/[?#].*$/, '').replace(/admin\.html$/, 'index.html');
-$('#urlBase').value = config.urlBase || autoUrl;
-$('#numMesas').value = config.numMesas || 10;
+$('#urlBase').value   = config.urlBase   || (rid ? `${autoUrl}?rid=${rid}` : autoUrl);
+$('#numMesas').value  = config.numMesas  || 10;
 
 // ===== TABS =====
 $$('.tab-btn').forEach(btn => {
@@ -76,20 +143,24 @@ $$('.tab-btn').forEach(btn => {
 });
 
 // ===== SALVAR CONFIGURAÇÕES =====
-$('#btnSalvarConfig').addEventListener('click', () => {
+$('#btnSalvarConfig').addEventListener('click', async () => {
   const novaSenha = $('#senhaAdminNova').value;
   const cfg = {
     ...carregarConfig(),
-    chavePix: $('#chavePix').value.trim(),
+    chavePix:   $('#chavePix').value.trim(),
     linkCartao: $('#linkCartao').value.trim(),
-    whatsapp: $('#whatsapp').value.trim().replace(/\D/g, ''),
+    whatsapp:   $('#whatsapp').value.trim().replace(/\D/g, ''),
   };
-  if (novaSenha) {
-    cfg.senhaAdmin = novaSenha;
-    $('#senhaAdminNova').value = '';
-  }
+  if (novaSenha) cfg.senhaAdmin = novaSenha;
   salvarConfig(cfg);
-  mostrarToast(novaSenha ? '✅ Configurações e senha salvos!' : '✅ Configurações salvas com sucesso!');
+
+  // Se modo Supabase, salva senha também no banco
+  if (modo === 'supabase' && novaSenha) {
+    await db.from('restaurantes').update({ senha_admin: novaSenha }).eq('id', rid);
+  }
+
+  if (novaSenha) $('#senhaAdminNova').value = '';
+  mostrarToast(novaSenha ? '✅ Configurações e senha salvos!' : '✅ Configurações salvas!');
 });
 
 // ===== GERAR QR CODES =====
@@ -97,23 +168,20 @@ $('#btnGerarQR').addEventListener('click', gerarQRCodes);
 $('#btnRegerar').addEventListener('click', gerarQRCodes);
 
 function gerarQRCodes() {
-  const urlBase = $('#urlBase').value.trim();
+  const urlBase  = $('#urlBase').value.trim();
   const numMesas = Math.min(Math.max(parseInt($('#numMesas').value) || 10, 1), 200);
 
-  if (!urlBase) {
-    mostrarToast('⚠️ Informe a URL base do cardápio');
-    return;
-  }
+  if (!urlBase) { mostrarToast('⚠️ Informe a URL base do cardápio'); return; }
 
-  const cfg = { ...carregarConfig(), urlBase, numMesas };
-  salvarConfig(cfg);
+  salvarConfig({ ...carregarConfig(), urlBase, numMesas });
 
   const qrGrid = $('#qrGrid');
   qrGrid.innerHTML = '';
 
   for (let i = 1; i <= numMesas; i++) {
-    const base = urlBase.replace(/\/$/, '');
-    const url = `${base}?mesa=${i}`;
+    const base = urlBase.replace(/\/$/, '').replace(/[?#].*$/, '');
+    const ridParam = rid ? `&rid=${rid}` : '';
+    const url = `${base}?mesa=${i}${ridParam}`;
 
     const card = document.createElement('div');
     card.className = 'qr-card';
@@ -122,32 +190,23 @@ function gerarQRCodes() {
       <div class="qr-card-info">
         <strong>Mesa ${i}</strong>
         <span class="qr-url">${url}</span>
-      </div>
-    `;
+      </div>`;
     qrGrid.appendChild(card);
 
     new QRCode(document.getElementById(`qr-mesa-${i}`), {
-      text: url,
-      width: 160,
-      height: 160,
-      colorDark: '#1A0F00',
-      colorLight: '#FFFFFF',
+      text: url, width: 160, height: 160,
+      colorDark: '#1A0F00', colorLight: '#FFFFFF',
       correctLevel: QRCode.CorrectLevel.M
     });
   }
 
   $('#qrActionsWrap').style.display = 'block';
   mostrarToast(`✅ ${numMesas} QR Code${numMesas > 1 ? 's' : ''} gerado${numMesas > 1 ? 's' : ''}!`);
-
-  setTimeout(() => {
-    $('#qrActionsWrap').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 200);
+  setTimeout(() => $('#qrActionsWrap').scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
 }
 
 // ===== IMPRIMIR =====
-$('#btnImprimirQR').addEventListener('click', () => {
-  window.print();
-});
+$('#btnImprimirQR').addEventListener('click', () => window.print());
 
 // ===== TOAST =====
 let toastTimer;
