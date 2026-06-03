@@ -182,8 +182,8 @@ body {
   position: relative;
   min-height: 420px;
   background:
-    linear-gradient(160deg, rgba(26,15,0,0.85) 0%, rgba(232,66,10,0.6) 60%, rgba(26,15,0,0.9) 100%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect fill='%23c13508' width='400' height='400'/%3E%3Ccircle cx='200' cy='200' r='150' fill='%23e8420a' opacity='0.5'/%3E%3Ccircle cx='80' cy='80' r='60' fill='%23f0a500' opacity='0.3'/%3E%3Ccircle cx='320' cy='320' r='80' fill='%23ff6b35' opacity='0.3'/%3E%3C/svg%3E") center/cover;
+    linear-gradient(160deg, rgba(26,15,0,0.82) 0%, rgba(232,66,10,0.52) 55%, rgba(26,15,0,0.88) 100%),
+    url("https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1400&q=80") center/cover no-repeat;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
