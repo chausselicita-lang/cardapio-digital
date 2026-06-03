@@ -19,7 +19,6 @@
       --text2: #5A4A3A;
       --text3: #9A8A7A;
       --font: 'Poppins', sans-serif;
-      --radius: 14px;
     }
     html { font-size: 16px; }
     body {
@@ -39,7 +38,7 @@
       border-radius: 20px;
       padding: 44px 36px;
       width: 100%;
-      max-width: 420px;
+      max-width: 400px;
       box-shadow: 0 20px 60px rgba(0,0,0,0.35);
       text-align: center;
     }
@@ -51,21 +50,22 @@
 
     .form-group { margin-bottom: 16px; text-align: left; }
     .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text2); margin-bottom: 6px; }
-    .form-group input {
+
+    .senha-wrap { position: relative; }
+    .senha-wrap input {
       width: 100%;
       border: 2px solid var(--border);
       border-radius: 10px;
-      padding: 13px 14px;
-      font-size: 14px;
+      padding: 13px 44px 13px 14px;
+      font-size: 15px;
       font-family: var(--font);
       color: var(--text);
       outline: none;
       transition: border-color 0.2s;
+      letter-spacing: 2px;
     }
-    .form-group input:focus { border-color: var(--primary); }
-
-    .senha-wrap { position: relative; }
-    .senha-wrap input { padding-right: 44px; }
+    .senha-wrap input::placeholder { letter-spacing: 0; }
+    .senha-wrap input:focus { border-color: var(--primary); }
     .btn-toggle {
       position: absolute;
       right: 12px;
@@ -137,12 +137,7 @@
   <div class="login-card">
     <div class="login-logo">🍽️</div>
     <h1>Painel Admin</h1>
-    <p>Entre com seu telefone e senha para acessar</p>
-
-    <div class="form-group">
-      <label>WhatsApp cadastrado</label>
-      <input type="tel" id="telefone" placeholder="(11) 99999-9999" autocomplete="tel" />
-    </div>
+    <p>Digite sua senha para acessar o painel</p>
 
     <div class="form-group">
       <label>Senha</label>
@@ -154,42 +149,41 @@
 
     <button class="btn-entrar" id="btnEntrar">
       <div class="spinner"></div>
-      <span class="btn-text">🔐 Entrar no Admin</span>
+      <span class="btn-text">🔐 Entrar</span>
     </button>
 
-    <div class="erro-msg" id="erroMsg">Telefone ou senha incorretos.</div>
+    <div class="erro-msg" id="erroMsg">Senha incorreta. Tente novamente.</div>
 
     <hr class="divider" />
 
     <p class="links-bottom">
-      Não tem cadastro? <a href="cadastro.html">Criar cardápio grátis</a>
+      Não tem cadastro? <a href="cadastro.html">Criar meu cardápio</a>
     </p>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script>
+    const rid = new URLSearchParams(location.search).get('rid');
+
     // Toggle senha
     const senhaInput = document.getElementById('senha');
     document.getElementById('btnToggle').addEventListener('click', () => {
       senhaInput.type = senhaInput.type === 'password' ? 'text' : 'password';
     });
 
-    // Enter key
-    document.getElementById('telefone').addEventListener('keydown', e => { if (e.key === 'Enter') entrar(); });
     senhaInput.addEventListener('keydown', e => { if (e.key === 'Enter') entrar(); });
     document.getElementById('btnEntrar').addEventListener('click', entrar);
 
     async function entrar() {
-      const tel   = document.getElementById('telefone').value.trim().replace(/\D/g, '');
-      const senha = document.getElementById('senha').value;
+      const senha = senhaInput.value;
       const erro  = document.getElementById('erroMsg');
       const btn   = document.getElementById('btnEntrar');
 
       erro.style.display = 'none';
 
-      if (!tel || !senha) {
-        erro.textContent = 'Preencha o telefone e a senha.';
+      if (!senha) {
+        erro.textContent = 'Digite sua senha.';
         erro.style.display = 'block';
         return;
       }
@@ -198,31 +192,39 @@
       btn.classList.add('loading');
 
       try {
-        // Busca pelo telefone com ou sem DDI 55
-        const { data, error } = await db
-          .from('restaurantes')
-          .select('id, nome_restaurante, telefone, senha_admin')
-          .or(`telefone.eq.55${tel},telefone.eq.${tel}`)
-          .single();
+        let query = db.from('restaurantes').select('id, nome_restaurante, senha_admin');
+
+        // Se tiver ?rid= na URL, valida só contra aquele restaurante
+        if (rid) {
+          query = query.eq('id', rid).single();
+        } else {
+          query = query.eq('senha_admin', senha).limit(1).single();
+        }
+
+        const { data, error } = await query;
 
         if (error || !data) throw new Error('não encontrado');
-        if (data.senha_admin !== senha) throw new Error('senha incorreta');
+        if (rid && data.senha_admin !== senha) throw new Error('senha incorreta');
 
-        // Login OK — salva sessão e redireciona
+        // Login OK — salva sessão e vai direto para o admin
         sessionStorage.setItem('admin_auth', '1');
-        sessionStorage.setItem('admin_rid', data.id);
+        sessionStorage.setItem('admin_rid',  data.id);
         sessionStorage.setItem('admin_nome', data.nome_restaurante);
 
         window.location.href = `admin.html?rid=${data.id}`;
 
       } catch {
-        erro.textContent = 'Telefone ou senha incorretos.';
+        erro.textContent = 'Senha incorreta. Tente novamente.';
         erro.style.display = 'block';
         btn.disabled = false;
         btn.classList.remove('loading');
-        document.getElementById('senha').value = '';
+        senhaInput.value = '';
+        senhaInput.focus();
       }
     }
+
+    // Foca a senha ao carregar
+    window.addEventListener('load', () => senhaInput.focus());
   </script>
 </body>
 </html>
