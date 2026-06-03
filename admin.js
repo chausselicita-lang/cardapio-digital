@@ -4,6 +4,7 @@ const $ = sel => document.querySelector(sel);
 const $$ = sel => [...document.querySelectorAll(sel)];
 
 const CONFIG_KEY = 'cardapio_config';
+const SENHA_PADRAO = 'admin123';
 
 function carregarConfig() {
   try { return JSON.parse(localStorage.getItem(CONFIG_KEY) || '{}'); } catch { return {}; }
@@ -12,6 +13,46 @@ function carregarConfig() {
 function salvarConfig(cfg) {
   localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg));
 }
+
+// ===== LOGIN =====
+const loginOverlay = $('#adminLoginOverlay');
+const senhaInput = $('#senhaInput');
+const loginError = $('#loginError');
+
+function verificarSessao() {
+  if (sessionStorage.getItem('admin_auth') === '1') {
+    loginOverlay.style.display = 'none';
+  }
+}
+
+function tentarLogin() {
+  const config = carregarConfig();
+  const senhaCorreta = config.senhaAdmin || SENHA_PADRAO;
+  if (senhaInput.value === senhaCorreta) {
+    sessionStorage.setItem('admin_auth', '1');
+    loginOverlay.style.display = 'none';
+    senhaInput.value = '';
+    loginError.style.display = 'none';
+  } else {
+    loginError.style.display = 'block';
+    senhaInput.value = '';
+    senhaInput.focus();
+  }
+}
+
+$('#btnEntrar').addEventListener('click', tentarLogin);
+senhaInput.addEventListener('keydown', e => { if (e.key === 'Enter') tentarLogin(); });
+
+$('#btnSair').addEventListener('click', () => {
+  sessionStorage.removeItem('admin_auth');
+  loginOverlay.style.display = 'flex';
+  senhaInput.value = '';
+  loginError.style.display = 'none';
+  setTimeout(() => senhaInput.focus(), 100);
+});
+
+// Verifica se já está autenticado ao carregar
+verificarSessao();
 
 // ===== CARREGAR VALORES SALVOS NO FORMULÁRIO =====
 const config = carregarConfig();
@@ -36,14 +77,19 @@ $$('.tab-btn').forEach(btn => {
 
 // ===== SALVAR CONFIGURAÇÕES =====
 $('#btnSalvarConfig').addEventListener('click', () => {
+  const novaSenha = $('#senhaAdminNova').value;
   const cfg = {
     ...carregarConfig(),
     chavePix: $('#chavePix').value.trim(),
     linkCartao: $('#linkCartao').value.trim(),
     whatsapp: $('#whatsapp').value.trim().replace(/\D/g, ''),
   };
+  if (novaSenha) {
+    cfg.senhaAdmin = novaSenha;
+    $('#senhaAdminNova').value = '';
+  }
   salvarConfig(cfg);
-  mostrarToast('✅ Configurações salvas com sucesso!');
+  mostrarToast(novaSenha ? '✅ Configurações e senha salvos!' : '✅ Configurações salvas com sucesso!');
 });
 
 // ===== GERAR QR CODES =====
@@ -59,7 +105,6 @@ function gerarQRCodes() {
     return;
   }
 
-  // Salva URL e número de mesas na config
   const cfg = { ...carregarConfig(), urlBase, numMesas };
   salvarConfig(cfg);
 
@@ -67,7 +112,6 @@ function gerarQRCodes() {
   qrGrid.innerHTML = '';
 
   for (let i = 1; i <= numMesas; i++) {
-    // Garante que a URL base não termine com /
     const base = urlBase.replace(/\/$/, '');
     const url = `${base}?mesa=${i}`;
 
@@ -95,7 +139,6 @@ function gerarQRCodes() {
   $('#qrActionsWrap').style.display = 'block';
   mostrarToast(`✅ ${numMesas} QR Code${numMesas > 1 ? 's' : ''} gerado${numMesas > 1 ? 's' : ''}!`);
 
-  // Scroll para os QR Codes
   setTimeout(() => {
     $('#qrActionsWrap').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, 200);
