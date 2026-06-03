@@ -401,6 +401,66 @@
       transition: all 0.2s;
     }
     .btn-sair:hover { background: rgba(255,255,255,0.15); color: white; }
+
+    /* PLANO INFO BADGE */
+    .plano-info-badge {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      background: #fff8f3;
+      border: 1.5px solid #f0e8df;
+      border-radius: 10px;
+      padding: 10px 16px;
+      margin-bottom: 18px;
+      font-size: 13px;
+    }
+    .plano-info-badge .plano-icon { font-size: 20px; }
+    .plano-info-badge .plano-texto { color: var(--text2); }
+    .plano-info-badge .plano-texto strong { color: var(--dark); }
+    .plano-info-badge .plano-limite-tag {
+      margin-left: auto;
+      background: rgba(232,66,10,0.1);
+      color: var(--primary);
+      border-radius: 6px;
+      padding: 3px 10px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    /* LIMITE AVISO */
+    .limite-aviso {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      background: #fff5ee;
+      border: 2px solid var(--primary);
+      border-radius: 14px;
+      padding: 28px 24px;
+      margin-top: 16px;
+      gap: 10px;
+    }
+    .limite-aviso-icon { font-size: 40px; }
+    .limite-aviso h3 { font-size: 16px; font-weight: 700; color: var(--dark); }
+    .limite-aviso p { font-size: 13px; color: var(--text2); line-height: 1.6; max-width: 340px; }
+    .btn-upgrade {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 9px;
+      padding: 11px 22px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: var(--font);
+      text-decoration: none;
+      margin-top: 6px;
+      transition: background 0.2s;
+    }
+    .btn-upgrade:hover { background: var(--primary-dark); }
   </style>
 </head>
 <body>
@@ -489,6 +549,13 @@
           <strong>Como funciona:</strong> Cada QR Code abre o cardápio com <code>?mesa=X</code> na URL. O número da mesa aparece no topo do cardápio e é enviado junto com o pedido no WhatsApp.
         </div>
 
+        <!-- Badge do plano atual (visível só no modo Supabase) -->
+        <div class="plano-info-badge" id="planoInfoBadge">
+          <span class="plano-icon">📋</span>
+          <span class="plano-texto">Seu plano: <strong id="planoNomeBadge">—</strong></span>
+          <span class="plano-limite-tag" id="planoLimiteTag">—</span>
+        </div>
+
         <div class="form-group">
           <label>URL base do cardápio</label>
           <input type="url" id="urlBase" placeholder="https://seusite.com/index.html">
@@ -501,6 +568,14 @@
             <input type="number" id="numMesas" min="1" max="200" value="10">
           </div>
           <button class="btn-primary" id="btnGerarQR">▶ Gerar QR Codes</button>
+        </div>
+
+        <!-- Aviso de limite atingido -->
+        <div class="limite-aviso" id="limiteAviso">
+          <div class="limite-aviso-icon">🔒</div>
+          <h3>Limite do seu plano atingido</h3>
+          <p id="limiteAvisoTexto">Faça upgrade para adicionar mais mesas.</p>
+          <a class="btn-upgrade" href="cadastro.html#planos">⬆ Fazer Upgrade</a>
         </div>
       </div>
 
@@ -524,6 +599,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script src="admin.js?v=5"></script>
+  <script src="admin.js?v=6"></script>
 </body>
 </html>

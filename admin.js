@@ -10,6 +10,43 @@ const SENHA_PADRAO  = 'admin123';
 const rid  = new URLSearchParams(location.search).get('rid');
 const modo = rid ? 'supabase' : 'local';
 
+// ===== LIMITE POR PLANO =====
+let limiteQR = Infinity;
+
+const PLANOS_LIMITE = [
+  { max: 5,        nome: 'Starter',    limite: 5  },
+  { max: 10,       nome: 'Popular',    limite: 10 },
+  { max: 20,       nome: 'Pro',        limite: 20 },
+  { max: 50,       nome: 'Business',   limite: 50 },
+  { max: Infinity, nome: 'Enterprise', limite: Infinity },
+];
+
+function getLimitePlano(numMesas) {
+  const entry = PLANOS_LIMITE.find(p => numMesas <= p.max) || PLANOS_LIMITE[PLANOS_LIMITE.length - 1];
+  return entry;
+}
+
+function atualizarBadgePlano(numMesas, plano) {
+  const badge    = $('#planoInfoBadge');
+  const nomeEl   = $('#planoNomeBadge');
+  const limiteEl = $('#planoLimiteTag');
+  if (!badge) return;
+
+  const entry = getLimitePlano(numMesas || 0);
+  limiteQR = entry.limite;
+
+  nomeEl.textContent   = plano || entry.nome;
+  limiteEl.textContent = entry.limite === Infinity ? 'Mesas ilimitadas' : `Máx. ${entry.limite} mesas`;
+  badge.style.display  = 'flex';
+
+  // Ajusta o max do input
+  const inputMesas = $('#numMesas');
+  if (entry.limite !== Infinity) {
+    inputMesas.max = entry.limite;
+    if (parseInt(inputMesas.value) > entry.limite) inputMesas.value = entry.limite;
+  }
+}
+
 function carregarConfig() {
   try { return JSON.parse(localStorage.getItem(CONFIG_KEY) || '{}'); } catch { return {}; }
 }
@@ -103,7 +140,7 @@ async function carregarDadosRestaurante() {
   if (modo !== 'supabase' || !rid) return;
   try {
     const { data } = await db.from('restaurantes')
-      .select('nome_restaurante, tipo, telefone, email, endereco, horario, senha_admin')
+      .select('nome_restaurante, tipo, telefone, email, endereco, horario, senha_admin, num_mesas, plano')
       .eq('id', rid).single();
     if (!data) return;
 
@@ -115,6 +152,9 @@ async function carregarDadosRestaurante() {
     $('#chavePix').value   = carregarConfig().chavePix  || '';
     $('#linkCartao').value = carregarConfig().linkCartao || '';
     $('#whatsapp').value   = (data.telefone || '').replace(/^55/, '');
+
+    // Configura limite de QR por plano
+    atualizarBadgePlano(data.num_mesas || 0, data.plano);
 
   } catch {}
 }
@@ -170,8 +210,22 @@ $('#btnRegerar').addEventListener('click', gerarQRCodes);
 function gerarQRCodes() {
   const urlBase  = $('#urlBase').value.trim();
   const numMesas = Math.min(Math.max(parseInt($('#numMesas').value) || 10, 1), 200);
+  const avisoEl  = $('#limiteAviso');
 
   if (!urlBase) { mostrarToast('⚠️ Informe a URL base do cardápio'); return; }
+
+  // Verifica limite do plano (somente no modo Supabase)
+  if (modo === 'supabase' && limiteQR !== Infinity && numMesas > limiteQR) {
+    if (avisoEl) {
+      $('#limiteAvisoTexto').textContent =
+        `Seu plano permite até ${limiteQR} mesa${limiteQR > 1 ? 's' : ''}. ` +
+        `Faça upgrade para adicionar mais mesas.`;
+      avisoEl.style.display = 'flex';
+    }
+    $('#qrActionsWrap').style.display = 'none';
+    return;
+  }
+  if (avisoEl) avisoEl.style.display = 'none';
 
   salvarConfig({ ...carregarConfig(), urlBase, numMesas });
 
