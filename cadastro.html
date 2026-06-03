@@ -3,106 +3,539 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Criar Meu Cardápio Digital</title>
+  <title>CardápioPro – Digitalize seu restaurante em 5 minutos</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --primary: #E8420A;
-      --primary-dark: #C13508;
-      --primary-light: #FF6B35;
-      --gold: #F0A500;
-      --dark: #1A0F00;
+      --primary: #FF6B00;
+      --primary-dark: #E05A00;
+      --primary-light: #FF8C35;
+      --primary-glow: rgba(255,107,0,0.25);
+      --gold: #FFB800;
+      --dark: #0F0700;
+      --dark2: #1C1008;
       --surface: #FFFFFF;
-      --surface2: #FFF8F3;
-      --border: #F0E8DF;
+      --surface2: #FFF8F2;
+      --surface3: #FFF3E8;
+      --border: #F0E4D4;
       --text: #1A0F00;
-      --text2: #5A4A3A;
-      --text3: #9A8A7A;
-      --success: #27ae60;
+      --text2: #5A4030;
+      --text3: #9A8070;
+      --success: #22c55e;
       --font: 'Poppins', sans-serif;
       --font2: 'Playfair Display', serif;
-      --radius: 14px;
+      --radius: 16px;
+      --shadow: 0 8px 40px rgba(0,0,0,0.10);
+      --shadow-lg: 0 20px 60px rgba(0,0,0,0.15);
     }
     html { font-size: 16px; scroll-behavior: smooth; }
     body { font-family: var(--font); background: var(--surface2); color: var(--text); min-height: 100vh; }
 
-    /* HERO */
+    /* ─── NAVBAR ─── */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(15,7,0,0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,107,0,0.15);
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .nav-logo-icon {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, #FF6B00, #FFB800);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 4px 12px rgba(255,107,0,0.4);
+    }
+    .nav-logo-text {
+      font-size: 20px;
+      font-weight: 800;
+      color: white;
+      letter-spacing: -0.5px;
+    }
+    .nav-logo-text span { color: var(--primary); }
+    .nav-cta {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 20px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: var(--font);
+      text-decoration: none;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .nav-cta:hover { background: var(--primary-dark); transform: translateY(-1px); }
+
+    /* ─── HERO ─── */
     .hero {
+      position: relative;
+      overflow: hidden;
       background:
-        linear-gradient(160deg, rgba(26,15,0,0.88) 0%, rgba(232,66,10,0.6) 55%, rgba(26,15,0,0.92) 100%),
-        url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80') center/cover no-repeat;
-      padding: 60px 24px 80px;
+        linear-gradient(150deg, rgba(15,7,0,0.93) 0%, rgba(255,107,0,0.45) 50%, rgba(15,7,0,0.95) 100%),
+        url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1400&q=85') center/cover no-repeat;
+      padding: 90px 24px 110px;
       text-align: center;
       color: white;
     }
-    .hero-logo { font-size: 48px; margin-bottom: 16px; }
-    .hero h1 {
-      font-family: var(--font2);
-      font-size: clamp(28px, 5vw, 48px);
-      font-weight: 800;
-      margin-bottom: 14px;
-      line-height: 1.15;
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      right: 0;
+      height: 80px;
+      background: linear-gradient(to bottom, transparent, var(--surface2));
     }
-    .hero p {
-      font-size: 16px;
-      color: rgba(255,255,255,0.8);
-      max-width: 520px;
-      margin: 0 auto 28px;
-      line-height: 1.6;
-    }
-    .hero-badges {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .hero-badge {
-      background: rgba(255,255,255,0.12);
-      border: 1px solid rgba(255,255,255,0.2);
-      color: white;
-      padding: 6px 14px;
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,107,0,0.15);
+      border: 1px solid rgba(255,107,0,0.3);
+      color: #FF9A4D;
+      padding: 6px 16px;
       border-radius: 50px;
       font-size: 12px;
-      font-weight: 500;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 24px;
     }
-
-    /* FORM CONTAINER */
-    .form-wrap {
-      max-width: 680px;
-      margin: -40px auto 60px;
-      padding: 0 20px;
+    .hero-brand {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      margin-bottom: 28px;
     }
-    .form-card {
-      background: var(--surface);
+    .hero-brand-icon {
+      width: 72px;
+      height: 72px;
+      background: linear-gradient(135deg, #FF6B00, #FFB800);
       border-radius: 20px;
-      padding: 40px 36px;
-      box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 32px rgba(255,107,0,0.5);
     }
-    @media (max-width: 600px) {
-      .form-card { padding: 28px 20px; }
+    .hero-brand-icon svg {
+      width: 40px;
+      height: 40px;
+      fill: white;
     }
-    .form-title {
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--dark);
-      margin-bottom: 6px;
+    .hero-brand-name {
+      text-align: left;
     }
-    .form-subtitle {
-      font-size: 13px;
-      color: var(--text3);
-      margin-bottom: 32px;
+    .hero-brand-name h2 {
+      font-size: 36px;
+      font-weight: 900;
+      color: white;
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+    .hero-brand-name h2 span { color: var(--primary); }
+    .hero-brand-name p {
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+    .hero h1 {
+      font-family: var(--font2);
+      font-size: clamp(32px, 5.5vw, 58px);
+      font-weight: 900;
+      line-height: 1.1;
+      margin-bottom: 20px;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(90deg, #FF6B00, #FFB800);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-sub {
+      font-size: 17px;
+      color: rgba(255,255,255,0.75);
+      max-width: 520px;
+      margin: 0 auto 36px;
+      line-height: 1.7;
+    }
+    .hero-cta-group {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+    }
+    .btn-hero-primary {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 16px 32px;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: var(--font);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 8px 32px rgba(255,107,0,0.45);
+      transition: all 0.2s;
+    }
+    .btn-hero-primary:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 12px 40px rgba(255,107,0,0.55); }
+    .btn-hero-secondary {
+      background: rgba(255,255,255,0.1);
+      color: white;
+      border: 2px solid rgba(255,255,255,0.25);
+      border-radius: 12px;
+      padding: 14px 28px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .btn-hero-secondary:hover { background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.4); }
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+    .hero-stat {
+      text-align: center;
+    }
+    .hero-stat-num {
+      font-size: 28px;
+      font-weight: 900;
+      color: white;
+      line-height: 1;
+    }
+    .hero-stat-num span { color: var(--primary); }
+    .hero-stat-label {
+      font-size: 11px;
+      color: rgba(255,255,255,0.5);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 2px;
     }
 
-    /* CAMPOS */
-    .form-section-title {
-      font-size: 12px;
+    /* ─── COMO FUNCIONA ─── */
+    .como-funciona {
+      padding: 80px 24px;
+      text-align: center;
+      background: var(--surface);
+    }
+    .section-tag {
+      display: inline-block;
+      background: var(--surface3);
+      color: var(--primary);
+      border: 1.5px solid rgba(255,107,0,0.2);
+      padding: 5px 14px;
+      border-radius: 50px;
+      font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 1px;
+      margin-bottom: 14px;
+    }
+    .section-title {
+      font-family: var(--font2);
+      font-size: clamp(26px, 4vw, 40px);
+      font-weight: 900;
+      color: var(--dark);
+      margin-bottom: 10px;
+      line-height: 1.15;
+    }
+    .section-sub {
+      font-size: 15px;
+      color: var(--text3);
+      max-width: 480px;
+      margin: 0 auto 56px;
+      line-height: 1.6;
+    }
+    .steps-grid {
+      display: flex;
+      gap: 0;
+      justify-content: center;
+      max-width: 900px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .steps-grid::before {
+      content: '';
+      position: absolute;
+      top: 44px;
+      left: 16%;
+      right: 16%;
+      height: 2px;
+      background: linear-gradient(90deg, var(--primary), var(--gold));
+      z-index: 0;
+    }
+    @media (max-width: 700px) { .steps-grid::before { display: none; } .steps-grid { flex-direction: column; gap: 32px; align-items: center; } }
+    .step {
+      flex: 1;
+      max-width: 260px;
+      position: relative;
+      z-index: 1;
+      padding: 0 16px;
+    }
+    .step-num {
+      width: 88px;
+      height: 88px;
+      background: linear-gradient(135deg, var(--primary), var(--gold));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 32px;
+      box-shadow: 0 8px 28px rgba(255,107,0,0.35);
+      border: 4px solid white;
+    }
+    .step h3 {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 8px;
+    }
+    .step p {
+      font-size: 13px;
+      color: var(--text3);
+      line-height: 1.6;
+    }
+
+    /* ─── PLANOS ─── */
+    .planos-section {
+      background: var(--surface2);
+      padding: 80px 24px;
+      text-align: center;
+    }
+    .planos-grid {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .plano-card {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 20px;
+      padding: 28px 20px;
+      width: 188px;
+      position: relative;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+      flex-shrink: 0;
+      cursor: pointer;
+      user-select: none;
+    }
+    .plano-card:hover { transform: translateY(-5px); box-shadow: 0 12px 36px rgba(0,0,0,0.10); }
+    .plano-card.selected {
+      border-color: var(--primary);
+      background: #FFF5EE;
+      box-shadow: 0 0 0 4px rgba(255,107,0,0.12), 0 12px 36px rgba(255,107,0,0.15);
+      transform: translateY(-5px);
+    }
+    .plano-card.popular {
+      background: var(--dark);
+      border-color: var(--primary);
+      transform: scale(1.06);
+      box-shadow: 0 16px 48px rgba(255,107,0,0.30);
+      z-index: 1;
+    }
+    .plano-card.popular:hover { transform: scale(1.06) translateY(-5px); }
+    .plano-card.popular.selected {
+      box-shadow: 0 0 0 4px rgba(255,107,0,0.5), 0 16px 48px rgba(255,107,0,0.40);
+      transform: scale(1.06) translateY(-5px);
+    }
+    .plano-popular-badge {
+      position: absolute;
+      top: -13px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(90deg, var(--primary), var(--gold));
+      color: white;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 4px 14px;
+      border-radius: 50px;
+      white-space: nowrap;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .plano-icon { font-size: 28px; margin-bottom: 10px; }
+    .plano-mesas { font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 12px; }
+    .plano-card.popular .plano-mesas { color: rgba(255,255,255,0.65); }
+    .plano-preco { font-size: 34px; font-weight: 900; color: var(--primary); line-height: 1; }
+    .plano-card.popular .plano-preco { color: white; }
+    .plano-periodo { font-size: 11px; color: var(--text3); margin-top: 2px; }
+    .plano-card.popular .plano-periodo { color: rgba(255,255,255,0.45); }
+    .plano-features { list-style: none; margin-top: 16px; display: flex; flex-direction: column; gap: 5px; }
+    .plano-features li { font-size: 11px; color: var(--text2); }
+    .plano-card.popular .plano-features li { color: rgba(255,255,255,0.7); }
+
+    /* ─── DEPOIMENTOS ─── */
+    .depoimentos {
+      background: var(--surface);
+      padding: 80px 24px;
+      text-align: center;
+    }
+    .depoimentos-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      max-width: 960px;
+      margin: 0 auto;
+      text-align: left;
+    }
+    @media (max-width: 800px) { .depoimentos-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 1100px) and (min-width: 801px) { .depoimentos-grid { grid-template-columns: repeat(2, 1fr); } }
+    .depoimento-card {
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 18px;
+      padding: 24px 22px;
+      position: relative;
+    }
+    .depoimento-card::before {
+      content: '"';
+      position: absolute;
+      top: 12px;
+      right: 18px;
+      font-family: var(--font2);
+      font-size: 64px;
+      color: rgba(255,107,0,0.15);
+      line-height: 1;
+    }
+    .depoimento-stars {
+      color: var(--gold);
+      font-size: 14px;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+    .depoimento-texto {
+      font-size: 13px;
+      color: var(--text2);
+      line-height: 1.7;
+      margin-bottom: 18px;
+    }
+    .depoimento-autor {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .depoimento-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: linear-gradient(135deg, var(--primary), var(--gold));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .depoimento-info strong {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--dark);
+    }
+    .depoimento-info span {
+      font-size: 11px;
+      color: var(--text3);
+    }
+
+    /* ─── FORM CONTAINER ─── */
+    .form-wrap {
+      max-width: 700px;
+      margin: -50px auto 60px;
+      padding: 0 20px;
+      position: relative;
+      z-index: 10;
+    }
+    .form-card {
+      background: var(--surface);
+      border-radius: 24px;
+      padding: 44px 40px;
+      box-shadow: 0 12px 60px rgba(0,0,0,0.13);
+      border: 1.5px solid var(--border);
+    }
+    @media (max-width: 600px) { .form-card { padding: 28px 20px; } }
+
+    .form-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 8px;
+    }
+    .form-header-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--primary), var(--gold));
+      border-radius: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .form-title { font-size: 22px; font-weight: 800; color: var(--dark); }
+    .form-subtitle { font-size: 13px; color: var(--text3); margin-bottom: 32px; margin-top: 4px; }
+
+    .form-section-title {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
       color: var(--primary);
-      margin: 28px 0 16px;
+      margin: 32px 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .form-section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
     }
     .form-section-title:first-of-type { margin-top: 0; }
 
@@ -112,7 +545,7 @@
       font-size: 13px;
       font-weight: 600;
       color: var(--text2);
-      margin-bottom: 6px;
+      margin-bottom: 7px;
     }
     .form-group label span { color: var(--primary); }
     .form-group input,
@@ -120,29 +553,26 @@
     .form-group textarea {
       width: 100%;
       border: 2px solid var(--border);
-      border-radius: 10px;
+      border-radius: 11px;
       padding: 12px 14px;
       font-size: 14px;
       font-family: var(--font);
       color: var(--text);
       background: var(--surface);
-      transition: border-color 0.2s;
+      transition: border-color 0.2s, box-shadow 0.2s;
       outline: none;
     }
     .form-group input:focus,
     .form-group select:focus,
-    .form-group textarea:focus { border-color: var(--primary); }
-    .form-group textarea { resize: vertical; min-height: 80px; }
-    .form-group small {
-      display: block;
-      font-size: 11px;
-      color: var(--text3);
-      margin-top: 4px;
+    .form-group textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(255,107,0,0.1);
     }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    .form-group small { display: block; font-size: 11px; color: var(--text3); margin-top: 5px; }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     @media (max-width: 500px) { .form-row { grid-template-columns: 1fr; } }
 
-    /* TIPOS DE ESTABELECIMENTO */
     .tipos-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -152,21 +582,20 @@
     .tipo-btn {
       border: 2px solid var(--border);
       background: var(--surface2);
-      border-radius: 10px;
+      border-radius: 12px;
       padding: 12px 8px;
       text-align: center;
       cursor: pointer;
       transition: all 0.2s;
       font-family: var(--font);
     }
-    .tipo-btn:hover { border-color: var(--primary-light); }
-    .tipo-btn.selected { border-color: var(--primary); background: rgba(232,66,10,0.06); }
+    .tipo-btn:hover { border-color: var(--primary-light); background: #FFF5EE; }
+    .tipo-btn.selected { border-color: var(--primary); background: #FFF5EE; box-shadow: 0 0 0 3px rgba(255,107,0,0.1); }
     .tipo-btn input { display: none; }
     .tipo-icon { font-size: 24px; display: block; margin-bottom: 4px; }
     .tipo-label { font-size: 11px; font-weight: 600; color: var(--text2); }
     .tipo-btn.selected .tipo-label { color: var(--primary); }
 
-    /* HORÁRIOS */
     .horario-grid { display: flex; flex-direction: column; gap: 8px; }
     .horario-row {
       display: grid;
@@ -174,20 +603,10 @@
       gap: 8px;
       align-items: center;
     }
-    .horario-dia {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text2);
-    }
-    .horario-row input[type="time"] {
-      padding: 8px 10px;
-      font-size: 13px;
-    }
-    @media (max-width: 500px) {
-      .horario-row { grid-template-columns: 80px 1fr 1fr; }
-    }
+    .horario-dia { font-size: 12px; font-weight: 600; color: var(--text2); }
+    .horario-row input[type="time"] { padding: 8px 10px; font-size: 13px; }
+    @media (max-width: 500px) { .horario-row { grid-template-columns: 80px 1fr 1fr; } }
 
-    /* SENHA */
     .senha-wrap { position: relative; }
     .senha-wrap input { padding-right: 44px; }
     .btn-toggle-senha {
@@ -203,16 +622,31 @@
       padding: 4px;
     }
 
-    /* SUBMIT */
+    .plano-resultado {
+      background: linear-gradient(135deg, #FFF5EE, #FFF8F2);
+      border: 2px solid var(--primary);
+      border-radius: 13px;
+      padding: 14px 16px;
+      margin-top: 12px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .plano-resultado.show { display: flex; }
+    .plano-resultado-info strong { display: block; font-size: 15px; font-weight: 800; color: var(--dark); }
+    .plano-resultado-info span { font-size: 12px; color: var(--text3); }
+    .plano-resultado-preco { font-size: 24px; font-weight: 900; color: var(--primary); white-space: nowrap; }
+
     .btn-submit {
       width: 100%;
-      background: var(--primary);
+      background: linear-gradient(135deg, var(--primary), #FF8C35);
       color: white;
       border: none;
-      border-radius: 12px;
-      padding: 16px;
+      border-radius: 13px;
+      padding: 17px;
       font-size: 16px;
-      font-weight: 700;
+      font-weight: 800;
       cursor: pointer;
       font-family: var(--font);
       transition: all 0.2s;
@@ -221,10 +655,11 @@
       justify-content: center;
       gap: 10px;
       margin-top: 32px;
-      box-shadow: 0 4px 16px rgba(232,66,10,0.3);
+      box-shadow: 0 6px 24px rgba(255,107,0,0.4);
+      letter-spacing: 0.2px;
     }
-    .btn-submit:hover { background: var(--primary-dark); transform: translateY(-1px); }
-    .btn-submit:disabled { background: #ccc; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-submit:hover { background: linear-gradient(135deg, var(--primary-dark), var(--primary)); transform: translateY(-2px); box-shadow: 0 10px 32px rgba(255,107,0,0.5); }
+    .btn-submit:disabled { background: #ddd; cursor: not-allowed; transform: none; box-shadow: none; }
     .btn-submit .spinner {
       width: 20px; height: 20px;
       border: 3px solid rgba(255,255,255,0.3);
@@ -243,18 +678,32 @@
       font-size: 13px;
       color: var(--text3);
     }
-    .ja-tem-conta a {
-      color: var(--primary);
-      font-weight: 600;
-      text-decoration: none;
-    }
+    .ja-tem-conta a { color: var(--primary); font-weight: 700; text-decoration: none; }
     .ja-tem-conta a:hover { text-decoration: underline; }
 
-    /* SUCCESS OVERLAY */
+    /* ─── FORM TRUST ─── */
+    .form-trust {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      margin-top: 22px;
+      flex-wrap: wrap;
+    }
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      color: var(--text3);
+      font-weight: 500;
+    }
+
+    /* ─── SUCCESS OVERLAY ─── */
     .success-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(26,15,0,0.92);
+      background: rgba(15,7,0,0.94);
       z-index: 999;
       display: none;
       align-items: center;
@@ -264,20 +713,20 @@
     .success-overlay.show { display: flex; }
     .success-box {
       background: var(--surface);
-      border-radius: 20px;
-      padding: 40px 32px;
-      max-width: 460px;
+      border-radius: 24px;
+      padding: 44px 36px;
+      max-width: 480px;
       width: 100%;
       text-align: center;
     }
-    .success-icon { font-size: 60px; margin-bottom: 16px; }
-    .success-box h2 { font-size: 22px; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
-    .success-box p { font-size: 14px; color: var(--text2); line-height: 1.6; margin-bottom: 20px; }
+    .success-icon { font-size: 64px; margin-bottom: 16px; }
+    .success-box h2 { font-size: 24px; font-weight: 800; color: var(--dark); margin-bottom: 8px; }
+    .success-box p { font-size: 14px; color: var(--text2); line-height: 1.7; margin-bottom: 24px; }
     .success-links { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
     .success-link {
       background: var(--surface2);
       border: 1.5px solid var(--border);
-      border-radius: 10px;
+      border-radius: 12px;
       padding: 12px 16px;
       text-align: left;
     }
@@ -288,160 +737,22 @@
       background: #25D366;
       color: white;
       border: none;
-      border-radius: 12px;
+      border-radius: 13px;
       padding: 15px;
       font-size: 15px;
-      font-weight: 700;
+      font-weight: 800;
       cursor: pointer;
       font-family: var(--font);
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      box-shadow: 0 4px 14px rgba(37,211,102,0.35);
+      box-shadow: 0 6px 20px rgba(37,211,102,0.35);
       transition: background 0.2s;
     }
     .btn-whats:hover { background: #1ebe5a; }
 
-    /* PLANOS */
-    .planos-section {
-      background: var(--surface);
-      padding: 64px 24px;
-      text-align: center;
-    }
-    .planos-titulo {
-      font-family: var(--font2);
-      font-size: clamp(24px, 4vw, 36px);
-      font-weight: 800;
-      color: var(--dark);
-      margin-bottom: 8px;
-    }
-    .planos-sub {
-      font-size: 15px;
-      color: var(--text3);
-      margin-bottom: 40px;
-    }
-    .planos-grid {
-      display: flex;
-      gap: 14px;
-      justify-content: center;
-      flex-wrap: wrap;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-    .plano-card {
-      background: var(--surface2);
-      border: 2px solid var(--border);
-      border-radius: 18px;
-      padding: 28px 22px;
-      width: 190px;
-      position: relative;
-      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
-      flex-shrink: 0;
-      cursor: pointer;
-      user-select: none;
-    }
-    .plano-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 28px rgba(0,0,0,0.10);
-    }
-    .plano-card.selected {
-      border-color: var(--primary);
-      background: rgba(232,66,10,0.05);
-      box-shadow: 0 0 0 4px rgba(232,66,10,0.15), 0 8px 28px rgba(232,66,10,0.15);
-      transform: translateY(-4px);
-    }
-    .plano-card.popular {
-      background: var(--dark);
-      border-color: var(--primary);
-      transform: scale(1.05);
-      box-shadow: 0 12px 40px rgba(232,66,10,0.25);
-      z-index: 1;
-    }
-    .plano-card.popular:hover { transform: scale(1.05) translateY(-4px); }
-    .plano-card.popular.selected {
-      box-shadow: 0 0 0 4px rgba(232,66,10,0.5), 0 12px 40px rgba(232,66,10,0.4);
-      transform: scale(1.05) translateY(-4px);
-    }
-    .plano-popular-badge {
-      position: absolute;
-      top: -13px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--primary);
-      color: white;
-      font-size: 11px;
-      font-weight: 700;
-      padding: 4px 14px;
-      border-radius: 50px;
-      white-space: nowrap;
-      letter-spacing: 0.3px;
-    }
-    .plano-icon { font-size: 30px; margin-bottom: 10px; }
-    .plano-mesas {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text2);
-      margin-bottom: 12px;
-    }
-    .plano-card.popular .plano-mesas { color: rgba(255,255,255,0.7); }
-    .plano-preco {
-      font-size: 32px;
-      font-weight: 800;
-      color: var(--primary);
-      line-height: 1;
-    }
-    .plano-card.popular .plano-preco { color: white; }
-    .plano-periodo {
-      font-size: 12px;
-      color: var(--text3);
-      margin-top: 2px;
-    }
-    .plano-card.popular .plano-periodo { color: rgba(255,255,255,0.5); }
-    .plano-features {
-      list-style: none;
-      margin-top: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .plano-features li {
-      font-size: 12px;
-      color: var(--text2);
-    }
-    .plano-card.popular .plano-features li { color: rgba(255,255,255,0.75); }
-
-    /* PLANO SELECIONADO NO FORM */
-    .plano-resultado {
-      background: rgba(232,66,10,0.07);
-      border: 2px solid var(--primary);
-      border-radius: 12px;
-      padding: 14px 16px;
-      margin-top: 12px;
-      display: none;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-    .plano-resultado.show { display: flex; }
-    .plano-resultado-info strong {
-      display: block;
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--dark);
-    }
-    .plano-resultado-info span {
-      font-size: 12px;
-      color: var(--text3);
-    }
-    .plano-resultado-preco {
-      font-size: 22px;
-      font-weight: 800;
-      color: var(--primary);
-      white-space: nowrap;
-    }
-
-    /* SETUP BANNER */
+    /* ─── SETUP BANNER ─── */
     .setup-banner {
       background: #fff3cd;
       border-bottom: 3px solid #f0a500;
@@ -470,8 +781,137 @@
       text-decoration: none;
     }
 
-    /* FOOTER */
-    .page-footer { text-align: center; padding: 24px; font-size: 12px; color: var(--text3); }
+    /* ─── FOOTER ─── */
+    .site-footer {
+      background: var(--dark);
+      color: rgba(255,255,255,0.6);
+      padding: 56px 24px 32px;
+    }
+    .footer-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .footer-top {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 44px;
+    }
+    @media (max-width: 720px) { .footer-top { grid-template-columns: 1fr; gap: 28px; } }
+    .footer-brand {}
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .footer-logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #FF6B00, #FFB800);
+      border-radius: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .footer-logo-text {
+      font-size: 21px;
+      font-weight: 900;
+      color: white;
+    }
+    .footer-logo-text span { color: var(--primary); }
+    .footer-desc {
+      font-size: 13px;
+      line-height: 1.7;
+      max-width: 280px;
+      margin-bottom: 20px;
+    }
+    .footer-social {
+      display: flex;
+      gap: 10px;
+    }
+    .footer-social a {
+      width: 36px;
+      height: 36px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .footer-social a:hover { background: rgba(255,107,0,0.25); }
+    .footer-col h4 {
+      font-size: 12px;
+      font-weight: 800;
+      color: white;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 16px;
+    }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-col ul li a {
+      font-size: 13px;
+      color: rgba(255,255,255,0.55);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-col ul li a:hover { color: var(--primary); }
+    .footer-whats {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(37,211,102,0.12);
+      border: 1px solid rgba(37,211,102,0.25);
+      color: #25D366;
+      padding: 9px 16px;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      margin-bottom: 12px;
+      transition: background 0.2s;
+      display: flex;
+    }
+    .footer-whats:hover { background: rgba(37,211,102,0.22); }
+    .footer-contact-item {
+      font-size: 12px;
+      color: rgba(255,255,255,0.45);
+      margin-top: 8px;
+    }
+    .footer-divider {
+      border: none;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 22px;
+    }
+    .footer-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .footer-copy {
+      font-size: 12px;
+      color: rgba(255,255,255,0.3);
+    }
+    .footer-badges {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .footer-badge {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.35);
+      padding: 4px 10px;
+      border-radius: 5px;
+      font-size: 10px;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -489,27 +929,97 @@
     </button>
   </div>
 
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a class="nav-logo" href="#">
+      <div class="nav-logo-icon">🍴</div>
+      <span class="nav-logo-text">Cardápio<span>Pro</span></span>
+    </a>
+    <a class="nav-cta" href="#form-section">Criar Grátis →</a>
+  </nav>
+
   <!-- HERO -->
-  <div class="hero">
-    <div class="hero-logo">🍽️</div>
-    <h1>Crie seu Cardápio Digital<br/>em minutos</h1>
-    <p>Cardápio online com QR Code por mesa, pagamento integrado e painel de administração. Planos a partir de R$ 47/mês.</p>
-    <div class="hero-badges">
-      <span class="hero-badge">📱 QR Code por mesa</span>
-      <span class="hero-badge">💳 PIX e Cartão</span>
-      <span class="hero-badge">📲 Pedidos pelo WhatsApp</span>
-      <span class="hero-badge">⚙️ Painel Admin</span>
+  <section class="hero">
+    <div class="hero-eyebrow">
+      ⚡ Mais de 800 restaurantes ativos
     </div>
-  </div>
+    <div class="hero-brand">
+      <div class="hero-brand-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18.06 22.99h1.66c.84 0 1.53-.64 1.63-1.46L23 5.05h-5V1h-1.97v4.05h-4.97l.3 2.34c1.71.47 3.31 1.32 4.27 2.26 1.44 1.42 2.43 2.89 2.43 5.29v8.05zM1 21.99V21h15.03v.99c0 .55-.45 1-1.01 1H2.01c-.56 0-1.01-.45-1.01-1zm15.03-7c0-8-15.03-8-15.03 0h15.03zM1.02 17h15v2h-15z"/>
+        </svg>
+      </div>
+      <div class="hero-brand-name">
+        <h2>Cardápio<span>Pro</span></h2>
+        <p>Cardápio digital para restaurantes</p>
+      </div>
+    </div>
+
+    <h1>Digitalize seu restaurante<br/><em>em 5 minutos</em></h1>
+    <p class="hero-sub">Cardápio online com QR Code por mesa, pedidos pelo WhatsApp, pagamentos integrados e painel de gestão completo. Sem mensalidade alta, sem contrato.</p>
+
+    <div class="hero-cta-group">
+      <a class="btn-hero-primary" href="#form-section">
+        🚀 Criar Meu Cardápio Agora
+      </a>
+      <a class="btn-hero-secondary" href="#como-funciona">
+        ▶ Ver como funciona
+      </a>
+    </div>
+
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-num"><span>+</span>800</div>
+        <div class="hero-stat-label">Restaurantes</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num"><span>R$</span>47</div>
+        <div class="hero-stat-label">A partir de/mês</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">5<span>min</span></div>
+        <div class="hero-stat-label">Para publicar</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">4.9<span>★</span></div>
+        <div class="hero-stat-label">Avaliação</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMO FUNCIONA -->
+  <section class="como-funciona" id="como-funciona">
+    <div class="section-tag">Como funciona</div>
+    <h2 class="section-title">Simples assim em 3 passos</h2>
+    <p class="section-sub">Do cadastro ao cardápio online em menos de 5 minutos. Sem precisar de técnico ou agência.</p>
+    <div class="steps-grid">
+      <div class="step">
+        <div class="step-num">📝</div>
+        <h3>Cadastre seu restaurante</h3>
+        <p>Preencha os dados do seu estabelecimento, escolha seu plano e crie sua senha de acesso.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">🍽️</div>
+        <h3>Adicione seu cardápio</h3>
+        <p>No painel admin, cadastre categorias, pratos, preços e fotos. Tudo de forma simples e rápida.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">📲</div>
+        <h3>Compartilhe o QR Code</h3>
+        <p>Imprima os QR Codes por mesa e comece a receber pedidos e pagamentos digitais imediatamente.</p>
+      </div>
+    </div>
+  </section>
 
   <!-- PLANOS -->
   <section class="planos-section">
-    <h2 class="planos-titulo">Planos por número de mesas</h2>
-    <p class="planos-sub">Escolha o plano ideal para o tamanho do seu estabelecimento</p>
+    <div class="section-tag">Planos e preços</div>
+    <h2 class="section-title">Escolha o plano ideal</h2>
+    <p class="section-sub">Por número de mesas. Sem taxa de setup, sem multa de saída.</p>
     <div class="planos-grid">
 
       <div class="plano-card" data-mesas="5">
-        <div class="plano-icon">🍽️</div>
+        <div class="plano-icon">🌱</div>
         <div class="plano-mesas">Até 5 mesas</div>
         <div class="plano-preco">R$ 47</div>
         <div class="plano-periodo">/mês</div>
@@ -522,8 +1032,8 @@
       </div>
 
       <div class="plano-card popular" data-mesas="8">
-        <div class="plano-popular-badge">⭐ Mais Popular</div>
-        <div class="plano-icon">🍽️</div>
+        <div class="plano-popular-badge">⭐ MAIS POPULAR</div>
+        <div class="plano-icon">🔥</div>
         <div class="plano-mesas">6 a 10 mesas</div>
         <div class="plano-preco">R$ 77</div>
         <div class="plano-periodo">/mês</div>
@@ -537,7 +1047,7 @@
       </div>
 
       <div class="plano-card" data-mesas="15">
-        <div class="plano-icon">🍽️</div>
+        <div class="plano-icon">🚀</div>
         <div class="plano-mesas">11 a 20 mesas</div>
         <div class="plano-preco">R$ 117</div>
         <div class="plano-periodo">/mês</div>
@@ -551,7 +1061,7 @@
       </div>
 
       <div class="plano-card" data-mesas="30">
-        <div class="plano-icon">🍽️</div>
+        <div class="plano-icon">💼</div>
         <div class="plano-mesas">21 a 50 mesas</div>
         <div class="plano-preco">R$ 177</div>
         <div class="plano-periodo">/mês</div>
@@ -565,7 +1075,7 @@
       </div>
 
       <div class="plano-card" data-mesas="60">
-        <div class="plano-icon">🍽️</div>
+        <div class="plano-icon">🏆</div>
         <div class="plano-mesas">Acima de 50 mesas</div>
         <div class="plano-preco">R$ 247</div>
         <div class="plano-periodo">/mês</div>
@@ -582,10 +1092,62 @@
     </div>
   </section>
 
+  <!-- DEPOIMENTOS -->
+  <section class="depoimentos">
+    <div class="section-tag">Depoimentos</div>
+    <h2 class="section-title">Quem já usa CardápioPro</h2>
+    <p class="section-sub">Mais de 800 restaurantes em todo o Brasil confiam na nossa plataforma.</p>
+    <div class="depoimentos-grid">
+
+      <div class="depoimento-card">
+        <div class="depoimento-stars">★★★★★</div>
+        <p class="depoimento-texto">Em menos de 10 minutos meu cardápio já estava no ar. Os clientes adoraram poder pedir pelo celular diretamente na mesa. As vendas aumentaram 30% no primeiro mês!</p>
+        <div class="depoimento-autor">
+          <div class="depoimento-avatar">👨‍🍳</div>
+          <div class="depoimento-info">
+            <strong>Carlos Mendes</strong>
+            <span>Restaurante Sabor da Terra · SP</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="depoimento-card">
+        <div class="depoimento-stars">★★★★★</div>
+        <p class="depoimento-texto">Tentei outras plataformas mas eram caras e complicadas. O CardápioPro é exatamente o que precisava: simples, bonito e com preço justo para o meu bar.</p>
+        <div class="depoimento-autor">
+          <div class="depoimento-avatar">👩‍💼</div>
+          <div class="depoimento-info">
+            <strong>Fernanda Rocha</strong>
+            <span>Bar da Fernanda · RJ</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="depoimento-card">
+        <div class="depoimento-stars">★★★★★</div>
+        <p class="depoimento-texto">O painel admin é muito intuitivo. Consigo atualizar preços e disponibilidade dos pratos em tempo real, sem depender de ninguém. Recomendo demais!</p>
+        <div class="depoimento-autor">
+          <div class="depoimento-avatar">🧑‍🍳</div>
+          <div class="depoimento-info">
+            <strong>Rafael Lemos</strong>
+            <span>Pizzaria Bella Vista · MG</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
   <!-- FORM -->
-  <div class="form-wrap">
+  <div class="form-wrap" id="form-section">
     <div class="form-card">
-      <h2 class="form-title">Cadastre seu estabelecimento</h2>
+
+      <div class="form-header">
+        <div class="form-header-icon">📋</div>
+        <div>
+          <h2 class="form-title">Cadastre seu estabelecimento</h2>
+        </div>
+      </div>
       <p class="form-subtitle">Preencha os dados abaixo e receba o link do seu cardápio na hora.</p>
 
       <form id="formCadastro" novalidate>
@@ -708,23 +1270,28 @@
 
         <button type="submit" class="btn-submit" id="btnSubmit">
           <div class="spinner"></div>
-          <span class="btn-text">🚀 Criar Meu Cardápio Digital</span>
+          <span class="btn-text">🚀 Criar Meu Cardápio Digital Grátis</span>
         </button>
 
       </form>
 
       <p class="ja-tem-conta">Já tem cadastro? <a href="login.html">Entrar no Admin</a></p>
+
+      <div class="form-trust">
+        <span class="trust-item">🔒 Dados protegidos</span>
+        <span class="trust-item">✅ Sem fidelidade</span>
+        <span class="trust-item">⚡ Ativação imediata</span>
+        <span class="trust-item">💬 Suporte via WhatsApp</span>
+      </div>
     </div>
   </div>
-
-  <div class="page-footer">© 2026 Cardápio Digital · Todos os direitos reservados</div>
 
   <!-- SUCCESS OVERLAY -->
   <div class="success-overlay" id="successOverlay">
     <div class="success-box">
       <div class="success-icon">🎉</div>
       <h2>Cardápio criado com sucesso!</h2>
-      <p>Salve os links abaixo. Enviamos também pelo WhatsApp.</p>
+      <p>Salve os links abaixo. Enviamos também pelo WhatsApp para facilitar o acesso.</p>
       <div class="success-links">
         <div class="success-link">
           <label>🔗 Link do Cardápio (para os clientes)</label>
@@ -740,6 +1307,53 @@
       </button>
     </div>
   </div>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <div class="footer-logo-icon">🍴</div>
+            <span class="footer-logo-text">Cardápio<span>Pro</span></span>
+          </div>
+          <p class="footer-desc">A plataforma mais simples para digitalizar o cardápio do seu restaurante. QR Code por mesa, pedidos e pagamentos online.</p>
+          <div class="footer-social">
+            <a href="#" title="Instagram">📸</a>
+            <a href="#" title="Facebook">👍</a>
+            <a href="#" title="YouTube">▶️</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Produto</h4>
+          <ul>
+            <li><a href="#como-funciona">Como funciona</a></li>
+            <li><a href="#planos">Planos e preços</a></li>
+            <li><a href="login.html">Acessar Admin</a></li>
+            <li><a href="cadastro.html">Criar conta</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Contato</h4>
+          <a class="footer-whats" href="https://wa.me/5511999999999?text=Ol%C3%A1%2C+tenho+d%C3%BAvidas+sobre+o+Card%C3%A1pioPro" target="_blank">
+            💬 Falar no WhatsApp
+          </a>
+          <p class="footer-contact-item">📧 contato@cardapiopro.com.br</p>
+          <p class="footer-contact-item">🕐 Seg–Sex, 9h às 18h</p>
+        </div>
+      </div>
+      <hr class="footer-divider" />
+      <div class="footer-bottom">
+        <p class="footer-copy">© 2026 CardápioPro · Todos os direitos reservados</p>
+        <div class="footer-badges">
+          <span class="footer-badge">PIX</span>
+          <span class="footer-badge">CARTÃO</span>
+          <span class="footer-badge">QR CODE</span>
+          <span class="footer-badge">WHATSAPP</span>
+        </div>
+      </div>
+    </div>
+  </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
@@ -816,27 +1430,26 @@ CREATE POLICY "pedidos_all" ON cardapio_pedidos FOR ALL USING (true) WITH CHECK 
 
     // ===== PLANOS =====
     const PLANOS = [
-      { max: 5,   nome: 'Starter',    mesas: 'Até 5 mesas',        preco: 47  },
-      { max: 10,  nome: 'Popular',    mesas: '6 a 10 mesas',       preco: 77  },
-      { max: 20,  nome: 'Pro',        mesas: '11 a 20 mesas',      preco: 117 },
-      { max: 50,  nome: 'Business',   mesas: '21 a 50 mesas',      preco: 177 },
-      { max: Infinity, nome: 'Enterprise', mesas: 'Acima de 50 mesas', preco: 247 },
+      { max: 5,        nome: 'Starter',    mesas: 'Até 5 mesas',        preco: 47  },
+      { max: 10,       nome: 'Popular',    mesas: '6 a 10 mesas',       preco: 77  },
+      { max: 20,       nome: 'Pro',        mesas: '11 a 20 mesas',      preco: 117 },
+      { max: 50,       nome: 'Business',   mesas: '21 a 50 mesas',      preco: 177 },
+      { max: Infinity, nome: 'Enterprise', mesas: 'Acima de 50 mesas',  preco: 247 },
     ];
 
     function calcularPlano(n) {
       return PLANOS.find(p => n <= p.max) || PLANOS[PLANOS.length - 1];
     }
 
-    const inputMesas   = document.getElementById('numMesas');
-    const btnSubmitEl  = document.getElementById('btnSubmit');
-    const btnTextEl    = btnSubmitEl.querySelector('.btn-text');
+    const inputMesas  = document.getElementById('numMesas');
+    const btnSubmitEl = document.getElementById('btnSubmit');
+    const btnTextEl   = btnSubmitEl.querySelector('.btn-text');
 
     function atualizarPlanoUI(n) {
       const resultado = document.getElementById('planoResultado');
       if (!n || n < 1) {
         resultado.classList.remove('show');
-        btnTextEl.textContent = '🚀 Criar Meu Cardápio Digital';
-        // remove selected dos cards
+        btnTextEl.textContent = '🚀 Criar Meu Cardápio Digital Grátis';
         document.querySelectorAll('.plano-card').forEach(c => c.classList.remove('selected'));
         return;
       }
@@ -846,7 +1459,6 @@ CREATE POLICY "pedidos_all" ON cardapio_pedidos FOR ALL USING (true) WITH CHECK 
       document.getElementById('planoPreco').textContent = `R$ ${plano.preco}/mês`;
       resultado.classList.add('show');
       btnTextEl.textContent = `🚀 Cadastrar — R$ ${plano.preco}/mês`;
-      // destaca o card cujo data-mesas cai no mesmo plano
       document.querySelectorAll('.plano-card').forEach(card => {
         const cardPlano = calcularPlano(parseInt(card.dataset.mesas));
         card.classList.toggle('selected', cardPlano.nome === plano.nome);
@@ -857,13 +1469,11 @@ CREATE POLICY "pedidos_all" ON cardapio_pedidos FOR ALL USING (true) WITH CHECK 
       atualizarPlanoUI(parseInt(this.value));
     });
 
-    // Clique nos cards de plano
     document.querySelectorAll('.plano-card').forEach(card => {
       card.addEventListener('click', () => {
         const mesas = parseInt(card.dataset.mesas);
         inputMesas.value = mesas;
         atualizarPlanoUI(mesas);
-        // Scroll suave até o campo de mesas
         inputMesas.scrollIntoView({ behavior: 'smooth', block: 'center' });
         inputMesas.focus();
       });
@@ -908,7 +1518,6 @@ CREATE POLICY "pedidos_all" ON cardapio_pedidos FOR ALL USING (true) WITH CHECK 
         `Dom: ${document.getElementById('h3_open').value}–${document.getElementById('h3_close').value}`,
       ].join(' | ');
 
-      // Validação
       if (!nomeRestaurante) { mostrarErro('Informe o nome do restaurante.'); return; }
       if (!nomeResponsavel) { mostrarErro('Informe o nome do responsável.'); return; }
       if (!numMesas || numMesas < 1) { mostrarErro('Informe o número de mesas do estabelecimento.'); return; }
@@ -943,13 +1552,7 @@ CREATE POLICY "pedidos_all" ON cardapio_pedidos FOR ALL USING (true) WITH CHECK 
         const linkCardapio = `${BASE_URL}/index.html?rid=${rid}`;
         const linkAdmin    = `${BASE_URL}/admin.html?rid=${rid}`;
 
-        dadosCadastro = {
-          nomeResponsavel,
-          telefone: '55' + telefone,
-          senhaAdmin,
-          linkCardapio,
-          linkAdmin,
-        };
+        dadosCadastro = { nomeResponsavel, telefone: '55' + telefone, senhaAdmin, linkCardapio, linkAdmin };
 
         document.getElementById('linkCardapio').textContent = linkCardapio;
         document.getElementById('linkAdmin').textContent    = linkAdmin;
@@ -978,7 +1581,7 @@ CREATE POLICY "pedidos_all" ON cardapio_pedidos FOR ALL USING (true) WITH CHECK 
     document.getElementById('btnWhatsSuccess').addEventListener('click', () => {
       const { nomeResponsavel, telefone, senhaAdmin, linkCardapio, linkAdmin } = dadosCadastro;
       const msg = encodeURIComponent(
-        `🍽️ *Seu Cardápio Digital foi criado!*\n\n` +
+        `🍴 *Seu CardápioPro foi criado!*\n\n` +
         `Olá, ${nomeResponsavel}! Tudo pronto.\n\n` +
         `🔗 *Cardápio (para os clientes):*\n${linkCardapio}\n\n` +
         `⚙️ *Painel Admin (só para você):*\n${linkAdmin}\n\n` +
