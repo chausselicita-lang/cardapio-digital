@@ -1414,9 +1414,16 @@ CREATE POLICY "items_all"   ON cardapio_items   FOR ALL USING (true) WITH CHECK 
 CREATE POLICY "pedidos_all" ON cardapio_pedidos FOR ALL USING (true) WITH CHECK (true);`;
 
     // ===== VERIFICAÇÃO AUTOMÁTICA DO SUPABASE =====
+    function tabelaFaltando(error) {
+      if (!error) return false;
+      const msg = (error.message || '').toLowerCase();
+      // 42P01 = código PostgreSQL para "relation does not exist"
+      return error.code === '42P01' || msg.includes('does not exist');
+    }
+
     (async () => {
       const { error } = await db.from('restaurantes').select('id').limit(1);
-      if (error && (error.code === 'PGRST205' || error.message?.includes('restaurantes'))) {
+      if (tabelaFaltando(error)) {
         document.getElementById('setupBanner').classList.add('show');
       }
     })();
@@ -1560,7 +1567,7 @@ CREATE POLICY "pedidos_all" ON cardapio_pedidos FOR ALL USING (true) WITH CHECK 
 
       } catch (err) {
         let msg = err.message || 'Tente novamente.';
-        if (err.code === 'PGRST205' || msg.includes('restaurantes')) {
+        if (tabelaFaltando(err)) {
           msg = 'Tabelas não encontradas no Supabase. Clique no banner amarelo acima e rode o SQL.';
           document.getElementById('setupBanner').classList.add('show');
           window.scrollTo({ top: 0, behavior: 'smooth' });
