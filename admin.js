@@ -1,441 +1,586 @@
-// ===== ADMIN.JS =====
+﻿// ===== ADMIN — Cardápio Digital =====
 
-const STORAGE_KEY = 'cardapio_data';
+const $ = sel => document.querySelector(sel);
+const $$ = sel => [...document.querySelectorAll(sel)];
 
-function getData() {
-  try {
-    const s = localStorage.getItem(STORAGE_KEY);
-    return s ? JSON.parse(s) : JSON.parse(JSON.stringify(window.MENU_DEFAULT));
-  } catch { return JSON.parse(JSON.stringify(window.MENU_DEFAULT)); }
+const CONFIG_KEY    = 'cardapio_config';
+const SENHA_PADRAO  = 'admin123';
+
+// Modo: 'supabase' se tiver ?rid na URL, 'local' caso contrário
+const rid  = new URLSearchParams(location.search).get('rid');
+const modo = rid ? 'supabase' : 'local';
+
+// ===== LIMITE POR PLANO =====
+let limiteQR = Infinity;
+
+const PLANOS_LIMITE = [
+  { max: 5,        nome: 'Starter',    limite: 5  },
+  { max: 10,       nome: 'Popular',    limite: 10 },
+  { max: 20,       nome: 'Pro',        limite: 20 },
+  { max: 50,       nome: 'Business',   limite: 50 },
+  { max: Infinity, nome: 'Enterprise', limite: Infinity },
+];
+
+function getLimitePlano(numMesas) {
+  const entry = PLANOS_LIMITE.find(p => numMesas <= p.max) || PLANOS_LIMITE[PLANOS_LIMITE.length - 1];
+  return entry;
 }
 
-function saveData(data) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+function atualizarBadgePlano(numMesas, plano) {
+  const badge    = $('#planoInfoBadge');
+  const nomeEl   = $('#planoNomeBadge');
+  const limiteEl = $('#planoLimiteTag');
+  if (!badge) return;
+
+  const entry = getLimitePlano(numMesas || 0);
+  limiteQR = entry.limite;
+
+  nomeEl.textContent   = plano || entry.nome;
+  limiteEl.textContent = entry.limite === Infinity ? 'Mesas ilimitadas' : `Máx. ${entry.limite} mesas`;
+  badge.style.display  = 'flex';
+
+  // Ajusta o max do input
+  const inputMesas = $('#numMesas');
+  if (entry.limite !== Infinity) {
+    inputMesas.max = entry.limite;
+    if (parseInt(inputMesas.value) > entry.limite) inputMesas.value = entry.limite;
+  }
 }
 
-function getSenha() {
-  return getData().config.senhaAdmin || 'admin123';
+function carregarConfig() {
+  try { return JSON.parse(localStorage.getItem(CONFIG_KEY) || '{}'); } catch { return {}; }
+}
+function salvarConfig(cfg) {
+  localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg));
 }
 
 // ===== LOGIN =====
-const loginScreen = document.getElementById('loginScreen');
-const dashboard = document.getElementById('dashboard');
+const loginOverlay = $('#adminLoginOverlay');
+const senhaInput   = $('#senhaInput');
+const loginError   = $('#loginError');
 
-if (sessionStorage.getItem('admin_ok') === '1') showDashboard();
-
-document.getElementById('loginForm').addEventListener('submit', e => {
-  e.preventDefault();
-  const val = document.getElementById('loginSenha').value;
-  if (val === getSenha()) {
-    sessionStorage.setItem('admin_ok', '1');
-    showDashboard();
+function verificarSessao() {
+  if (modo === 'supabase') {
+    if (sessionStorage.getItem('admin_auth') === '1' &&
+        sessionStorage.getItem('admin_rid')   === rid) {
+      carregarDadosRestaurante();
+      abrirTabCardapio();
+      return; // autenticado — overlay permanece oculto
+    }
   } else {
-    document.getElementById('loginErro').style.display = 'block';
+    if (sessionStorage.getItem('admin_auth') === '1') {
+      return; // autenticado — overlay permanece oculto
+    }
   }
+  // Não autenticado — exibe o overlay de login
+  loginOverlay.style.display = 'flex';
+}
+
+async function tentarLogin() {
+  const senha = senhaInput.value;
+  loginError.style.display = 'none';
+
+  if (modo === 'supabase') {
+    // Valida senha contra Supabase
+    try {
+      const { data, error } = await db
+        .from('restaurantes')
+        .select('id, nome_restaurante, senha_admin')
+        .eq('id', rid).single();
+
+      if (error || !data) throw new Error();
+      if (data.senha_admin !== senha) throw new Error('senha errada');
+
+      sessionStorage.setItem('admin_auth', '1');
+      sessionStorage.setItem('admin_rid',  rid);
+      sessionStorage.setItem('admin_nome', data.nome_restaurante);
+      loginOverlay.style.display = 'none';
+      senhaInput.value = '';
+      carregarDadosRestaurante();
+      abrirTabCardapio();
+
+    } catch {
+      loginError.style.display = 'block';
+      senhaInput.value = '';
+      senhaInput.focus();
+    }
+
+  } else {
+    // Modo local: compara com localStorage
+    const config = carregarConfig();
+    const correta = config.senhaAdmin || SENHA_PADRAO;
+    if (senha === correta) {
+      sessionStorage.setItem('admin_auth', '1');
+      loginOverlay.style.display = 'none';
+      senhaInput.value = '';
+      loginError.style.display = 'none';
+      abrirTabCardapio();
+    } else {
+      loginError.style.display = 'block';
+      senhaInput.value = '';
+      senhaInput.focus();
+    }
+  }
+}
+
+$('#btnEntrar').addEventListener('click', tentarLogin);
+senhaInput.addEventListener('keydown', e => { if (e.key === 'Enter') tentarLogin(); });
+
+$('#btnSair').addEventListener('click', () => {
+  sessionStorage.removeItem('admin_auth');
+  sessionStorage.removeItem('admin_rid');
+  sessionStorage.removeItem('admin_nome');
+  loginOverlay.style.display = 'flex';
+  senhaInput.value = '';
+  loginError.style.display = 'none';
+  // Se veio via Supabase, redireciona para login
+  if (modo === 'supabase') window.location.href = 'login.html';
+  else setTimeout(() => senhaInput.focus(), 100);
 });
 
-function showDashboard() {
-  loginScreen.style.display = 'none';
-  dashboard.style.display = 'flex';
-  initDashboard();
+// ===== CARREGAR DADOS DO RESTAURANTE (modo Supabase) =====
+async function carregarDadosRestaurante() {
+  if (modo !== 'supabase' || !rid) return;
+  try {
+    const { data } = await db.from('restaurantes')
+      .select('nome_restaurante, tipo, telefone, email, endereco, horario, senha_admin, num_mesas, plano')
+      .eq('id', rid).single();
+    if (!data) return;
+
+    // Atualiza header do admin
+    const sub = document.querySelector('.admin-header-sub');
+    if (sub) sub.textContent = `| ${data.nome_restaurante}`;
+
+    // Configura limite de QR por plano
+    atualizarBadgePlano(data.num_mesas || 0, data.plano);
+
+  } catch {}
 }
 
-document.getElementById('btnLogout').addEventListener('click', () => {
-  sessionStorage.removeItem('admin_ok');
-  location.reload();
-});
+// Verifica sessão ao carregar
+verificarSessao();
 
-// ===== NAVEGAÇÃO =====
-function initDashboard() {
-  document.querySelectorAll('.nav-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById('panel-' + btn.dataset.panel).classList.add('active');
-      if (btn.dataset.panel === 'cadastros') carregarPainelCadastros();
-    });
+// ===== CONFIGURAÇÕES EM LISTA =====
+const autoUrl = window.location.href.replace(/[?#].*$/, '').replace(/admin\.html$/, 'index.html');
+
+// Mapeamento: chave interna → { storageKey, inputId, valId, itemId, label }
+const CONFIG_MAP = {
+  pix:      { key: 'chavePix',   inputId: 'inp-pix',      valId: 'val-pix',      itemId: 'ci-pix'      },
+  cartao:   { key: 'linkCartao', inputId: 'inp-cartao',   valId: 'val-cartao',   itemId: 'ci-cartao'   },
+  whatsapp: { key: 'whatsapp',   inputId: 'inp-whatsapp', valId: 'val-whatsapp', itemId: 'ci-whatsapp' },
+  senha:    { key: 'senhaAdmin', inputId: 'inp-senha',    valId: 'val-senha',    itemId: 'ci-senha'    },
+};
+
+function renderConfigList() {
+  const cfg = carregarConfig();
+  Object.entries(CONFIG_MAP).forEach(([name, { key, valId }]) => {
+    const el  = document.getElementById(valId);
+    if (!el) return;
+    const val = cfg[key] || '';
+    if (name === 'senha') {
+      el.textContent = val ? '••••••  (configurada)' : '••••••  (padrão: admin123)';
+      el.className   = 'config-item-val' + (val ? ' set' : '');
+    } else if (val) {
+      el.textContent = val.length > 40 ? val.slice(0, 40) + '…' : val;
+      el.className   = 'config-item-val set';
+    } else {
+      el.textContent = 'Não configurado';
+      el.className   = 'config-item-val';
+    }
   });
-  carregarTabelaPratos();
-  carregarFormConfig();
-  initFormConfig();
-  initFormSenha();
-  initModal();
-  atualizarBadgeCadastros();
 }
 
-// ===== PAINEL PRATOS =====
-function carregarTabelaPratos() {
-  const data = getData();
-  const body = document.getElementById('tabelaBody');
-  const filtroNome = document.getElementById('filtroNome').value.toLowerCase();
-  const filtroCat = document.getElementById('filtroCat').value;
+function toggleConfig(name) {
+  const { inputId, itemId, key } = CONFIG_MAP[name];
+  const item = document.getElementById(itemId);
+  const isOpen = item.classList.contains('open');
 
-  // Popular select de categorias
-  const sel = document.getElementById('filtroCat');
-  if (sel.options.length <= 1) {
-    data.categorias.forEach(cat => {
-      const opt = document.createElement('option');
-      opt.value = cat.id; opt.textContent = `${cat.emoji} ${cat.nome}`;
-      sel.appendChild(opt);
-    });
+  // Fecha todos
+  Object.values(CONFIG_MAP).forEach(({ itemId: id }) =>
+    document.getElementById(id).classList.remove('open')
+  );
+
+  if (!isOpen) {
+    item.classList.add('open');
+    const cfg = carregarConfig();
+    const inp = document.getElementById(inputId);
+    inp.value = name === 'senha' ? '' : (cfg[key] || '');
+    setTimeout(() => inp.focus(), 50);
+  }
+}
+
+function fecharConfig(name) {
+  document.getElementById(CONFIG_MAP[name].itemId).classList.remove('open');
+}
+
+async function salvarConfigItem(name) {
+  const { key, inputId, itemId } = CONFIG_MAP[name];
+  const inp = document.getElementById(inputId);
+  let val   = inp.value.trim();
+
+  if (name === 'senha') {
+    if (!val) { mostrarToast('⚠️ Digite a nova senha'); inp.focus(); return; }
+    if (val.length < 6) { mostrarToast('⚠️ Mínimo 6 caracteres'); inp.focus(); return; }
+  }
+  if (name === 'whatsapp') val = val.replace(/\D/g, '');
+
+  const cfg = { ...carregarConfig(), [key]: val };
+  salvarConfig(cfg);
+
+  // Senha também no Supabase
+  if (name === 'senha' && modo === 'supabase') {
+    await db.from('restaurantes').update({ senha_admin: val }).eq('id', rid);
   }
 
-  let prods = data.produtos;
-  if (filtroNome) prods = prods.filter(p => p.nome.toLowerCase().includes(filtroNome));
-  if (filtroCat) prods = prods.filter(p => p.cat === filtroCat);
+  document.getElementById(itemId).classList.remove('open');
+  renderConfigList();
+  mostrarToast('✅ ' + ({ pix:'Chave PIX', cartao:'Link do Cartão', whatsapp:'WhatsApp', senha:'Senha' }[name]) + ' salvo!');
+}
 
-  body.innerHTML = prods.map(p => {
-    const cat = data.categorias.find(c => c.id === p.cat);
-    const tagHtml = p.tag ? `<span class="badge-tag ${p.tag}">${p.tag}</span>` : '—';
-    const foto = p.foto
-      ? `<img class="table-foto" src="${p.foto}" alt="${p.nome}" onerror="this.outerHTML='<div class=\\'table-foto-ph\\'>🍽️</div>'">`
-      : `<div class="table-foto-ph">🍽️</div>`;
-    return `<tr>
-      <td>${foto}</td>
-      <td><strong>${p.nome}</strong></td>
-      <td>${cat ? cat.emoji + ' ' + cat.nome : p.cat}</td>
-      <td><strong style="color:var(--primary)">${fmt(p.preco)}</strong></td>
-      <td>${tagHtml}</td>
-      <td><button class="toggle-ativo ${p.ativo!==false?'on':''}" data-id="${p.id}" title="${p.ativo!==false?'Ativo':'Inativo'}"></button></td>
-      <td>
-        <button class="btn-edit" data-id="${p.id}">✏️ Editar</button>
-        <button class="btn-del" data-id="${p.id}">🗑️</button>
-      </td>
-    </tr>`;
-  }).join('') || `<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text3)">Nenhum item encontrado</td></tr>`;
+// Inicializa lista ao carregar
+renderConfigList();
 
-  // Eventos da tabela
-  body.querySelectorAll('.toggle-ativo').forEach(btn => {
+// URL base e num mesas para o tab de QR
+$('#urlBase').value  = carregarConfig().urlBase  || (rid ? `${autoUrl}?rid=${rid}` : autoUrl);
+$('#numMesas').value = carregarConfig().numMesas || 10;
+
+// ===== TABS =====
+function abrirTabCardapio() {
+  $$('.tab-btn').forEach(b => b.classList.remove('active'));
+  $$('.tab-content').forEach(t => t.style.display = 'none');
+  const btn = $('[data-tab="cardapio"]');
+  if (btn) btn.classList.add('active');
+  const tab = $('#tab-cardapio');
+  if (tab) tab.style.display = 'block';
+  carregarCardapio();
+}
+
+$$('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    $$('.tab-btn').forEach(b => b.classList.remove('active'));
+    $$('.tab-content').forEach(t => t.style.display = 'none');
+    btn.classList.add('active');
+    $(`#tab-${btn.dataset.tab}`).style.display = 'block';
+    if (btn.dataset.tab === 'cardapio') carregarCardapio();
+  });
+});
+
+// Atualiza link "Ver Cardápio" com o rid do restaurante
+if (rid) {
+  const linkCardapio = $('.btn-ver-cardapio');
+  if (linkCardapio) linkCardapio.href = `index.html?rid=${rid}`;
+}
+
+// ===== GERENCIAR CARDÁPIO =====
+const PRATOS_LS_KEY = 'cardapio_pratos';
+let pratosCache  = [];
+let editandoId   = null;
+let filtroCatAtivo = 'todos';
+let excluindoId  = null;
+
+const CATEGORIAS_LABEL = {
+  entradas:'Entradas', pratos:'Pratos', lanches:'Lanches',
+  pizzas:'Pizzas', petiscos:'Petiscos', bebidas:'Bebidas',
+  sobremesas:'Sobremesas', combos:'Combos'
+};
+const BADGES_LABEL = { popular:'⭐ Popular', novo:'🆕 Novo', chef:'👨‍🍳 Chef Indica' };
+
+// --- Carregar pratos ---
+async function carregarCardapio() {
+  $('#pratosLoading').style.display = 'block';
+  $('#pratosVazio').style.display   = 'none';
+  $('#pratosGrid').innerHTML        = '';
+
+  if (modo === 'supabase') {
+    try {
+      const { data, error } = await db
+        .from('cardapio_items')
+        .select('*')
+        .eq('restaurante_id', rid)
+        .order('categoria').order('ordem');
+      if (error) throw error;
+      pratosCache = data || [];
+    } catch {
+      pratosCache = [];
+    }
+  } else {
+    // Modo local: localStorage sobrescreve data.js
+    const salvo = localStorage.getItem(PRATOS_LS_KEY);
+    pratosCache = salvo ? JSON.parse(salvo) : (window.MENU_DEFAULT?.produtos || []);
+  }
+
+  $('#pratosLoading').style.display = 'none';
+  renderPratos();
+}
+
+// --- Renderizar grid ---
+function renderPratos() {
+  const grid  = $('#pratosGrid');
+  const vazio = $('#pratosVazio');
+  grid.innerHTML = '';
+
+  const lista = filtroCatAtivo === 'todos'
+    ? pratosCache
+    : pratosCache.filter(p => p.categoria === filtroCatAtivo);
+
+  if (lista.length === 0) {
+    vazio.style.display = 'block';
+    return;
+  }
+  vazio.style.display = 'none';
+
+  lista.forEach(p => {
+    const preco = parseFloat(p.preco || p.preco_original || 0).toLocaleString('pt-BR', { style:'currency', currency:'BRL' });
+    const cat   = CATEGORIAS_LABEL[p.categoria] || p.categoria || '';
+    const badge = p.tag ? `<span class="prato-badge ${p.tag}">${BADGES_LABEL[p.tag] || p.tag}</span>` : '';
+    const foto  = p.foto_url || p.foto || '';
+    const disponivel = p.disponivel !== false;
+
+    const card = document.createElement('div');
+    card.className = `prato-card${disponivel ? '' : ' indisponivel'}`;
+    card.dataset.id = p.id;
+    card.innerHTML = `
+      ${foto
+        ? `<img class="prato-foto" src="${foto}" alt="${p.nome}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="prato-foto-placeholder" style="display:none">🍽️</div>`
+        : `<div class="prato-foto-placeholder">🍽️</div>`}
+      <div class="prato-body">
+        <div class="prato-cat-tag">${cat}${!disponivel ? ' · <em>Indisponível</em>' : ''}</div>
+        <div class="prato-top">
+          <div class="prato-nome">${p.nome}</div>
+          ${badge}
+        </div>
+        ${p.descricao ? `<div class="prato-desc">${p.descricao}</div>` : ''}
+        <div class="prato-footer">
+          <div class="prato-preco">${preco}</div>
+          <div class="prato-acoes">
+            <button class="btn-prato-acao btn-prato-editar" data-id="${p.id}">✏️ Editar</button>
+            <button class="btn-prato-acao btn-prato-excluir" data-id="${p.id}" data-nome="${p.nome}">🗑️</button>
+          </div>
+        </div>
+      </div>`;
+    grid.appendChild(card);
+  });
+
+  // Eventos nos botões
+  $$('.btn-prato-editar').forEach(btn => {
     btn.addEventListener('click', () => {
-      const data = getData();
-      const p = data.produtos.find(x => x.id === btn.dataset.id);
-      if (p) { p.ativo = !(p.ativo !== false); saveData(data); carregarTabelaPratos(); toast('✅ Status atualizado'); }
+      const prato = pratosCache.find(p => String(p.id) === btn.dataset.id);
+      if (prato) abrirModalPrato(prato);
     });
   });
-
-  body.querySelectorAll('.btn-edit').forEach(btn => {
-    btn.addEventListener('click', () => abrirModalEditar(btn.dataset.id));
-  });
-
-  body.querySelectorAll('.btn-del').forEach(btn => {
-    btn.addEventListener('click', () => {
-      if (!confirm('Excluir este prato do cardápio?')) return;
-      const data = getData();
-      data.produtos = data.produtos.filter(x => x.id !== btn.dataset.id);
-      saveData(data); carregarTabelaPratos(); toast('🗑️ Prato excluído');
-    });
+  $$('.btn-prato-excluir').forEach(btn => {
+    btn.addEventListener('click', () => confirmarExcluir(btn.dataset.id, btn.dataset.nome));
   });
 }
 
-document.getElementById('filtroNome').addEventListener('input', carregarTabelaPratos);
-document.getElementById('filtroCat').addEventListener('change', carregarTabelaPratos);
-document.getElementById('btnNovoPrato').addEventListener('click', () => abrirModalNovo());
-
-// ===== MODAL =====
-function initModal() {
-  document.getElementById('btnModalClose').addEventListener('click', fecharModal);
-  document.getElementById('btnCancelarModal').addEventListener('click', fecharModal);
-  document.getElementById('modalOverlay').addEventListener('click', e => {
-    if (e.target === document.getElementById('modalOverlay')) fecharModal();
+// --- Filtros de categoria ---
+$$('.filtro-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    $$('.filtro-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filtroCatAtivo = btn.dataset.cat;
+    renderPratos();
   });
+});
 
-  // Preview foto
-  document.getElementById('pFoto').addEventListener('input', e => {
-    const url = e.target.value.trim();
-    const preview = document.getElementById('fotoPreview');
-    const img = document.getElementById('fotoPreviewImg');
-    if (url) { img.src = url; preview.style.display = 'block'; }
-    else preview.style.display = 'none';
-  });
+// --- Abrir modal ---
+function abrirModalPrato(prato = null) {
+  editandoId = prato ? prato.id : null;
+  $('#modalPratoTitulo').textContent = prato ? 'Editar Prato' : 'Novo Prato';
 
-  // Popular select categoria no modal
-  const catSel = document.getElementById('pCat');
-  getData().categorias.forEach(cat => {
-    const opt = document.createElement('option');
-    opt.value = cat.id; opt.textContent = `${cat.emoji} ${cat.nome}`;
-    catSel.appendChild(opt);
-  });
+  // Preenche ou limpa campos
+  $('#pratoFoto').value       = prato?.foto_url || prato?.foto || '';
+  $('#pratoNome').value       = prato?.nome        || '';
+  $('#pratoDesc').value       = prato?.descricao   || '';
+  $('#pratoPreco').value      = prato?.preco        || '';
+  $('#pratoCat').value        = prato?.categoria    || '';
+  $('#pratoBadge').value      = prato?.tag          || '';
+  $('#pratoDisponivel').checked = prato ? prato.disponivel !== false : true;
 
-  document.getElementById('formPrato').addEventListener('submit', salvarPrato);
-}
-
-function abrirModalNovo() {
-  document.getElementById('modalTitulo').textContent = 'Novo Prato';
-  document.getElementById('formPrato').reset();
-  document.getElementById('pratoId').value = '';
-  document.getElementById('fotoPreview').style.display = 'none';
-  document.getElementById('pAtivo').checked = true;
-  document.getElementById('modalOverlay').classList.add('open');
-}
-
-function abrirModalEditar(id) {
-  const data = getData();
-  const p = data.produtos.find(x => x.id === id);
-  if (!p) return;
-  document.getElementById('modalTitulo').textContent = 'Editar Prato';
-  document.getElementById('pratoId').value = p.id;
-  document.getElementById('pNome').value = p.nome;
-  document.getElementById('pDesc').value = p.desc || '';
-  document.getElementById('pPreco').value = p.preco;
-  document.getElementById('pPrecoOld').value = p.precoOriginal || '';
-  document.getElementById('pCat').value = p.cat;
-  document.getElementById('pTag').value = p.tag || '';
-  document.getElementById('pFoto').value = p.foto || '';
-  document.getElementById('pDestaque').value = p.destaque ? 'true' : 'false';
-  document.getElementById('pExtras').value = (p.extras || []).join('\n');
-  document.getElementById('pAtivo').checked = p.ativo !== false;
-
-  const preview = document.getElementById('fotoPreview');
-  if (p.foto) { document.getElementById('fotoPreviewImg').src = p.foto; preview.style.display = 'block'; }
-  else preview.style.display = 'none';
-
-  document.getElementById('modalOverlay').classList.add('open');
+  atualizarPreviewFoto();
+  $('#modalPratoOverlay').classList.add('open');
+  setTimeout(() => $('#pratoNome').focus(), 100);
 }
 
 function fecharModal() {
-  document.getElementById('modalOverlay').classList.remove('open');
+  $('#modalPratoOverlay').classList.remove('open');
 }
 
-function salvarPrato(e) {
-  e.preventDefault();
-  const data = getData();
-  const id = document.getElementById('pratoId').value;
-  const extras = document.getElementById('pExtras').value.trim().split('\n').filter(Boolean);
+$('#btnNovoPrato').addEventListener('click',    () => abrirModalPrato());
+$('#btnFecharModal').addEventListener('click',  fecharModal);
+$('#btnCancelarModal').addEventListener('click', fecharModal);
+$('#modalPratoOverlay').addEventListener('click', e => {
+  if (e.target === $('#modalPratoOverlay')) fecharModal();
+});
 
-  const prato = {
-    id: id || 'p-' + Date.now(),
-    nome: document.getElementById('pNome').value.trim(),
-    desc: document.getElementById('pDesc').value.trim(),
-    preco: parseFloat(document.getElementById('pPreco').value),
-    precoOriginal: parseFloat(document.getElementById('pPrecoOld').value) || undefined,
-    cat: document.getElementById('pCat').value,
-    tag: document.getElementById('pTag').value,
-    foto: document.getElementById('pFoto').value.trim(),
-    destaque: document.getElementById('pDestaque').value === 'true',
-    ativo: document.getElementById('pAtivo').checked,
-    extras: extras.length ? extras : undefined
-  };
-  if (!prato.precoOriginal) delete prato.precoOriginal;
-  if (!prato.extras) delete prato.extras;
-
-  if (id) {
-    const idx = data.produtos.findIndex(x => x.id === id);
-    if (idx >= 0) data.produtos[idx] = prato;
+// Preview de foto
+$('#pratoFoto').addEventListener('input', atualizarPreviewFoto);
+function atualizarPreviewFoto() {
+  const url = $('#pratoFoto').value.trim();
+  const wrap = $('#previewWrap');
+  if (url) {
+    $('#pratoFotoPreview').src = url;
+    wrap.classList.add('show');
   } else {
-    data.produtos.push(prato);
-  }
-
-  saveData(data);
-  fecharModal();
-  carregarTabelaPratos();
-  toast(id ? '✅ Prato atualizado!' : '✅ Prato adicionado!');
-}
-
-// ===== CONFIGURAÇÕES =====
-function carregarFormConfig() {
-  const cfg = getData().config;
-  document.getElementById('cfg-nome').value = cfg.nome || '';
-  document.getElementById('cfg-sub').value = cfg.subtitulo || '';
-  document.getElementById('cfg-emoji').value = cfg.emoji || '🍽️';
-  document.getElementById('cfg-cor').value = cfg.corPrimaria || '#E8420A';
-  document.getElementById('cfg-cor-hex').value = cfg.corPrimaria || '#E8420A';
-  document.getElementById('cfg-whats').value = cfg.whatsapp || '';
-  document.getElementById('cfg-tel').value = cfg.telefone || '';
-  document.getElementById('cfg-end').value = cfg.endereco || '';
-  document.getElementById('cfg-hor').value = cfg.horario || '';
-  document.getElementById('cfg-b1').value = cfg.heroBadge1 || '';
-  document.getElementById('cfg-b2').value = cfg.heroBadge2 || '';
-  document.getElementById('cfg-b3').value = cfg.heroBadge3 || '';
-  document.getElementById('cfg-pix-chave').value = cfg.pixChave || '';
-  document.getElementById('cfg-pix-nome').value = cfg.pixNome || '';
-  document.getElementById('cfg-mp-link').value = cfg.mpLink || '';
-  document.getElementById('cfg-whats-admin').value = cfg.whatsappAdmin || '';
-}
-
-function initFormConfig() {
-  // Sincronizar color picker com hex
-  document.getElementById('cfg-cor').addEventListener('input', e => {
-    document.getElementById('cfg-cor-hex').value = e.target.value;
-  });
-  document.getElementById('cfg-cor-hex').addEventListener('input', e => {
-    const hex = e.target.value;
-    if (/^#[0-9A-Fa-f]{6}$/.test(hex)) document.getElementById('cfg-cor').value = hex;
-  });
-
-  document.getElementById('formConfig').addEventListener('submit', e => {
-    e.preventDefault();
-    const data = getData();
-    data.config.nome = document.getElementById('cfg-nome').value.trim();
-    data.config.subtitulo = document.getElementById('cfg-sub').value.trim();
-    data.config.emoji = document.getElementById('cfg-emoji').value.trim();
-    data.config.corPrimaria = document.getElementById('cfg-cor').value;
-    data.config.whatsapp = document.getElementById('cfg-whats').value.trim();
-    data.config.telefone = document.getElementById('cfg-tel').value.trim();
-    data.config.endereco = document.getElementById('cfg-end').value.trim();
-    data.config.horario = document.getElementById('cfg-hor').value.trim();
-    data.config.heroBadge1 = document.getElementById('cfg-b1').value.trim();
-    data.config.heroBadge2 = document.getElementById('cfg-b2').value.trim();
-    data.config.heroBadge3 = document.getElementById('cfg-b3').value.trim();
-    data.config.pixChave = document.getElementById('cfg-pix-chave').value.trim();
-    data.config.pixNome = document.getElementById('cfg-pix-nome').value.trim();
-    data.config.mpLink = document.getElementById('cfg-mp-link').value.trim();
-    data.config.whatsappAdmin = document.getElementById('cfg-whats-admin').value.trim();
-    saveData(data);
-    toast('✅ Configurações salvas!');
-  });
-
-  document.getElementById('btnResetConfig').addEventListener('click', () => {
-    if (!confirm('Restaurar configurações padrão? As personalizações serão perdidas.')) return;
-    const data = getData();
-    data.config = JSON.parse(JSON.stringify(window.MENU_DEFAULT.config));
-    data.config.senhaAdmin = getSenha(); // mantém senha
-    saveData(data);
-    carregarFormConfig();
-    toast('♻️ Configurações restauradas');
-  });
-}
-
-// ===== SENHA =====
-function initFormSenha() {
-  document.getElementById('formSenha').addEventListener('submit', e => {
-    e.preventDefault();
-    const atual = document.getElementById('senhaAtual').value;
-    const nova = document.getElementById('senhaNova').value;
-    const confirm = document.getElementById('senhaConfirm').value;
-    if (atual !== getSenha()) { toast('❌ Senha atual incorreta'); return; }
-    if (nova.length < 4) { toast('❌ A nova senha precisa ter pelo menos 4 caracteres'); return; }
-    if (nova !== confirm) { toast('❌ As senhas não coincidem'); return; }
-    const data = getData();
-    data.config.senhaAdmin = nova;
-    saveData(data);
-    document.getElementById('formSenha').reset();
-    toast('✅ Senha alterada com sucesso!');
-  });
-}
-
-// ===== CADASTROS =====
-const CAD_KEY = 'cardapio_cadastros';
-
-function getCadastros() {
-  try { return JSON.parse(localStorage.getItem(CAD_KEY) || '[]'); } catch { return []; }
-}
-
-function saveCadastros(lista) {
-  localStorage.setItem(CAD_KEY, JSON.stringify(lista));
-}
-
-function atualizarBadgeCadastros() {
-  const pendentes = getCadastros().filter(c => c.status === 'aguardando_pagamento').length;
-  const badge = document.getElementById('cad-badge');
-  if (pendentes > 0) {
-    badge.textContent = pendentes;
-    badge.style.display = 'inline-block';
-  } else {
-    badge.style.display = 'none';
+    wrap.classList.remove('show');
   }
 }
 
-function carregarPainelCadastros() {
-  const lista = getCadastros().sort((a, b) => new Date(b.dataCadastro) - new Date(a.dataCadastro));
-  const body = document.getElementById('tabelaCadastrosBody');
-  const vazio = document.getElementById('cadastrosVazio');
-  const wrap = document.getElementById('cadastrosTableWrap');
+// --- Salvar prato ---
+$('#btnSalvarPrato').addEventListener('click', salvarPrato);
 
-  if (!lista.length) {
-    vazio.style.display = 'block';
-    wrap.style.display = 'none';
+async function salvarPrato() {
+  const nome       = $('#pratoNome').value.trim();
+  const preco      = parseFloat($('#pratoPreco').value);
+  const categoria  = $('#pratoCat').value;
+  const descricao  = $('#pratoDesc').value.trim();
+  const foto_url   = $('#pratoFoto').value.trim();
+  const tag        = $('#pratoBadge').value;
+  const disponivel = $('#pratoDisponivel').checked;
+
+  if (!nome)      { mostrarToast('⚠️ Informe o nome do prato');    return; }
+  if (!preco || preco <= 0) { mostrarToast('⚠️ Informe um preço válido'); return; }
+  if (!categoria) { mostrarToast('⚠️ Selecione uma categoria');    return; }
+
+  const btn = $('#btnSalvarPrato');
+  btn.disabled = true;
+  btn.textContent = 'Salvando...';
+
+  try {
+    if (modo === 'supabase') {
+      const payload = { nome, descricao, preco, categoria, foto_url, tag, disponivel, restaurante_id: rid };
+
+      if (editandoId) {
+        const { error } = await db.from('cardapio_items').update(payload).eq('id', editandoId);
+        if (error) throw error;
+      } else {
+        const { error } = await db.from('cardapio_items').insert(payload);
+        if (error) throw error;
+      }
+    } else {
+      // Modo local
+      if (editandoId) {
+        const idx = pratosCache.findIndex(p => String(p.id) === String(editandoId));
+        if (idx !== -1) pratosCache[idx] = { ...pratosCache[idx], nome, descricao, preco, categoria, foto_url, tag, disponivel };
+      } else {
+        pratosCache.push({ id: Date.now(), nome, descricao, preco, categoria, foto_url, tag, disponivel });
+      }
+      localStorage.setItem(PRATOS_LS_KEY, JSON.stringify(pratosCache));
+    }
+
+    fecharModal();
+    await carregarCardapio();
+    mostrarToast(editandoId ? '✅ Prato atualizado!' : '✅ Prato adicionado!');
+  } catch (err) {
+    mostrarToast('❌ Erro ao salvar: ' + (err.message || err));
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '💾 Salvar Prato';
+  }
+}
+
+// --- Confirmar e excluir ---
+function confirmarExcluir(id, nome) {
+  excluindoId = id;
+  $('#confirmDelNome').textContent = `Excluir "${nome}"? Esta ação não pode ser desfeita.`;
+  $('#confirmDel').classList.add('open');
+}
+
+$('#btnCancelDel').addEventListener('click', () => {
+  excluindoId = null;
+  $('#confirmDel').classList.remove('open');
+});
+
+$('#btnConfirmDel').addEventListener('click', async () => {
+  if (!excluindoId) return;
+  const btn = $('#btnConfirmDel');
+  btn.disabled = true;
+
+  try {
+    if (modo === 'supabase') {
+      const { error } = await db.from('cardapio_items').delete().eq('id', excluindoId);
+      if (error) throw error;
+    } else {
+      pratosCache = pratosCache.filter(p => String(p.id) !== String(excluindoId));
+      localStorage.setItem(PRATOS_LS_KEY, JSON.stringify(pratosCache));
+    }
+    $('#confirmDel').classList.remove('open');
+    excluindoId = null;
+    await carregarCardapio();
+    mostrarToast('🗑️ Prato excluído!');
+  } catch (err) {
+    mostrarToast('❌ Erro ao excluir: ' + (err.message || err));
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+
+// ===== GERAR QR CODES =====
+$('#btnGerarQR').addEventListener('click', gerarQRCodes);
+$('#btnRegerar').addEventListener('click', gerarQRCodes);
+
+function gerarQRCodes() {
+  const urlBase  = $('#urlBase').value.trim();
+  const numMesas = Math.min(Math.max(parseInt($('#numMesas').value) || 10, 1), 200);
+  const avisoEl  = $('#limiteAviso');
+
+  if (!urlBase) { mostrarToast('⚠️ Informe a URL base do cardápio'); return; }
+
+  // Verifica limite do plano (somente no modo Supabase)
+  if (modo === 'supabase' && limiteQR !== Infinity && numMesas > limiteQR) {
+    if (avisoEl) {
+      $('#limiteAvisoTexto').textContent =
+        `Seu plano permite até ${limiteQR} mesa${limiteQR > 1 ? 's' : ''}. ` +
+        `Faça upgrade para adicionar mais mesas.`;
+      avisoEl.style.display = 'flex';
+    }
+    $('#qrActionsWrap').style.display = 'none';
     return;
   }
+  if (avisoEl) avisoEl.style.display = 'none';
 
-  vazio.style.display = 'none';
-  wrap.style.display = 'block';
+  salvarConfig({ ...carregarConfig(), urlBase, numMesas });
 
-  body.innerHTML = lista.map(c => {
-    const dt = new Date(c.dataCadastro);
-    const dtStr = dt.toLocaleDateString('pt-BR') + ' ' + dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-    const whatsNum = (c.whatsapp || '').replace(/\D/g, '');
-    const statusHtml = c.status === 'ativo'
-      ? '<span class="badge-cad ativo">✅ Ativo</span>'
-      : '<span class="badge-cad pendente">⏳ Aguardando</span>';
-    const btnAtivar = c.status === 'aguardando_pagamento'
-      ? `<button class="btn-ativar-cad" data-id="${c.id}">✅ Ativar</button>`
-      : '';
-    return `<tr>
-      <td style="font-size:12px;color:var(--text2);white-space:nowrap">${dtStr}</td>
-      <td>
-        <strong>${c.nome}</strong><br>
-        <small style="color:var(--text3)">${c.segmento || ''} — ${c.cidade || ''}</small>
-      </td>
-      <td>
-        ${c.responsavel}<br>
-        <small style="color:var(--text3)">${c.email || ''}</small>
-      </td>
-      <td>
-        ${whatsNum
-          ? `<a href="https://wa.me/${whatsNum}" target="_blank" style="color:var(--primary);font-weight:600;text-decoration:none">${c.whatsapp}</a>`
-          : c.whatsapp}
-      </td>
-      <td>
-        <strong>${c.plano ? c.plano.nome : '—'}</strong><br>
-        <small style="color:var(--text3)">${c.plano ? fmt(c.plano.preco) + '/mês' : ''}</small>
-      </td>
-      <td>${statusHtml}</td>
-      <td style="white-space:nowrap">
-        ${btnAtivar}
-        <button class="btn-del btn-del-cad" data-id="${c.id}" title="Excluir cadastro">🗑️</button>
-      </td>
-    </tr>`;
-  }).join('') || `<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text3)">Nenhum cadastro encontrado</td></tr>`;
+  const qrGrid = $('#qrGrid');
+  qrGrid.innerHTML = '';
 
-  body.querySelectorAll('.btn-ativar-cad').forEach(btn => {
-    btn.addEventListener('click', () => ativarCadastro(btn.dataset.id));
-  });
-  body.querySelectorAll('.btn-del-cad').forEach(btn => {
-    btn.addEventListener('click', () => excluirCadastro(btn.dataset.id));
-  });
-}
+  for (let i = 1; i <= numMesas; i++) {
+    const base = urlBase.replace(/\/$/, '').replace(/[?#].*$/, '');
+    const ridParam = rid ? `&rid=${rid}` : '';
+    const url = `${base}?mesa=${i}${ridParam}`;
 
-function ativarCadastro(id) {
-  if (!confirm('Confirmar ativação do cardápio para este cliente?')) return;
-  const lista = getCadastros();
-  const c = lista.find(x => x.id === id);
-  if (!c) return;
-  c.status = 'ativo';
-  c.dataAtivacao = new Date().toISOString();
-  saveCadastros(lista);
-  carregarPainelCadastros();
-  atualizarBadgeCadastros();
-  toast(`✅ Cardápio de "${c.nome}" ativado!`);
+    const card = document.createElement('div');
+    card.className = 'qr-card';
+    card.innerHTML = `
+      <div class="qr-code" id="qr-mesa-${i}"></div>
+      <div class="qr-card-info">
+        <strong>Mesa ${i}</strong>
+        <span class="qr-url">${url}</span>
+      </div>`;
+    qrGrid.appendChild(card);
 
-  // Oferecer envio de confirmação via WhatsApp
-  const num = (c.whatsapp || '').replace(/\D/g, '');
-  if (num && confirm(`Deseja enviar a confirmação de ativação para ${c.responsavel} via WhatsApp?`)) {
-    const msg = encodeURIComponent(
-      `Olá, *${c.responsavel}*! 🎉\n\n` +
-      `Seu cardápio digital do *${c.nome}* foi ativado com sucesso!\n\n` +
-      `Acesse agora e comece a personalizar: https://chausselicita-lang.github.io/cardapio-digital/\n\n` +
-      `Qualquer dúvida, estamos à disposição. 😊`
-    );
-    window.open(`https://wa.me/${num}?text=${msg}`, '_blank');
+    new QRCode(document.getElementById(`qr-mesa-${i}`), {
+      text: url, width: 160, height: 160,
+      colorDark: '#1A0F00', colorLight: '#FFFFFF',
+      correctLevel: QRCode.CorrectLevel.M
+    });
   }
+
+  $('#qrActionsWrap').style.display = 'block';
+  mostrarToast(`✅ ${numMesas} QR Code${numMesas > 1 ? 's' : ''} gerado${numMesas > 1 ? 's' : ''}!`);
+  setTimeout(() => $('#qrActionsWrap').scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
 }
 
-function excluirCadastro(id) {
-  if (!confirm('Excluir este cadastro permanentemente?')) return;
-  saveCadastros(getCadastros().filter(x => x.id !== id));
-  carregarPainelCadastros();
-  atualizarBadgeCadastros();
-  toast('🗑️ Cadastro excluído');
-}
+// ===== IMPRIMIR =====
+$('#btnImprimirQR').addEventListener('click', () => window.print());
 
 // ===== TOAST =====
 let toastTimer;
-function toast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg; el.classList.add('show');
+function mostrarToast(msg) {
+  const el = $('#adminToast');
+  el.textContent = msg;
+  el.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
 }
-
-function fmt(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }

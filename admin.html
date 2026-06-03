@@ -1,345 +1,1198 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin — Cardápio Digital</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="admin.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --primary: #E8420A;
+      --primary-dark: #C13508;
+      --gold: #F0A500;
+      --dark: #1A0F00;
+      --surface: #FFFFFF;
+      --surface2: #FFF8F3;
+      --border: #F0E8DF;
+      --text: #1A0F00;
+      --text2: #5A4A3A;
+      --text3: #9A8A7A;
+      --success: #27ae60;
+      --font: 'Poppins', sans-serif;
+      --radius: 12px;
+    }
+    html { font-size: 16px; }
+    body {
+      font-family: var(--font);
+      background: var(--surface2);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 60px;
+    }
+
+    /* HEADER */
+    .admin-header {
+      background: var(--dark);
+      color: white;
+      padding: 0 24px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.3);
+    }
+    .admin-header-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .admin-header-logo span { font-size: 22px; }
+    .admin-header-sub { font-size: 11px; color: rgba(255,255,255,0.5); margin-left: 4px; }
+    .btn-ver-cardapio {
+      background: rgba(255,255,255,0.1);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: var(--font);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s;
+    }
+    .btn-ver-cardapio:hover { background: rgba(255,255,255,0.18); }
+
+    /* TABS */
+    .admin-tabs {
+      background: var(--surface);
+      border-bottom: 2px solid var(--border);
+      display: flex;
+      padding: 0 24px;
+      gap: 4px;
+      position: sticky;
+      top: 60px;
+      z-index: 99;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      padding: 14px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text3);
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all 0.2s;
+      margin-bottom: -2px;
+    }
+    .tab-btn:hover { color: var(--primary); }
+    .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+    /* CONTEÚDO */
+    .admin-content {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+    .admin-section {
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 28px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    }
+    .admin-section h2 {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .admin-section p.section-desc {
+      font-size: 13px;
+      color: var(--text3);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    /* FORMULÁRIO */
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text2);
+      margin-bottom: 6px;
+    }
+    .form-group input {
+      width: 100%;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-size: 14px;
+      font-family: var(--font);
+      color: var(--text);
+      background: var(--surface);
+      transition: border-color 0.2s;
+      outline: none;
+    }
+    .form-group input:focus { border-color: var(--primary); }
+    .form-group small {
+      display: block;
+      font-size: 12px;
+      color: var(--text3);
+      margin-top: 5px;
+    }
+    .form-row {
+      display: flex;
+      gap: 16px;
+      align-items: flex-end;
+    }
+    .form-row .form-group { flex: 1; margin-bottom: 0; }
+
+    /* BOTÕES */
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+    .btn-secondary {
+      background: var(--surface2);
+      color: var(--text2);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-secondary:hover { border-color: var(--primary); color: var(--primary); }
+
+    /* GERADOR QR */
+    .qr-actions {
+      display: flex;
+      gap: 12px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+    .btn-imprimir {
+      background: var(--dark);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-imprimir:hover { background: #333; }
+
+    .qr-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 16px;
+      margin-top: 8px;
+    }
+    .qr-card {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      transition: box-shadow 0.2s;
+    }
+    .qr-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+    .qr-code img, .qr-code canvas { width: 160px !important; height: 160px !important; }
+    .qr-card-info strong {
+      display: block;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--dark);
+    }
+    .qr-url {
+      display: block;
+      font-size: 10px;
+      color: var(--text3);
+      word-break: break-all;
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+
+    /* TOAST */
+    .admin-toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--dark);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: 500;
+      z-index: 999;
+      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s;
+      opacity: 0;
+      pointer-events: none;
+      border-left: 4px solid var(--success);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      white-space: nowrap;
+    }
+    .admin-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    /* INFO BOX */
+    .info-box {
+      background: rgba(240,165,0,0.1);
+      border: 1.5px solid var(--gold);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #7a5900;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    .info-box strong { font-weight: 700; }
+
+    /* ── LISTA DE CONFIGURAÇÕES ── */
+    .config-list { display: flex; flex-direction: column; gap: 0; }
+    .config-item {
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .config-item:last-child { border-bottom: none; }
+    .config-item-main {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 0;
+      cursor: pointer;
+    }
+    .config-item-main:hover .config-item-label { color: var(--primary); }
+    .config-item-icon {
+      font-size: 24px;
+      width: 44px;
+      height: 44px;
+      background: var(--surface2);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      border: 1.5px solid var(--border);
+    }
+    .config-item-body { flex: 1; min-width: 0; }
+    .config-item-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--dark);
+      transition: color 0.15s;
+    }
+    .config-item-val {
+      font-size: 12px;
+      color: var(--text3);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .config-item-val.set { color: var(--success); font-weight: 600; }
+    .btn-config-edit {
+      flex-shrink: 0;
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text2);
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all 0.15s;
+    }
+    .btn-config-edit:hover,
+    .config-item.open .btn-config-edit {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: #fff5ee;
+    }
+    .config-edit-panel {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      padding: 0 0 18px 58px;
+    }
+    .config-item.open .config-edit-panel { display: flex; }
+    .config-edit-panel input,
+    .config-edit-panel textarea {
+      width: 100%;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-family: var(--font);
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .config-edit-panel input:focus,
+    .config-edit-panel textarea:focus { border-color: var(--primary); }
+    .config-edit-panel small {
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: -4px;
+    }
+    .config-edit-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-sm {
+      padding: 8px 18px;
+      font-size: 13px;
+    }
+
+    /* IMPRESSÃO */
+    @media print {
+      body * { visibility: hidden; }
+      .qr-grid, .qr-grid * { visibility: visible; }
+      .qr-grid {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        padding: 12px;
+      }
+      .qr-card {
+        border: 1px dashed #ccc;
+        page-break-inside: avoid;
+        padding: 10px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .admin-content { padding: 20px 16px; }
+      .admin-section { padding: 20px; }
+      .form-row { flex-direction: column; }
+      .qr-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+    }
+
+    /* LOGIN */
+    .admin-login-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--dark);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .admin-login-box {
+      background: var(--surface);
+      border-radius: 20px;
+      padding: 40px 32px;
+      width: 100%;
+      max-width: 380px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+    .login-logo { font-size: 52px; margin-bottom: 16px; }
+    .admin-login-box h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 6px;
+    }
+    .admin-login-box > p {
+      font-size: 13px;
+      color: var(--text3);
+      margin-bottom: 28px;
+    }
+    .login-form { display: flex; flex-direction: column; gap: 12px; }
+    .login-form input {
+      width: 100%;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 13px 16px;
+      font-size: 15px;
+      font-family: var(--font);
+      color: var(--text);
+      outline: none;
+      text-align: center;
+      letter-spacing: 3px;
+      transition: border-color 0.2s;
+    }
+    .login-form input:focus { border-color: var(--primary); }
+    .login-form input::placeholder { letter-spacing: 0; }
+    .btn-entrar {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 13px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: background 0.2s;
+    }
+    .btn-entrar:hover { background: var(--primary-dark); }
+    .login-error {
+      margin-top: 12px;
+      font-size: 13px;
+      color: #e74c3c;
+      font-weight: 600;
+    }
+    .btn-sair {
+      background: rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.7);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all 0.2s;
+    }
+    .btn-sair:hover { background: rgba(255,255,255,0.15); color: white; }
+
+    /* PLANO INFO BADGE */
+    .plano-info-badge {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      background: #fff8f3;
+      border: 1.5px solid #f0e8df;
+      border-radius: 10px;
+      padding: 10px 16px;
+      margin-bottom: 18px;
+      font-size: 13px;
+    }
+    .plano-info-badge .plano-icon { font-size: 20px; }
+    .plano-info-badge .plano-texto { color: var(--text2); }
+    .plano-info-badge .plano-texto strong { color: var(--dark); }
+    .plano-info-badge .plano-limite-tag {
+      margin-left: auto;
+      background: rgba(232,66,10,0.1);
+      color: var(--primary);
+      border-radius: 6px;
+      padding: 3px 10px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    /* LIMITE AVISO */
+    .limite-aviso {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      background: #fff5ee;
+      border: 2px solid var(--primary);
+      border-radius: 14px;
+      padding: 28px 24px;
+      margin-top: 16px;
+      gap: 10px;
+    }
+    .limite-aviso-icon { font-size: 40px; }
+    .limite-aviso h3 { font-size: 16px; font-weight: 700; color: var(--dark); }
+    .limite-aviso p { font-size: 13px; color: var(--text2); line-height: 1.6; max-width: 340px; }
+    .btn-upgrade {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 9px;
+      padding: 11px 22px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: var(--font);
+      text-decoration: none;
+      margin-top: 6px;
+      transition: background 0.2s;
+    }
+    .btn-upgrade:hover { background: var(--primary-dark); }
+
+    /* ── GERENCIAR CARDÁPIO ── */
+    .pratos-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .pratos-header h2 { margin-bottom: 4px; }
+    .pratos-header .section-desc { margin-bottom: 0; }
+
+    .filtros-cat {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .filtro-btn {
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text2);
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all 0.15s;
+    }
+    .filtro-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .filtro-btn.active { background: var(--primary); border-color: var(--primary); color: white; }
+
+    .pratos-loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--text3);
+      font-size: 14px;
+    }
+    .pratos-vazio {
+      display: none;
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--text3);
+    }
+    .pratos-vazio .vazio-icon { font-size: 48px; margin-bottom: 12px; }
+    .pratos-vazio p { font-size: 14px; margin-bottom: 16px; }
+
+    .pratos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+    .prato-card {
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: box-shadow 0.2s;
+    }
+    .prato-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.10); }
+    .prato-card.indisponivel { opacity: 0.55; }
+    .prato-foto {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      background: var(--border);
+      display: block;
+    }
+    .prato-foto-placeholder {
+      width: 100%;
+      height: 140px;
+      background: linear-gradient(135deg, #f0e8df, #ffe0cc);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+    }
+    .prato-body {
+      padding: 14px;
+    }
+    .prato-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .prato-nome {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--dark);
+      line-height: 1.3;
+    }
+    .prato-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 5px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .prato-badge.popular { background: rgba(240,165,0,0.15); color: #a07000; }
+    .prato-badge.novo    { background: rgba(39,174,96,0.15);  color: #1a7a40; }
+    .prato-badge.chef    { background: rgba(232,66,10,0.12);  color: var(--primary); }
+    .prato-desc {
+      font-size: 12px;
+      color: var(--text3);
+      line-height: 1.5;
+      margin-bottom: 10px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .prato-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .prato-preco {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+    .prato-acoes {
+      display: flex;
+      gap: 6px;
+    }
+    .btn-prato-acao {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 7px;
+      padding: 5px 10px;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: var(--font);
+      font-weight: 600;
+      transition: all 0.15s;
+    }
+    .btn-prato-editar { color: var(--text2); }
+    .btn-prato-editar:hover { border-color: var(--primary); color: var(--primary); }
+    .btn-prato-excluir { color: #e74c3c; }
+    .btn-prato-excluir:hover { background: #fef2f2; border-color: #e74c3c; }
+    .prato-cat-tag {
+      font-size: 10px;
+      color: var(--text3);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    /* ── MODAL ADD/EDIT PRATO ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(26,15,0,0.7);
+      z-index: 500;
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 24px;
+      overflow-y: auto;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: var(--surface);
+      border-radius: 18px;
+      width: 100%;
+      max-width: 560px;
+      margin: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 24px 0;
+    }
+    .modal-header h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--dark);
+    }
+    .modal-close {
+      background: var(--surface2);
+      border: none;
+      border-radius: 8px;
+      width: 32px;
+      height: 32px;
+      font-size: 16px;
+      cursor: pointer;
+      color: var(--text3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+    }
+    .modal-close:hover { background: var(--border); }
+    .modal-body { padding: 20px 24px; }
+    .modal-footer {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      padding: 0 24px 22px;
+    }
+    .modal-body .form-group input,
+    .modal-body .form-group select,
+    .modal-body .form-group textarea {
+      width: 100%;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-family: var(--font);
+      color: var(--text);
+      background: var(--surface);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .modal-body .form-group select { cursor: pointer; }
+    .modal-body .form-group textarea { resize: vertical; min-height: 72px; }
+    .modal-body .form-group input:focus,
+    .modal-body .form-group select:focus,
+    .modal-body .form-group textarea:focus { border-color: var(--primary); }
+    .modal-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 500px) { .modal-form-row { grid-template-columns: 1fr; } }
+
+    .img-preview-wrap {
+      margin-top: 8px;
+      display: none;
+    }
+    .img-preview-wrap.show { display: block; }
+    .img-preview {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-top: 8px;
+    }
+    .toggle-row span {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text2);
+    }
+    .toggle-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+    }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background: #ccc;
+      border-radius: 24px;
+      transition: 0.2s;
+    }
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      left: 3px;
+      bottom: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: 0.2s;
+    }
+    .toggle-switch input:checked + .toggle-slider { background: var(--success); }
+    .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+    /* confirm delete */
+    .confirm-del {
+      position: fixed;
+      inset: 0;
+      background: rgba(26,15,0,0.75);
+      z-index: 600;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .confirm-del.open { display: flex; }
+    .confirm-box {
+      background: var(--surface);
+      border-radius: 16px;
+      padding: 32px 28px;
+      max-width: 360px;
+      width: 100%;
+      text-align: center;
+    }
+    .confirm-box h3 { font-size: 17px; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
+    .confirm-box p  { font-size: 13px; color: var(--text2); margin-bottom: 22px; }
+    .confirm-btns   { display: flex; gap: 10px; justify-content: center; }
+    .btn-del-conf { background: #e74c3c; color: white; border: none; border-radius: 9px; padding: 10px 22px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: var(--font); }
+    .btn-del-conf:hover { background: #c0392b; }
+  </style>
 </head>
 <body>
 
-  <!-- LOGIN -->
-  <div class="login-screen" id="loginScreen">
-    <div class="login-card">
-      <div class="login-logo">⚙️</div>
-      <h1>Painel Admin</h1>
-      <p>Cardápio Digital</p>
-      <form id="loginForm">
-        <div class="field">
-          <label>Senha</label>
-          <input type="password" id="loginSenha" placeholder="Digite a senha" autocomplete="current-password"/>
-        </div>
-        <div class="login-erro" id="loginErro" style="display:none;">Senha incorreta</div>
-        <button type="submit" class="btn-primary w100">Entrar</button>
-      </form>
-      <a href="index.html" class="btn-link">← Voltar ao Cardápio</a>
+  <!-- LOGIN OVERLAY -->
+  <div class="admin-login-overlay" id="adminLoginOverlay" style="display:none;">
+    <div class="admin-login-box">
+      <div class="login-logo">🍽️</div>
+      <h2>Área Administrativa</h2>
+      <p>Digite a senha para acessar o painel</p>
+      <div class="login-form">
+        <input type="password" id="senhaInput" placeholder="Senha" autocomplete="current-password" />
+        <button class="btn-entrar" id="btnEntrar">Entrar</button>
+      </div>
+      <p class="login-error" id="loginError" style="display:none;">Senha incorreta. Tente novamente.</p>
     </div>
   </div>
 
-  <!-- DASHBOARD -->
-  <div class="dashboard" id="dashboard" style="display:none;">
+  <!-- HEADER -->
+  <header class="admin-header">
+    <div class="admin-header-logo">
+      <span>🍽️</span>
+      Sabor & Arte
+      <span class="admin-header-sub">| Painel Admin</span>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <a href="index.html" class="btn-ver-cardapio">↗ Ver Cardápio</a>
+      <button class="btn-sair" id="btnSair">Sair</button>
+    </div>
+  </header>
 
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="sidebar-logo">
-        <span>⚙️</span>
-        <div>
-          <strong>Admin</strong>
-          <small>Cardápio Digital</small>
+  <!-- TABS -->
+  <nav class="admin-tabs">
+    <button class="tab-btn active" data-tab="configuracoes">⚙️ Configurações</button>
+    <button class="tab-btn" data-tab="cardapio">🍽️ Cardápio</button>
+    <button class="tab-btn" data-tab="qrcodes">📱 QR Codes</button>
+  </nav>
+
+  <!-- CONTEÚDO -->
+  <div class="admin-content">
+
+    <!-- TAB: Configurações -->
+    <div class="tab-content" id="tab-configuracoes">
+
+      <div class="admin-section">
+        <h2>⚙️ Configurações</h2>
+        <p class="section-desc">Toque em um item para editar.</p>
+
+        <div class="config-list">
+
+          <!-- PIX -->
+          <div class="config-item" id="ci-pix">
+            <div class="config-item-main" onclick="toggleConfig('pix')">
+              <div class="config-item-icon">💳</div>
+              <div class="config-item-body">
+                <div class="config-item-label">Chave PIX</div>
+                <div class="config-item-val" id="val-pix">Não configurado</div>
+              </div>
+              <button class="btn-config-edit">✏️ Editar</button>
+            </div>
+            <div class="config-edit-panel">
+              <input type="text" id="inp-pix" placeholder="CPF, e-mail, telefone ou chave aleatória" />
+              <small>Exibida ao cliente quando escolher PIX no checkout.</small>
+              <div class="config-edit-actions">
+                <button class="btn-secondary btn-sm" onclick="fecharConfig('pix')">Cancelar</button>
+                <button class="btn-primary btn-sm" onclick="salvarConfigItem('pix')">💾 Salvar</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARTÃO -->
+          <div class="config-item" id="ci-cartao">
+            <div class="config-item-main" onclick="toggleConfig('cartao')">
+              <div class="config-item-icon">💳</div>
+              <div class="config-item-body">
+                <div class="config-item-label">Link do Cartão (Mercado Pago)</div>
+                <div class="config-item-val" id="val-cartao">Não configurado</div>
+              </div>
+              <button class="btn-config-edit">✏️ Editar</button>
+            </div>
+            <div class="config-edit-panel">
+              <input type="url" id="inp-cartao" placeholder="https://mpago.la/..." />
+              <small>Gere o link no painel do Mercado Pago e cole aqui.</small>
+              <div class="config-edit-actions">
+                <button class="btn-secondary btn-sm" onclick="fecharConfig('cartao')">Cancelar</button>
+                <button class="btn-primary btn-sm" onclick="salvarConfigItem('cartao')">💾 Salvar</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- WHATSAPP -->
+          <div class="config-item" id="ci-whatsapp">
+            <div class="config-item-main" onclick="toggleConfig('whatsapp')">
+              <div class="config-item-icon">💬</div>
+              <div class="config-item-body">
+                <div class="config-item-label">WhatsApp para pedidos</div>
+                <div class="config-item-val" id="val-whatsapp">Não configurado</div>
+              </div>
+              <button class="btn-config-edit">✏️ Editar</button>
+            </div>
+            <div class="config-edit-panel">
+              <input type="tel" id="inp-whatsapp" placeholder="5511999999999" maxlength="15" />
+              <small>DDI + DDD + número, sem espaços. Ex: 5511999999999</small>
+              <div class="config-edit-actions">
+                <button class="btn-secondary btn-sm" onclick="fecharConfig('whatsapp')">Cancelar</button>
+                <button class="btn-primary btn-sm" onclick="salvarConfigItem('whatsapp')">💾 Salvar</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- SENHA -->
+          <div class="config-item" id="ci-senha">
+            <div class="config-item-main" onclick="toggleConfig('senha')">
+              <div class="config-item-icon">🔒</div>
+              <div class="config-item-body">
+                <div class="config-item-label">Senha do Admin</div>
+                <div class="config-item-val" id="val-senha">••••••</div>
+              </div>
+              <button class="btn-config-edit">✏️ Editar</button>
+            </div>
+            <div class="config-edit-panel">
+              <input type="password" id="inp-senha" placeholder="Nova senha (mín. 6 caracteres)" autocomplete="new-password" />
+              <small>Ao salvar, a senha antiga deixa de funcionar.</small>
+              <div class="config-edit-actions">
+                <button class="btn-secondary btn-sm" onclick="fecharConfig('senha')">Cancelar</button>
+                <button class="btn-primary btn-sm" onclick="salvarConfigItem('senha')">💾 Salvar</button>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
-      <nav class="sidebar-nav">
-        <button class="nav-btn active" data-panel="pratos">🍽️ Pratos</button>
-        <button class="nav-btn" data-panel="cadastros">📋 Cadastros <span id="cad-badge" class="cad-badge" style="display:none">0</span></button>
-        <button class="nav-btn" data-panel="config">⚙️ Configurações</button>
-        <button class="nav-btn" data-panel="senha">🔒 Alterar Senha</button>
-      </nav>
-      <div class="sidebar-footer">
-        <a href="index.html" class="btn-link-sm" target="_blank">🔗 Ver Cardápio</a>
-        <button class="btn-link-sm danger" id="btnLogout">Sair</button>
-      </div>
-    </aside>
 
-    <!-- Conteúdo -->
-    <main class="content">
+    </div>
 
-      <!-- PAINEL: PRATOS -->
-      <div class="panel active" id="panel-pratos">
-        <div class="panel-header">
+    <!-- TAB: Cardápio -->
+    <div class="tab-content" id="tab-cardapio" style="display:none;">
+      <div class="admin-section">
+        <div class="pratos-header">
           <div>
-            <h2>🍽️ Gerenciar Pratos</h2>
-            <p>Adicione, edite ou remova itens do cardápio</p>
+            <h2>🍽️ Gerenciar Cardápio</h2>
+            <p class="section-desc">Adicione, edite ou remova pratos do seu cardápio digital.</p>
           </div>
           <button class="btn-primary" id="btnNovoPrato">+ Novo Prato</button>
         </div>
 
-        <div class="filtro-bar">
-          <input type="text" id="filtroNome" placeholder="🔍 Filtrar por nome..." class="input-filtro"/>
-          <select id="filtroCat" class="input-filtro">
-            <option value="">Todas as categorias</option>
-          </select>
+        <div class="filtros-cat" id="filtrosCat">
+          <button class="filtro-btn active" data-cat="todos">Todos</button>
+          <button class="filtro-btn" data-cat="entradas">🥗 Entradas</button>
+          <button class="filtro-btn" data-cat="pratos">🍖 Pratos</button>
+          <button class="filtro-btn" data-cat="lanches">🍔 Lanches</button>
+          <button class="filtro-btn" data-cat="pizzas">🍕 Pizzas</button>
+          <button class="filtro-btn" data-cat="petiscos">🍟 Petiscos</button>
+          <button class="filtro-btn" data-cat="bebidas">🍺 Bebidas</button>
+          <button class="filtro-btn" data-cat="sobremesas">🍰 Sobremesas</button>
+          <button class="filtro-btn" data-cat="combos">🎁 Combos</button>
         </div>
 
-        <div class="table-wrap">
-          <table class="table" id="tabelaPratos">
-            <thead>
-              <tr>
-                <th>Foto</th>
-                <th>Nome</th>
-                <th>Categoria</th>
-                <th>Preço</th>
-                <th>Tag</th>
-                <th>Ativo</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody id="tabelaBody"></tbody>
-          </table>
+        <div class="pratos-loading" id="pratosLoading">⏳ Carregando pratos...</div>
+
+        <div class="pratos-vazio" id="pratosVazio">
+          <div class="vazio-icon">🍽️</div>
+          <p>Nenhum prato cadastrado nesta categoria.</p>
+          <button class="btn-primary" onclick="abrirModalPrato()">+ Adicionar Primeiro Prato</button>
+        </div>
+
+        <div class="pratos-grid" id="pratosGrid"></div>
+      </div>
+    </div>
+
+    <!-- TAB: QR Codes -->
+    <div class="tab-content" id="tab-qrcodes" style="display:none;">
+
+      <div class="admin-section">
+        <h2>📱 Gerador de QR Code por Mesa</h2>
+        <p class="section-desc">Gere QR Codes para cada mesa. Ao escanear, o cliente abre o cardápio já identificado com o número da mesa.</p>
+
+        <div class="info-box">
+          <strong>Como funciona:</strong> Cada QR Code abre o cardápio com <code>?mesa=X</code> na URL. O número da mesa aparece no topo do cardápio e é enviado junto com o pedido no WhatsApp.
+        </div>
+
+        <!-- Badge do plano atual (visível só no modo Supabase) -->
+        <div class="plano-info-badge" id="planoInfoBadge">
+          <span class="plano-icon">📋</span>
+          <span class="plano-texto">Seu plano: <strong id="planoNomeBadge">—</strong></span>
+          <span class="plano-limite-tag" id="planoLimiteTag">—</span>
+        </div>
+
+        <div class="form-group">
+          <label>URL base do cardápio</label>
+          <input type="url" id="urlBase" placeholder="https://seusite.com/index.html">
+          <small>URL completa do cardápio digital. Os QR Codes serão gerados como: <em>[URL]?mesa=1</em>, <em>[URL]?mesa=2</em>, etc.</small>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Número de mesas</label>
+            <input type="number" id="numMesas" min="1" max="200" value="10">
+          </div>
+          <button class="btn-primary" id="btnGerarQR">▶ Gerar QR Codes</button>
+        </div>
+
+        <!-- Aviso de limite atingido -->
+        <div class="limite-aviso" id="limiteAviso">
+          <div class="limite-aviso-icon">🔒</div>
+          <h3>Limite do seu plano atingido</h3>
+          <p id="limiteAvisoTexto">Faça upgrade para adicionar mais mesas.</p>
+          <a class="btn-upgrade" href="cadastro.html#planos">⬆ Fazer Upgrade</a>
         </div>
       </div>
 
-      <!-- PAINEL: CONFIGURAÇÕES -->
-      <div class="panel" id="panel-config">
-        <div class="panel-header">
-          <div>
-            <h2>⚙️ Configurações da Loja</h2>
-            <p>Personalize as informações do seu estabelecimento</p>
+      <div id="qrActionsWrap" style="display:none;">
+        <div class="admin-section">
+          <div class="qr-actions">
+            <button class="btn-imprimir" id="btnImprimirQR">🖨️ Imprimir Todos os QR Codes</button>
+            <button class="btn-secondary" id="btnRegerar">↺ Gerar Novamente</button>
           </div>
-        </div>
-        <form id="formConfig" class="form-config">
-          <div class="form-section">
-            <h3>Identidade</h3>
-            <div class="form-row">
-              <div class="field">
-                <label>Nome do Estabelecimento</label>
-                <input type="text" id="cfg-nome" placeholder="Ex: Sabor & Arte"/>
-              </div>
-              <div class="field">
-                <label>Subtítulo</label>
-                <input type="text" id="cfg-sub" placeholder="Ex: Bar & Restaurante"/>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="field field-sm">
-                <label>Emoji / Ícone</label>
-                <input type="text" id="cfg-emoji" placeholder="🍽️" maxlength="4"/>
-              </div>
-              <div class="field field-sm">
-                <label>Cor Principal</label>
-                <div class="color-wrap">
-                  <input type="color" id="cfg-cor" value="#E8420A"/>
-                  <input type="text" id="cfg-cor-hex" placeholder="#E8420A" maxlength="7"/>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-section">
-            <h3>Contato & Funcionamento</h3>
-            <div class="form-row">
-              <div class="field">
-                <label>WhatsApp (só números, com DDD e DDI)</label>
-                <input type="text" id="cfg-whats" placeholder="5511999999999"/>
-              </div>
-              <div class="field">
-                <label>Telefone (exibição)</label>
-                <input type="text" id="cfg-tel" placeholder="(11) 99999-9999"/>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="field">
-                <label>Endereço</label>
-                <input type="text" id="cfg-end" placeholder="Rua das Flores, 123 — Centro"/>
-              </div>
-              <div class="field">
-                <label>Horário de Funcionamento</label>
-                <input type="text" id="cfg-hor" placeholder="Seg–Sex: 11h–23h | Sáb–Dom: 11h–00h"/>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-section">
-            <h3>Badges do Banner (textos no topo da página)</h3>
-            <div class="form-row">
-              <div class="field"><label>Badge 1</label><input type="text" id="cfg-b1" placeholder="⭐ 4.9 no Google"/></div>
-              <div class="field"><label>Badge 2</label><input type="text" id="cfg-b2" placeholder="🕐 Aberto agora"/></div>
-              <div class="field"><label>Badge 3</label><input type="text" id="cfg-b3" placeholder="🚗 Delivery disponível"/></div>
-            </div>
-          </div>
-
-          <div class="form-section">
-            <h3>💳 Pagamento & PIX</h3>
-            <div class="form-row">
-              <div class="field">
-                <label>Chave PIX</label>
-                <input type="text" id="cfg-pix-chave" placeholder="email, CPF, CNPJ ou chave aleatória"/>
-              </div>
-              <div class="field">
-                <label>Nome do Beneficiário (PIX)</label>
-                <input type="text" id="cfg-pix-nome" placeholder="Seu nome ou razão social"/>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="field">
-                <label>Link do Mercado Pago (pagamento com cartão)</label>
-                <input type="url" id="cfg-mp-link" placeholder="https://www.mercadopago.com.br/..."/>
-              </div>
-              <div class="field">
-                <label>WhatsApp para receber comprovantes (DDI+DDD+número)</label>
-                <input type="text" id="cfg-whats-admin" placeholder="5511999999999"/>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-actions">
-            <button type="submit" class="btn-primary">💾 Salvar Configurações</button>
-            <button type="button" class="btn-outline" id="btnResetConfig">Restaurar padrão</button>
-          </div>
-        </form>
-      </div>
-
-      <!-- PAINEL: CADASTROS -->
-      <div class="panel" id="panel-cadastros">
-        <div class="panel-header">
-          <div>
-            <h2>📋 Cadastros de Clientes</h2>
-            <p>Gerencie os clientes aguardando confirmação de pagamento</p>
-          </div>
-          <a href="cadastro.html" target="_blank" class="btn-primary" style="text-decoration:none;font-size:13px;padding:10px 16px;">
-            + Ver página de cadastro
-          </a>
-        </div>
-        <div id="cadastrosVazio" style="text-align:center;padding:56px 24px;display:none;">
-          <div style="font-size:52px;margin-bottom:14px;">📭</div>
-          <p style="font-size:15px;font-weight:600;color:var(--text2)">Nenhum cadastro ainda</p>
-          <p style="font-size:13px;color:var(--text3);margin-top:6px">Os novos cadastros feitos em <strong>cadastro.html</strong> aparecerão aqui</p>
-        </div>
-        <div class="table-wrap" id="cadastrosTableWrap" style="display:none;">
-          <table class="table" id="tabelaCadastros">
-            <thead>
-              <tr>
-                <th>Data</th>
-                <th>Estabelecimento</th>
-                <th>Responsável</th>
-                <th>WhatsApp</th>
-                <th>Plano</th>
-                <th>Status</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody id="tabelaCadastrosBody"></tbody>
-          </table>
+          <div class="qr-grid" id="qrGrid"></div>
         </div>
       </div>
 
-      <!-- PAINEL: SENHA -->
-      <div class="panel" id="panel-senha">
-        <div class="panel-header">
-          <div>
-            <h2>🔒 Alterar Senha</h2>
-            <p>Mude a senha de acesso ao painel admin</p>
-          </div>
-        </div>
-        <form id="formSenha" class="form-config">
-          <div class="form-section">
-            <div class="form-row">
-              <div class="field">
-                <label>Senha Atual</label>
-                <input type="password" id="senhaAtual" placeholder="Senha atual"/>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="field">
-                <label>Nova Senha</label>
-                <input type="password" id="senhaNova" placeholder="Nova senha (mín. 4 caracteres)"/>
-              </div>
-              <div class="field">
-                <label>Confirmar Nova Senha</label>
-                <input type="password" id="senhaConfirm" placeholder="Repita a nova senha"/>
-              </div>
-            </div>
-          </div>
-          <div class="form-actions">
-            <button type="submit" class="btn-primary">🔒 Alterar Senha</button>
-          </div>
-        </form>
-      </div>
+    </div>
 
-    </main>
   </div>
 
-  <!-- MODAL PRATO -->
-  <div class="modal-overlay" id="modalOverlay">
-    <div class="modal" id="modalPrato">
+  <!-- MODAL ADD/EDIT PRATO -->
+  <div class="modal-overlay" id="modalPratoOverlay">
+    <div class="modal-box">
       <div class="modal-header">
-        <h3 id="modalTitulo">Novo Prato</h3>
-        <button class="btn-modal-close" id="btnModalClose">✕</button>
+        <h3 id="modalPratoTitulo">Novo Prato</h3>
+        <button class="modal-close" id="btnFecharModal">✕</button>
       </div>
-      <form id="formPrato" class="modal-body">
-        <input type="hidden" id="pratoId"/>
-        <div class="form-row">
-          <div class="field">
-            <label>Nome do Prato *</label>
-            <input type="text" id="pNome" required placeholder="Ex: Bruschetta Italiana"/>
+      <div class="modal-body">
+        <form id="formPrato" autocomplete="off">
+
+          <div class="form-group">
+            <label>Foto (URL da imagem)</label>
+            <input type="url" id="pratoFoto" placeholder="https://images.unsplash.com/..." />
+            <div class="img-preview-wrap" id="previewWrap">
+              <img class="img-preview" id="pratoFotoPreview" src="" alt="Preview" />
+            </div>
           </div>
-          <div class="field field-sm">
-            <label>Preço (R$) *</label>
-            <input type="number" id="pPreco" required step="0.01" min="0" placeholder="29.90"/>
+
+          <div class="form-group">
+            <label>Nome do prato <span style="color:var(--primary)">*</span></label>
+            <input type="text" id="pratoNome" placeholder="Ex: Picanha na Brasa" required />
           </div>
-        </div>
-        <div class="field">
-          <label>Descrição</label>
-          <textarea id="pDesc" rows="2" placeholder="Descreva os ingredientes e diferenciais..."></textarea>
-        </div>
-        <div class="form-row">
-          <div class="field">
-            <label>Categoria *</label>
-            <select id="pCat" required></select>
+
+          <div class="form-group">
+            <label>Descrição</label>
+            <textarea id="pratoDesc" placeholder="Ingredientes, preparo, acompanhamentos..."></textarea>
           </div>
-          <div class="field field-sm">
-            <label>Tag</label>
-            <select id="pTag">
-              <option value="">Nenhuma</option>
-              <option value="popular">Popular</option>
-              <option value="novo">Novo</option>
-              <option value="chef">Chef indica</option>
+
+          <div class="modal-form-row">
+            <div class="form-group">
+              <label>Preço (R$) <span style="color:var(--primary)">*</span></label>
+              <input type="number" id="pratoPreco" placeholder="0.00" min="0" step="0.01" required />
+            </div>
+            <div class="form-group">
+              <label>Categoria <span style="color:var(--primary)">*</span></label>
+              <select id="pratoCat" required>
+                <option value="">Selecione...</option>
+                <option value="entradas">🥗 Entradas</option>
+                <option value="pratos">🍖 Pratos</option>
+                <option value="lanches">🍔 Lanches</option>
+                <option value="pizzas">🍕 Pizzas</option>
+                <option value="petiscos">🍟 Petiscos</option>
+                <option value="bebidas">🍺 Bebidas</option>
+                <option value="sobremesas">🍰 Sobremesas</option>
+                <option value="combos">🎁 Combos</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Badge / Destaque</label>
+            <select id="pratoBadge">
+              <option value="">Nenhum</option>
+              <option value="popular">⭐ Popular</option>
+              <option value="novo">🆕 Novo</option>
+              <option value="chef">👨‍🍳 Chef Indica</option>
             </select>
           </div>
-        </div>
-        <div class="field">
-          <label>URL da Foto (Unsplash ou outra)</label>
-          <input type="url" id="pFoto" placeholder="https://images.unsplash.com/photo-..."/>
-        </div>
-        <div id="fotoPreview" class="foto-preview" style="display:none;">
-          <img id="fotoPreviewImg" src="" alt="Preview" />
-        </div>
-        <div class="form-row">
-          <div class="field">
-            <label>Preço Original (riscado, para combos)</label>
-            <input type="number" id="pPrecoOld" step="0.01" min="0" placeholder="Deixe em branco se não tiver"/>
+
+          <div class="form-group">
+            <label>Disponibilidade</label>
+            <div class="toggle-row">
+              <span>Prato disponível no cardápio</span>
+              <label class="toggle-switch">
+                <input type="checkbox" id="pratoDisponivel" checked />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
           </div>
-          <div class="field field-sm">
-            <label>Destaque</label>
-            <select id="pDestaque">
-              <option value="false">Não</option>
-              <option value="true">Sim (borda colorida)</option>
-            </select>
-          </div>
-        </div>
-        <div class="field">
-          <label>Itens do Combo (um por linha, só para combos)</label>
-          <textarea id="pExtras" rows="3" placeholder="2 Pratos à escolha&#10;2 Refrigerantes&#10;🎉 Economia de R$ 30,00"></textarea>
-        </div>
-        <div class="field">
-          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
-            <input type="checkbox" id="pAtivo" checked style="width:auto;height:auto;accent-color:var(--primary)"/>
-            Prato ativo (visível no cardápio)
-          </label>
-        </div>
-        <div class="modal-actions">
-          <button type="submit" class="btn-primary" id="btnSalvarPrato">💾 Salvar Prato</button>
-          <button type="button" class="btn-outline" id="btnCancelarModal">Cancelar</button>
-        </div>
-      </form>
+
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" id="btnCancelarModal">Cancelar</button>
+        <button class="btn-primary" id="btnSalvarPrato">💾 Salvar Prato</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFIRM EXCLUIR -->
+  <div class="confirm-del" id="confirmDel">
+    <div class="confirm-box">
+      <h3>Excluir prato?</h3>
+      <p id="confirmDelNome">Esta ação não pode ser desfeita.</p>
+      <div class="confirm-btns">
+        <button class="btn-secondary" id="btnCancelDel">Cancelar</button>
+        <button class="btn-del-conf" id="btnConfirmDel">🗑️ Excluir</button>
+      </div>
     </div>
   </div>
 
   <!-- TOAST -->
-  <div class="toast" id="toast"></div>
+  <div class="admin-toast" id="adminToast"></div>
 
-  <script src="data.js"></script>
-  <script src="admin.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="admin.js?v=9"></script>
 </body>
 </html>
