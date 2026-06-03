@@ -1062,6 +1062,52 @@
       text-decoration: none;
     }
     .btn-payment-whats:hover { background: #1ebe5a; }
+
+    /* ─── PAYMENT TABS ─── */
+    .pay-tabs {
+      display: flex;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .pay-tab {
+      flex: 1;
+      padding: 10px 8px;
+      background: none;
+      border: none;
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text3);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .pay-tab:not(:last-child) { border-right: 2px solid var(--border); }
+    .pay-tab.active { background: var(--primary); color: white; }
+    .pay-tab-pane { display: none; }
+    .pay-tab-pane.active { display: block; animation: fadeIn 0.2s; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .btn-mp {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      background: #009EE3;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 15px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: var(--font);
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .btn-mp:hover { background: #007BB5; }
+    .cartao-desc { font-size: 13px; color: var(--text2); margin-bottom: 16px; line-height: 1.6; }
   </style>
 </head>
 <body>
@@ -1460,10 +1506,10 @@
 
   <!-- PAYMENT OVERLAY -->
   <div class="payment-overlay" id="paymentOverlay">
-    <div class="payment-box">
+    <div class="payment-box" id="paymentBox">
       <div class="payment-icon">💳</div>
       <h2>Quase lá! Finalize o pagamento</h2>
-      <p>Seu cadastro foi criado. Agora realize o pagamento para ativar seu cardápio.</p>
+      <p>Seu cadastro foi criado. Realize o pagamento para ativar seu cardápio.</p>
 
       <div class="payment-resumo">
         <div>
@@ -1473,15 +1519,32 @@
         <div class="payment-resumo-preco" id="pay-plano-preco">—<br/><small>/mês</small></div>
       </div>
 
-      <div class="payment-pix-label">🔑 Chave PIX para pagamento</div>
-      <div class="payment-pix-box">
-        <div class="payment-pix-chave" id="pay-pix-chave">—</div>
-        <button class="btn-copy-pix" id="btnCopyPix">📋 Copiar</button>
+      <!-- ABAS PIX / CARTÃO -->
+      <div class="pay-tabs">
+        <button class="pay-tab active" data-tab="pix">💚 PIX</button>
+        <button class="pay-tab" data-tab="cartao">💳 Cartão (Créd/Déb)</button>
       </div>
-      <div class="payment-pix-nome" id="pay-pix-nome"></div>
+
+      <!-- PIX -->
+      <div class="pay-tab-pane active" id="pay-tab-pix">
+        <div class="payment-pix-label">🔑 Chave PIX</div>
+        <div class="payment-pix-box">
+          <div class="payment-pix-chave" id="pay-pix-chave">—</div>
+          <button class="btn-copy-pix" id="btnCopyPix">📋 Copiar</button>
+        </div>
+        <div class="payment-pix-nome" id="pay-pix-nome"></div>
+      </div>
+
+      <!-- CARTÃO -->
+      <div class="pay-tab-pane" id="pay-tab-cartao">
+        <p class="cartao-desc" id="cartaoDesc">Pague com cartão de crédito ou débito de forma segura pelo Mercado Pago.</p>
+        <a href="#" class="btn-mp" id="btnMercadoPago" target="_blank" rel="noopener noreferrer">
+          💳 Pagar com Cartão — Mercado Pago
+        </a>
+      </div>
 
       <div class="payment-instrucao">
-        📱 Após pagar, clique no botão abaixo e envie o comprovante pelo WhatsApp. Seu cardápio será ativado em até <strong>24h úteis</strong>.
+        📱 Após pagar, clique abaixo e envie o comprovante pelo WhatsApp. Seu cardápio será ativado em até <strong>24h úteis</strong>.
       </div>
 
       <a href="#" class="btn-payment-whats" id="btnPaymentWhats" target="_blank" rel="noopener noreferrer">
@@ -1751,8 +1814,8 @@ CREATE POLICY "pedidos_all" ON cardapio_pedidos FOR ALL USING (true) WITH CHECK 
         document.getElementById('linkCardapio').textContent = linkCardapio;
         document.getElementById('linkAdmin').textContent    = linkAdmin;
 
-        // Mostra tela de pagamento antes do overlay de sucesso
-        mostrarPagamento(plano, nomeRestaurante, nomeResponsavel, '55' + telefone);
+        // Mostra tela de pagamento — links ficam só na mensagem do admin
+        mostrarPagamento(plano, nomeRestaurante, nomeResponsavel, '55' + telefone, linkCardapio, linkAdmin);
 
       } catch (err) {
         let msg = err.message || 'Tente novamente.';
@@ -1774,54 +1837,81 @@ CREATE POLICY "pedidos_all" ON cardapio_pedidos FOR ALL USING (true) WITH CHECK 
     }
 
     // ===== PAGAMENTO =====
-    function mostrarPagamento(plano, nomeRestaurante, nomeResponsavel, telefone) {
-      // Preenche resumo do plano
+    function mostrarPagamento(plano, nomeRestaurante, nomeResponsavel, telefone, linkCardapio, linkAdmin) {
+      // Resumo do plano
       document.getElementById('pay-plano-nome').textContent = plano ? `Plano ${plano.nome}` : 'Plano selecionado';
       document.getElementById('pay-plano-desc').textContent = plano ? plano.mesas : '';
       document.getElementById('pay-plano-preco').innerHTML  = plano ? `R$ ${plano.preco}<br/><small>/mês</small>` : '—';
 
-      // Lê chave PIX do config do admin (mesmo domínio = mesmo localStorage)
-      let pixChave = '', pixNome = '';
-      try {
-        const cfg = JSON.parse(localStorage.getItem('cardapio_data') || '{}').config || {};
-        pixChave = cfg.pixChave || '';
-        pixNome  = cfg.pixNome  || '';
-      } catch (_) {}
+      // Lê config do admin (mesmo domínio = mesmo localStorage)
+      let cfg = {};
+      try { cfg = JSON.parse(localStorage.getItem('cardapio_data') || '{}').config || {}; } catch (_) {}
 
-      document.getElementById('pay-pix-chave').textContent = pixChave || 'Chave PIX não configurada — entre em contato pelo WhatsApp';
+      // PIX
+      const pixChave = cfg.pixChave || '';
+      const pixNome  = cfg.pixNome  || '';
+      document.getElementById('pay-pix-chave').textContent = pixChave || 'Chave PIX não configurada — entre em contato';
       document.getElementById('pay-pix-nome').textContent  = pixNome ? `Beneficiário: ${pixNome}` : '';
 
-      // Monta link do WhatsApp com mensagem automática
-      let whatsAdmin = '';
-      try {
-        const cfg = JSON.parse(localStorage.getItem('cardapio_data') || '{}').config || {};
-        whatsAdmin = (cfg.whatsappAdmin || cfg.whatsapp || '').replace(/\D/g, '');
-      } catch (_) {}
+      // Cartão (Mercado Pago)
+      const mpLink = cfg.mpLink || '';
+      const btnMp  = document.getElementById('btnMercadoPago');
+      if (mpLink) {
+        btnMp.href = mpLink;
+        btnMp.style.display = 'inline-flex';
+        document.getElementById('cartaoDesc').textContent = 'Pague com cartão de crédito ou débito de forma segura pelo Mercado Pago.';
+      } else {
+        btnMp.style.display = 'none';
+        document.getElementById('cartaoDesc').textContent = 'Pagamento por cartão não disponível no momento. Use o PIX ou entre em contato.';
+      }
 
-      const precoStr = plano ? `R$ ${plano.preco}/mês` : '';
+      // WhatsApp → vai para o ADMIN com os links já gerados
+      // O cliente NÃO vê os links — só o admin recebe e envia após confirmar
+      const whatsAdmin = (cfg.whatsappAdmin || cfg.whatsapp || '').replace(/\D/g, '');
+      const precoStr   = plano ? `R$ ${plano.preco}/mês` : '';
       const msg = encodeURIComponent(
-        `Olá! Realizei o pagamento do *Plano ${plano ? plano.nome : ''}* (${precoStr}).\n\n` +
+        `🔔 *Novo cadastro aguardando ativação!*\n\n` +
         `🏠 *Restaurante:* ${nomeRestaurante}\n` +
-        `👤 *Responsável:* ${nomeResponsavel}\n\n` +
-        `Segue o comprovante em anexo para ativar meu cardápio. 🙏`
+        `👤 *Responsável:* ${nomeResponsavel}\n` +
+        `📞 *WhatsApp:* ${telefone}\n` +
+        `💎 *Plano:* ${plano ? plano.nome : ''} — ${precoStr}\n\n` +
+        `*Links gerados — envie ao cliente após confirmar o pagamento:*\n` +
+        `🔗 Cardápio: ${linkCardapio}\n` +
+        `⚙️ Admin: ${linkAdmin}\n\n` +
+        `Comprovante de pagamento em anexo. ✅`
       );
-      const waLink = whatsAdmin
+      const btnWa = document.getElementById('btnPaymentWhats');
+      btnWa.href = whatsAdmin
         ? `https://wa.me/${whatsAdmin}?text=${msg}`
         : `https://wa.me/?text=${msg}`;
 
-      const btnWa = document.getElementById('btnPaymentWhats');
-      btnWa.href = waLink;
-
-      // Após clicar em enviar comprovante, exibe o overlay de sucesso também
+      // Após enviar o comprovante: cliente vê "Aguardando ativação" (sem links)
       btnWa.addEventListener('click', () => {
         setTimeout(() => {
-          document.getElementById('paymentOverlay').classList.remove('show');
-          document.getElementById('successOverlay').classList.add('show');
-        }, 800);
+          document.getElementById('paymentBox').innerHTML = `
+            <div class="payment-icon">⏳</div>
+            <h2 style="font-size:22px;font-weight:800;color:var(--dark);margin-bottom:10px">Aguardando ativação</h2>
+            <p style="font-size:14px;color:var(--text2);line-height:1.7">
+              Comprovante enviado com sucesso!<br/>
+              Em breve você receberá o link do seu cardápio pelo WhatsApp,
+              assim que confirmarmos o pagamento. 🎉
+            </p>
+          `;
+        }, 600);
       }, { once: true });
 
       document.getElementById('paymentOverlay').classList.add('show');
     }
+
+    // ===== CHAVEAMENTO DE ABAS PIX / CARTÃO =====
+    document.querySelectorAll('.pay-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.pay-tab').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.pay-tab-pane').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('pay-tab-' + btn.dataset.tab).classList.add('active');
+      });
+    });
 
     // ===== COPIAR PIX =====
     document.getElementById('btnCopyPix').addEventListener('click', () => {
