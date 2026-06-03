@@ -5,9 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cardápio Digital — Bar & Restaurante</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;0,800;1,700;1,800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=5" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css?v=6" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
 </head>
@@ -876,18 +875,7 @@
     </div>
   </div>
 
-  <script src="app.js?v=5"></script>
-  <script>
-    // Scroll reveal — ativa cards conforme entram na viewport
-    (function() {
-      const io = new IntersectionObserver(entries => {
-        entries.forEach(e => {
-          if (e.isIntersecting) { e.target.classList.add('revealed'); io.unobserve(e.target); }
-        });
-      }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
-      document.querySelectorAll('.card-produto').forEach(el => io.observe(el));
-    })();
-  </script>
+  <script src="app.js?v=4"></script>
   <script>
     // Carrega dados do restaurante se vier via ?rid=
     (async () => {
