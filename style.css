@@ -656,7 +656,21 @@ body {
   color: rgba(255,255,255,0.4);
   padding: 16px 24px;
   border-top: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
 }
+
+.footer-admin-link {
+  color: rgba(255,255,255,0.3);
+  text-decoration: none;
+  font-size: 11px;
+  transition: color 0.2s;
+}
+
+.footer-admin-link:hover { color: rgba(255,255,255,0.7); }
 
 /* ===== CARRINHO ===== */
 .cart-overlay {
