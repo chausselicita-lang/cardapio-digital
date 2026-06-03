@@ -841,9 +841,14 @@
       // WhatsApp comprovante
       const whatsAdmin = (cfg.whatsappAdmin || cfg.whatsapp || '').replace(/\D/g, '');
       const msg = encodeURIComponent(
-        `Olá! Sou ${dadosCliente.responsavel} do *${dadosCliente.nome}* (${dadosCliente.segmento}).\n\n` +
-        `Acabei de me cadastrar no *Plano ${plano.nome}* — R$ ${plano.preco.toFixed(2).replace('.', ',')}\/mês.\n\n` +
-        `Segue o comprovante de pagamento para ativar meu cardápio. 🙏`
+        `Olá! Segue meu cadastro para ativar o cardápio digital:\n\n` +
+        `🏠 *Estabelecimento:* ${dadosCliente.nome} (${dadosCliente.segmento})\n` +
+        `👤 *Responsável:* ${dadosCliente.responsavel}\n` +
+        `📍 *Cidade:* ${dadosCliente.cidade}\n` +
+        `📧 *E-mail:* ${dadosCliente.email}\n` +
+        `📱 *WhatsApp:* ${dadosCliente.whatsapp}\n\n` +
+        `💎 *Plano:* ${plano.nome} — R$ ${plano.preco.toFixed(2).replace('.', ',')}\/mês\n\n` +
+        `Segue o comprovante de pagamento em anexo. Aguardo a ativação! 🙏`
       );
       document.getElementById('btnEnviarComprovante').href = whatsAdmin
         ? `https://wa.me/${whatsAdmin}?text=${msg}`

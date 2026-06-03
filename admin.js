@@ -407,6 +407,18 @@ function ativarCadastro(id) {
   carregarPainelCadastros();
   atualizarBadgeCadastros();
   toast(`✅ Cardápio de "${c.nome}" ativado!`);
+
+  // Oferecer envio de confirmação via WhatsApp
+  const num = (c.whatsapp || '').replace(/\D/g, '');
+  if (num && confirm(`Deseja enviar a confirmação de ativação para ${c.responsavel} via WhatsApp?`)) {
+    const msg = encodeURIComponent(
+      `Olá, *${c.responsavel}*! 🎉\n\n` +
+      `Seu cardápio digital do *${c.nome}* foi ativado com sucesso!\n\n` +
+      `Acesse agora e comece a personalizar: https://chausselicita-lang.github.io/cardapio-digital/\n\n` +
+      `Qualquer dúvida, estamos à disposição. 😊`
+    );
+    window.open(`https://wa.me/${num}?text=${msg}`, '_blank');
+  }
 }
 
 function excluirCadastro(id) {

@@ -12,7 +12,11 @@ window.MENU_DEFAULT = {
     heroBadge1: "⭐ 4.9 no Google",
     heroBadge2: "🕐 Aberto agora",
     heroBadge3: "🚗 Delivery disponível",
-    senhaAdmin: "admin123"
+    senhaAdmin: "admin123",
+    pixChave: "",
+    pixNome: "",
+    mpLink: "",
+    whatsappAdmin: ""
   },
   categorias: [
     { id: "entradas",   nome: "Entradas",   emoji: "🥗", desc: "Para começar com o pé direito" },
