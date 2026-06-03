@@ -883,20 +883,42 @@
       if (!rid) return;
       try {
         const { data } = await db.from('restaurantes')
-          .select('nome_restaurante, tipo, horario, endereco')
+          .select('nome_restaurante, tipo, horario, endereco, telefone')
           .eq('id', rid).single();
         if (!data) return;
-        document.querySelector('.logo-nome').textContent = data.nome_restaurante;
-        document.querySelector('.logo-sub').textContent  = data.tipo || 'Bar & Restaurante';
-        document.title = `Cardápio — ${data.nome_restaurante}`;
+
+        const nome = data.nome_restaurante || '';
+        const tipo = data.tipo || 'Bar & Restaurante';
+
+        // Header
+        document.querySelector('.logo-nome').textContent = nome;
+        document.querySelector('.logo-sub').textContent  = tipo;
+        document.title = `Cardápio — ${nome}`;
         document.querySelector('.hero-title').innerHTML =
-          `${data.nome_restaurante}<br/><span style="font-size:0.6em;font-weight:400;opacity:0.85">${data.tipo || ''}</span>`;
-        if (data.horario) {
-          document.querySelector('.footer-item:nth-child(3) span + *') &&
-            (document.querySelector('.footer-item:nth-child(3)').innerHTML = `<span>🕐</span> ${data.horario}`);
-        }
+          `${nome}<br/><span style="font-size:0.6em;font-weight:400;opacity:0.85">${tipo}</span>`;
+
+        // Rodapé — nome e subtítulo
+        const footerStrong = document.querySelector('.footer-logo strong');
+        const footerSub    = document.querySelector('.footer-logo div span');
+        if (footerStrong) footerStrong.textContent = nome;
+        if (footerSub)    footerSub.textContent    = tipo;
+
+        // Rodapé — endereço
         if (data.endereco) {
-          document.querySelector('.footer-item:first-child').innerHTML = `<span>📍</span> ${data.endereco}`;
+          const el = document.querySelector('.footer-item:nth-child(1)');
+          if (el) el.innerHTML = `<span>📍</span> ${data.endereco}`;
+        }
+
+        // Rodapé — telefone
+        if (data.telefone) {
+          const el = document.querySelector('.footer-item:nth-child(2)');
+          if (el) el.innerHTML = `<span>📞</span> ${data.telefone}`;
+        }
+
+        // Rodapé — horário
+        if (data.horario) {
+          const el = document.querySelector('.footer-item:nth-child(3)');
+          if (el) el.innerHTML = `<span>🕐</span> ${data.horario}`;
         }
       } catch {}
     })();
