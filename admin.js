@@ -59,20 +59,20 @@ const loginOverlay = $('#adminLoginOverlay');
 const senhaInput   = $('#senhaInput');
 const loginError   = $('#loginError');
 
-async function verificarSessao() {
+function verificarSessao() {
   if (modo === 'supabase') {
-    // Sessão via Supabase: verificar sessionStorage com rid correto
     if (sessionStorage.getItem('admin_auth') === '1' &&
         sessionStorage.getItem('admin_rid')   === rid) {
-      loginOverlay.style.display = 'none';
       carregarDadosRestaurante();
+      return; // autenticado — overlay permanece oculto
     }
   } else {
-    // Modo local: sessionStorage simples
     if (sessionStorage.getItem('admin_auth') === '1') {
-      loginOverlay.style.display = 'none';
+      return; // autenticado — overlay permanece oculto
     }
   }
+  // Não autenticado — exibe o overlay de login
+  loginOverlay.style.display = 'flex';
 }
 
 async function tentarLogin() {
