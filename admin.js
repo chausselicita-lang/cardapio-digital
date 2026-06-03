@@ -179,7 +179,252 @@ $$('.tab-btn').forEach(btn => {
     $$('.tab-content').forEach(t => t.style.display = 'none');
     btn.classList.add('active');
     $(`#tab-${btn.dataset.tab}`).style.display = 'block';
+    if (btn.dataset.tab === 'cardapio') carregarCardapio();
   });
+});
+
+// ===== GERENCIAR CARDÁPIO =====
+const PRATOS_LS_KEY = 'cardapio_pratos';
+let pratosCache  = [];
+let editandoId   = null;
+let filtroCatAtivo = 'todos';
+let excluindoId  = null;
+
+const CATEGORIAS_LABEL = {
+  entradas:'Entradas', pratos:'Pratos', lanches:'Lanches',
+  pizzas:'Pizzas', petiscos:'Petiscos', bebidas:'Bebidas',
+  sobremesas:'Sobremesas', combos:'Combos'
+};
+const BADGES_LABEL = { popular:'⭐ Popular', novo:'🆕 Novo', chef:'👨‍🍳 Chef Indica' };
+
+// --- Carregar pratos ---
+async function carregarCardapio() {
+  $('#pratosLoading').style.display = 'block';
+  $('#pratosVazio').style.display   = 'none';
+  $('#pratosGrid').innerHTML        = '';
+
+  if (modo === 'supabase') {
+    try {
+      const { data, error } = await db
+        .from('cardapio_items')
+        .select('*')
+        .eq('restaurante_id', rid)
+        .order('categoria').order('ordem');
+      if (error) throw error;
+      pratosCache = data || [];
+    } catch {
+      pratosCache = [];
+    }
+  } else {
+    // Modo local: localStorage sobrescreve data.js
+    const salvo = localStorage.getItem(PRATOS_LS_KEY);
+    pratosCache = salvo ? JSON.parse(salvo) : (window.MENU_DEFAULT?.produtos || []);
+  }
+
+  $('#pratosLoading').style.display = 'none';
+  renderPratos();
+}
+
+// --- Renderizar grid ---
+function renderPratos() {
+  const grid  = $('#pratosGrid');
+  const vazio = $('#pratosVazio');
+  grid.innerHTML = '';
+
+  const lista = filtroCatAtivo === 'todos'
+    ? pratosCache
+    : pratosCache.filter(p => p.categoria === filtroCatAtivo);
+
+  if (lista.length === 0) {
+    vazio.style.display = 'block';
+    return;
+  }
+  vazio.style.display = 'none';
+
+  lista.forEach(p => {
+    const preco = parseFloat(p.preco || p.preco_original || 0).toLocaleString('pt-BR', { style:'currency', currency:'BRL' });
+    const cat   = CATEGORIAS_LABEL[p.categoria] || p.categoria || '';
+    const badge = p.tag ? `<span class="prato-badge ${p.tag}">${BADGES_LABEL[p.tag] || p.tag}</span>` : '';
+    const foto  = p.foto_url || p.foto || '';
+    const disponivel = p.disponivel !== false;
+
+    const card = document.createElement('div');
+    card.className = `prato-card${disponivel ? '' : ' indisponivel'}`;
+    card.dataset.id = p.id;
+    card.innerHTML = `
+      ${foto
+        ? `<img class="prato-foto" src="${foto}" alt="${p.nome}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="prato-foto-placeholder" style="display:none">🍽️</div>`
+        : `<div class="prato-foto-placeholder">🍽️</div>`}
+      <div class="prato-body">
+        <div class="prato-cat-tag">${cat}${!disponivel ? ' · <em>Indisponível</em>' : ''}</div>
+        <div class="prato-top">
+          <div class="prato-nome">${p.nome}</div>
+          ${badge}
+        </div>
+        ${p.descricao ? `<div class="prato-desc">${p.descricao}</div>` : ''}
+        <div class="prato-footer">
+          <div class="prato-preco">${preco}</div>
+          <div class="prato-acoes">
+            <button class="btn-prato-acao btn-prato-editar" data-id="${p.id}">✏️ Editar</button>
+            <button class="btn-prato-acao btn-prato-excluir" data-id="${p.id}" data-nome="${p.nome}">🗑️</button>
+          </div>
+        </div>
+      </div>`;
+    grid.appendChild(card);
+  });
+
+  // Eventos nos botões
+  $$('.btn-prato-editar').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const prato = pratosCache.find(p => String(p.id) === btn.dataset.id);
+      if (prato) abrirModalPrato(prato);
+    });
+  });
+  $$('.btn-prato-excluir').forEach(btn => {
+    btn.addEventListener('click', () => confirmarExcluir(btn.dataset.id, btn.dataset.nome));
+  });
+}
+
+// --- Filtros de categoria ---
+$$('.filtro-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    $$('.filtro-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filtroCatAtivo = btn.dataset.cat;
+    renderPratos();
+  });
+});
+
+// --- Abrir modal ---
+function abrirModalPrato(prato = null) {
+  editandoId = prato ? prato.id : null;
+  $('#modalPratoTitulo').textContent = prato ? 'Editar Prato' : 'Novo Prato';
+
+  // Preenche ou limpa campos
+  $('#pratoFoto').value       = prato?.foto_url || prato?.foto || '';
+  $('#pratoNome').value       = prato?.nome        || '';
+  $('#pratoDesc').value       = prato?.descricao   || '';
+  $('#pratoPreco').value      = prato?.preco        || '';
+  $('#pratoCat').value        = prato?.categoria    || '';
+  $('#pratoBadge').value      = prato?.tag          || '';
+  $('#pratoDisponivel').checked = prato ? prato.disponivel !== false : true;
+
+  atualizarPreviewFoto();
+  $('#modalPratoOverlay').classList.add('open');
+  setTimeout(() => $('#pratoNome').focus(), 100);
+}
+
+function fecharModal() {
+  $('#modalPratoOverlay').classList.remove('open');
+}
+
+$('#btnNovoPrato').addEventListener('click',    () => abrirModalPrato());
+$('#btnFecharModal').addEventListener('click',  fecharModal);
+$('#btnCancelarModal').addEventListener('click', fecharModal);
+$('#modalPratoOverlay').addEventListener('click', e => {
+  if (e.target === $('#modalPratoOverlay')) fecharModal();
+});
+
+// Preview de foto
+$('#pratoFoto').addEventListener('input', atualizarPreviewFoto);
+function atualizarPreviewFoto() {
+  const url = $('#pratoFoto').value.trim();
+  const wrap = $('#previewWrap');
+  if (url) {
+    $('#pratoFotoPreview').src = url;
+    wrap.classList.add('show');
+  } else {
+    wrap.classList.remove('show');
+  }
+}
+
+// --- Salvar prato ---
+$('#btnSalvarPrato').addEventListener('click', salvarPrato);
+
+async function salvarPrato() {
+  const nome       = $('#pratoNome').value.trim();
+  const preco      = parseFloat($('#pratoPreco').value);
+  const categoria  = $('#pratoCat').value;
+  const descricao  = $('#pratoDesc').value.trim();
+  const foto_url   = $('#pratoFoto').value.trim();
+  const tag        = $('#pratoBadge').value;
+  const disponivel = $('#pratoDisponivel').checked;
+
+  if (!nome)      { mostrarToast('⚠️ Informe o nome do prato');    return; }
+  if (!preco || preco <= 0) { mostrarToast('⚠️ Informe um preço válido'); return; }
+  if (!categoria) { mostrarToast('⚠️ Selecione uma categoria');    return; }
+
+  const btn = $('#btnSalvarPrato');
+  btn.disabled = true;
+  btn.textContent = 'Salvando...';
+
+  try {
+    if (modo === 'supabase') {
+      const payload = { nome, descricao, preco, categoria, foto_url, tag, disponivel, restaurante_id: rid };
+
+      if (editandoId) {
+        const { error } = await db.from('cardapio_items').update(payload).eq('id', editandoId);
+        if (error) throw error;
+      } else {
+        const { error } = await db.from('cardapio_items').insert(payload);
+        if (error) throw error;
+      }
+    } else {
+      // Modo local
+      if (editandoId) {
+        const idx = pratosCache.findIndex(p => String(p.id) === String(editandoId));
+        if (idx !== -1) pratosCache[idx] = { ...pratosCache[idx], nome, descricao, preco, categoria, foto_url, tag, disponivel };
+      } else {
+        pratosCache.push({ id: Date.now(), nome, descricao, preco, categoria, foto_url, tag, disponivel });
+      }
+      localStorage.setItem(PRATOS_LS_KEY, JSON.stringify(pratosCache));
+    }
+
+    fecharModal();
+    await carregarCardapio();
+    mostrarToast(editandoId ? '✅ Prato atualizado!' : '✅ Prato adicionado!');
+  } catch (err) {
+    mostrarToast('❌ Erro ao salvar: ' + (err.message || err));
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '💾 Salvar Prato';
+  }
+}
+
+// --- Confirmar e excluir ---
+function confirmarExcluir(id, nome) {
+  excluindoId = id;
+  $('#confirmDelNome').textContent = `Excluir "${nome}"? Esta ação não pode ser desfeita.`;
+  $('#confirmDel').classList.add('open');
+}
+
+$('#btnCancelDel').addEventListener('click', () => {
+  excluindoId = null;
+  $('#confirmDel').classList.remove('open');
+});
+
+$('#btnConfirmDel').addEventListener('click', async () => {
+  if (!excluindoId) return;
+  const btn = $('#btnConfirmDel');
+  btn.disabled = true;
+
+  try {
+    if (modo === 'supabase') {
+      const { error } = await db.from('cardapio_items').delete().eq('id', excluindoId);
+      if (error) throw error;
+    } else {
+      pratosCache = pratosCache.filter(p => String(p.id) !== String(excluindoId));
+      localStorage.setItem(PRATOS_LS_KEY, JSON.stringify(pratosCache));
+    }
+    $('#confirmDel').classList.remove('open');
+    excluindoId = null;
+    await carregarCardapio();
+    mostrarToast('🗑️ Prato excluído!');
+  } catch (err) {
+    mostrarToast('❌ Erro ao excluir: ' + (err.message || err));
+  } finally {
+    btn.disabled = false;
+  }
 });
 
 // ===== SALVAR CONFIGURAÇÕES =====

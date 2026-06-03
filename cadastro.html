@@ -1383,10 +1383,14 @@ CREATE TABLE IF NOT EXISTS cardapio_items (
   descricao      TEXT,
   preco          DECIMAL(10,2) NOT NULL,
   foto_url       TEXT,
+  tag            TEXT DEFAULT '',
   disponivel     BOOLEAN DEFAULT true,
   ordem          INTEGER DEFAULT 0,
   created_at     TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Adiciona coluna tag em bancos já existentes (sem erro se já existir)
+ALTER TABLE cardapio_items ADD COLUMN IF NOT EXISTS tag TEXT DEFAULT '';
 
 CREATE TABLE IF NOT EXISTS cardapio_pedidos (
   id              UUID DEFAULT gen_random_uuid() PRIMARY KEY,

@@ -461,6 +461,319 @@
       transition: background 0.2s;
     }
     .btn-upgrade:hover { background: var(--primary-dark); }
+
+    /* ── GERENCIAR CARDÁPIO ── */
+    .pratos-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .pratos-header h2 { margin-bottom: 4px; }
+    .pratos-header .section-desc { margin-bottom: 0; }
+
+    .filtros-cat {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .filtro-btn {
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text2);
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all 0.15s;
+    }
+    .filtro-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .filtro-btn.active { background: var(--primary); border-color: var(--primary); color: white; }
+
+    .pratos-loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--text3);
+      font-size: 14px;
+    }
+    .pratos-vazio {
+      display: none;
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--text3);
+    }
+    .pratos-vazio .vazio-icon { font-size: 48px; margin-bottom: 12px; }
+    .pratos-vazio p { font-size: 14px; margin-bottom: 16px; }
+
+    .pratos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+    .prato-card {
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: box-shadow 0.2s;
+    }
+    .prato-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.10); }
+    .prato-card.indisponivel { opacity: 0.55; }
+    .prato-foto {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      background: var(--border);
+      display: block;
+    }
+    .prato-foto-placeholder {
+      width: 100%;
+      height: 140px;
+      background: linear-gradient(135deg, #f0e8df, #ffe0cc);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+    }
+    .prato-body {
+      padding: 14px;
+    }
+    .prato-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .prato-nome {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--dark);
+      line-height: 1.3;
+    }
+    .prato-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 5px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .prato-badge.popular { background: rgba(240,165,0,0.15); color: #a07000; }
+    .prato-badge.novo    { background: rgba(39,174,96,0.15);  color: #1a7a40; }
+    .prato-badge.chef    { background: rgba(232,66,10,0.12);  color: var(--primary); }
+    .prato-desc {
+      font-size: 12px;
+      color: var(--text3);
+      line-height: 1.5;
+      margin-bottom: 10px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .prato-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .prato-preco {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+    .prato-acoes {
+      display: flex;
+      gap: 6px;
+    }
+    .btn-prato-acao {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 7px;
+      padding: 5px 10px;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: var(--font);
+      font-weight: 600;
+      transition: all 0.15s;
+    }
+    .btn-prato-editar { color: var(--text2); }
+    .btn-prato-editar:hover { border-color: var(--primary); color: var(--primary); }
+    .btn-prato-excluir { color: #e74c3c; }
+    .btn-prato-excluir:hover { background: #fef2f2; border-color: #e74c3c; }
+    .prato-cat-tag {
+      font-size: 10px;
+      color: var(--text3);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    /* ── MODAL ADD/EDIT PRATO ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(26,15,0,0.7);
+      z-index: 500;
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 24px;
+      overflow-y: auto;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: var(--surface);
+      border-radius: 18px;
+      width: 100%;
+      max-width: 560px;
+      margin: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 24px 0;
+    }
+    .modal-header h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--dark);
+    }
+    .modal-close {
+      background: var(--surface2);
+      border: none;
+      border-radius: 8px;
+      width: 32px;
+      height: 32px;
+      font-size: 16px;
+      cursor: pointer;
+      color: var(--text3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+    }
+    .modal-close:hover { background: var(--border); }
+    .modal-body { padding: 20px 24px; }
+    .modal-footer {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      padding: 0 24px 22px;
+    }
+    .modal-body .form-group input,
+    .modal-body .form-group select,
+    .modal-body .form-group textarea {
+      width: 100%;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-family: var(--font);
+      color: var(--text);
+      background: var(--surface);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .modal-body .form-group select { cursor: pointer; }
+    .modal-body .form-group textarea { resize: vertical; min-height: 72px; }
+    .modal-body .form-group input:focus,
+    .modal-body .form-group select:focus,
+    .modal-body .form-group textarea:focus { border-color: var(--primary); }
+    .modal-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 500px) { .modal-form-row { grid-template-columns: 1fr; } }
+
+    .img-preview-wrap {
+      margin-top: 8px;
+      display: none;
+    }
+    .img-preview-wrap.show { display: block; }
+    .img-preview {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-top: 8px;
+    }
+    .toggle-row span {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text2);
+    }
+    .toggle-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+    }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background: #ccc;
+      border-radius: 24px;
+      transition: 0.2s;
+    }
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      left: 3px;
+      bottom: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: 0.2s;
+    }
+    .toggle-switch input:checked + .toggle-slider { background: var(--success); }
+    .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+    /* confirm delete */
+    .confirm-del {
+      position: fixed;
+      inset: 0;
+      background: rgba(26,15,0,0.75);
+      z-index: 600;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .confirm-del.open { display: flex; }
+    .confirm-box {
+      background: var(--surface);
+      border-radius: 16px;
+      padding: 32px 28px;
+      max-width: 360px;
+      width: 100%;
+      text-align: center;
+    }
+    .confirm-box h3 { font-size: 17px; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
+    .confirm-box p  { font-size: 13px; color: var(--text2); margin-bottom: 22px; }
+    .confirm-btns   { display: flex; gap: 10px; justify-content: center; }
+    .btn-del-conf { background: #e74c3c; color: white; border: none; border-radius: 9px; padding: 10px 22px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: var(--font); }
+    .btn-del-conf:hover { background: #c0392b; }
   </style>
 </head>
 <body>
@@ -495,7 +808,8 @@
   <!-- TABS -->
   <nav class="admin-tabs">
     <button class="tab-btn active" data-tab="configuracoes">⚙️ Configurações</button>
-    <button class="tab-btn" data-tab="qrcodes">📱 QR Codes de Mesa</button>
+    <button class="tab-btn" data-tab="cardapio">🍽️ Cardápio</button>
+    <button class="tab-btn" data-tab="qrcodes">📱 QR Codes</button>
   </nav>
 
   <!-- CONTEÚDO -->
@@ -536,6 +850,41 @@
         <button class="btn-primary" id="btnSalvarConfig">💾 Salvar Configurações</button>
       </div>
 
+    </div>
+
+    <!-- TAB: Cardápio -->
+    <div class="tab-content" id="tab-cardapio" style="display:none;">
+      <div class="admin-section">
+        <div class="pratos-header">
+          <div>
+            <h2>🍽️ Gerenciar Cardápio</h2>
+            <p class="section-desc">Adicione, edite ou remova pratos do seu cardápio digital.</p>
+          </div>
+          <button class="btn-primary" id="btnNovoPrato">+ Novo Prato</button>
+        </div>
+
+        <div class="filtros-cat" id="filtrosCat">
+          <button class="filtro-btn active" data-cat="todos">Todos</button>
+          <button class="filtro-btn" data-cat="entradas">🥗 Entradas</button>
+          <button class="filtro-btn" data-cat="pratos">🍖 Pratos</button>
+          <button class="filtro-btn" data-cat="lanches">🍔 Lanches</button>
+          <button class="filtro-btn" data-cat="pizzas">🍕 Pizzas</button>
+          <button class="filtro-btn" data-cat="petiscos">🍟 Petiscos</button>
+          <button class="filtro-btn" data-cat="bebidas">🍺 Bebidas</button>
+          <button class="filtro-btn" data-cat="sobremesas">🍰 Sobremesas</button>
+          <button class="filtro-btn" data-cat="combos">🎁 Combos</button>
+        </div>
+
+        <div class="pratos-loading" id="pratosLoading">⏳ Carregando pratos...</div>
+
+        <div class="pratos-vazio" id="pratosVazio">
+          <div class="vazio-icon">🍽️</div>
+          <p>Nenhum prato cadastrado nesta categoria.</p>
+          <button class="btn-primary" onclick="abrirModalPrato()">+ Adicionar Primeiro Prato</button>
+        </div>
+
+        <div class="pratos-grid" id="pratosGrid"></div>
+      </div>
     </div>
 
     <!-- TAB: QR Codes -->
@@ -593,12 +942,103 @@
 
   </div>
 
+  <!-- MODAL ADD/EDIT PRATO -->
+  <div class="modal-overlay" id="modalPratoOverlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="modalPratoTitulo">Novo Prato</h3>
+        <button class="modal-close" id="btnFecharModal">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="formPrato" autocomplete="off">
+
+          <div class="form-group">
+            <label>Foto (URL da imagem)</label>
+            <input type="url" id="pratoFoto" placeholder="https://images.unsplash.com/..." />
+            <div class="img-preview-wrap" id="previewWrap">
+              <img class="img-preview" id="pratoFotoPreview" src="" alt="Preview" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Nome do prato <span style="color:var(--primary)">*</span></label>
+            <input type="text" id="pratoNome" placeholder="Ex: Picanha na Brasa" required />
+          </div>
+
+          <div class="form-group">
+            <label>Descrição</label>
+            <textarea id="pratoDesc" placeholder="Ingredientes, preparo, acompanhamentos..."></textarea>
+          </div>
+
+          <div class="modal-form-row">
+            <div class="form-group">
+              <label>Preço (R$) <span style="color:var(--primary)">*</span></label>
+              <input type="number" id="pratoPreco" placeholder="0.00" min="0" step="0.01" required />
+            </div>
+            <div class="form-group">
+              <label>Categoria <span style="color:var(--primary)">*</span></label>
+              <select id="pratoCat" required>
+                <option value="">Selecione...</option>
+                <option value="entradas">🥗 Entradas</option>
+                <option value="pratos">🍖 Pratos</option>
+                <option value="lanches">🍔 Lanches</option>
+                <option value="pizzas">🍕 Pizzas</option>
+                <option value="petiscos">🍟 Petiscos</option>
+                <option value="bebidas">🍺 Bebidas</option>
+                <option value="sobremesas">🍰 Sobremesas</option>
+                <option value="combos">🎁 Combos</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Badge / Destaque</label>
+            <select id="pratoBadge">
+              <option value="">Nenhum</option>
+              <option value="popular">⭐ Popular</option>
+              <option value="novo">🆕 Novo</option>
+              <option value="chef">👨‍🍳 Chef Indica</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Disponibilidade</label>
+            <div class="toggle-row">
+              <span>Prato disponível no cardápio</span>
+              <label class="toggle-switch">
+                <input type="checkbox" id="pratoDisponivel" checked />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" id="btnCancelarModal">Cancelar</button>
+        <button class="btn-primary" id="btnSalvarPrato">💾 Salvar Prato</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFIRM EXCLUIR -->
+  <div class="confirm-del" id="confirmDel">
+    <div class="confirm-box">
+      <h3>Excluir prato?</h3>
+      <p id="confirmDelNome">Esta ação não pode ser desfeita.</p>
+      <div class="confirm-btns">
+        <button class="btn-secondary" id="btnCancelDel">Cancelar</button>
+        <button class="btn-del-conf" id="btnConfirmDel">🗑️ Excluir</button>
+      </div>
+    </div>
+  </div>
+
   <!-- TOAST -->
   <div class="admin-toast" id="adminToast"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script src="admin.js?v=6"></script>
+  <script src="admin.js?v=7"></script>
 </body>
 </html>
