@@ -592,7 +592,17 @@
     .tipo-btn:hover { border-color: var(--primary-light); background: #FFF5EE; }
     .tipo-btn.selected { border-color: var(--primary); background: #FFF5EE; box-shadow: 0 0 0 3px rgba(255,107,0,0.1); }
     .tipo-btn input { display: none; }
-    .tipo-icon { font-size: 24px; display: block; margin-bottom: 4px; }
+    .tipo-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 12px;
+      object-fit: cover;
+      display: block;
+      margin: 0 auto 8px;
+      border: 2px solid transparent;
+      transition: border-color 0.2s;
+    }
+    .tipo-btn.selected .tipo-icon { border-color: var(--primary); }
     .tipo-label { font-size: 11px; font-weight: 600; color: var(--text2); }
     .tipo-btn.selected .tipo-label { color: var(--primary); }
 
@@ -1164,32 +1174,32 @@
           <div class="tipos-grid" id="tiposGrid">
             <label class="tipo-btn">
               <input type="radio" name="tipo" value="Restaurante" />
-              <span class="tipo-icon">🍽️</span>
+              <img class="tipo-icon" src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=120&h=120&fit=crop&auto=format&q=80" alt="Restaurante" />
               <span class="tipo-label">Restaurante</span>
             </label>
             <label class="tipo-btn">
               <input type="radio" name="tipo" value="Bar" />
-              <span class="tipo-icon">🍺</span>
+              <img class="tipo-icon" src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=120&h=120&fit=crop&auto=format&q=80" alt="Bar" />
               <span class="tipo-label">Bar</span>
             </label>
             <label class="tipo-btn">
               <input type="radio" name="tipo" value="Lanchonete" />
-              <span class="tipo-icon">🍔</span>
+              <img class="tipo-icon" src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=120&h=120&fit=crop&auto=format&q=80" alt="Lanchonete" />
               <span class="tipo-label">Lanchonete</span>
             </label>
             <label class="tipo-btn">
               <input type="radio" name="tipo" value="Pizzaria" />
-              <span class="tipo-icon">🍕</span>
+              <img class="tipo-icon" src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=120&h=120&fit=crop&auto=format&q=80" alt="Pizzaria" />
               <span class="tipo-label">Pizzaria</span>
             </label>
             <label class="tipo-btn">
               <input type="radio" name="tipo" value="Hamburgueria" />
-              <span class="tipo-icon">🥩</span>
+              <img class="tipo-icon" src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=120&h=120&fit=crop&auto=format&q=80" alt="Hamburgueria" />
               <span class="tipo-label">Hamburgueria</span>
             </label>
             <label class="tipo-btn">
               <input type="radio" name="tipo" value="Cafeteria" />
-              <span class="tipo-icon">☕</span>
+              <img class="tipo-icon" src="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=120&h=120&fit=crop&auto=format&q=80" alt="Cafeteria" />
               <span class="tipo-label">Cafeteria</span>
             </label>
           </div>
