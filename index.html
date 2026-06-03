@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cardápio Digital — Bar & Restaurante</title>
+  <title id="page-title">Cardápio Digital</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
@@ -14,10 +14,10 @@
   <header class="header" id="header">
     <div class="header-inner">
       <div class="logo">
-        <span class="logo-icon">🍽️</span>
+        <span class="logo-icon" id="logo-emoji">🍽️</span>
         <div class="logo-text">
-          <span class="logo-nome">Sabor & Arte</span>
-          <span class="logo-sub">Bar & Restaurante</span>
+          <span class="logo-nome" id="logo-nome">Cardápio</span>
+          <span class="logo-sub" id="logo-sub">Bar & Restaurante</span>
         </div>
       </div>
       <div class="header-actions">
@@ -30,7 +30,6 @@
         </button>
       </div>
     </div>
-    <!-- Barra de busca expansível -->
     <div class="search-bar" id="searchBar">
       <div class="search-inner">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
@@ -40,7 +39,7 @@
     </div>
   </header>
 
-  <!-- HERO BANNER -->
+  <!-- HERO -->
   <section class="hero">
     <div class="hero-overlay"></div>
     <div class="hero-content">
@@ -49,25 +48,13 @@
       <p class="hero-desc">Ingredientes frescos, receitas únicas e muito amor em cada prato. Peça agora pelo cardápio digital.</p>
       <a href="#categorias" class="btn-hero">Ver Cardápio <span>↓</span></a>
     </div>
-    <div class="hero-badges">
-      <div class="badge"><span>⭐</span> 4.9 no Google</div>
-      <div class="badge"><span>🕐</span> Aberto agora</div>
-      <div class="badge"><span>🚗</span> Delivery disponível</div>
-    </div>
+    <div class="hero-badges" id="hero-badges"></div>
   </section>
 
   <!-- CATEGORIAS -->
   <nav class="categorias" id="categorias">
-    <div class="categorias-scroll">
+    <div class="categorias-scroll" id="cats-scroll">
       <button class="cat-btn active" data-cat="todos">🍽️ Todos</button>
-      <button class="cat-btn" data-cat="entradas">🥗 Entradas</button>
-      <button class="cat-btn" data-cat="pratos">🍖 Pratos</button>
-      <button class="cat-btn" data-cat="lanches">🍔 Lanches</button>
-      <button class="cat-btn" data-cat="pizzas">🍕 Pizzas</button>
-      <button class="cat-btn" data-cat="petiscos">🍟 Petiscos</button>
-      <button class="cat-btn" data-cat="bebidas">🍺 Bebidas</button>
-      <button class="cat-btn" data-cat="sobremesas">🍰 Sobremesas</button>
-      <button class="cat-btn" data-cat="combos">🎁 Combos</button>
     </div>
   </nav>
 
@@ -77,642 +64,8 @@
     <button id="btnLimparBusca">Limpar busca</button>
   </div>
 
-  <!-- MAIN CONTENT -->
-  <main class="main" id="main">
-
-    <!-- ENTRADAS -->
-    <section class="secao" data-secao="entradas">
-      <div class="secao-header">
-        <h2 class="secao-titulo"><span>🥗</span> Entradas</h2>
-        <p class="secao-desc">Para começar com o pé direito</p>
-      </div>
-      <div class="grid-produtos">
-        <div class="card-produto" data-cat="entradas" data-nome="Bruschetta Italiana" data-preco="24.90">
-          <div class="card-img-wrap">
-            <div class="card-img" style="background: linear-gradient(135deg,#f59e42,#e84393);">
-              <span class="card-emoji">🥖</span>
-            </div>
-            <span class="card-tag">Popular</span>
-          </div>
-          <div class="card-body">
-            <h3 class="card-nome">Bruschetta Italiana</h3>
-            <p class="card-desc">Pão italiano grelhado com tomate, manjericão fresco e azeite extra virgem</p>
-            <div class="card-footer">
-              <span class="card-preco">R$ 24,90</span>
-              <button class="btn-add" data-nome="Bruschetta Italiana" data-preco="24.90" data-emoji="🥖">+ Adicionar</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="card-produto" data-cat="entradas" data-nome="Carpaccio de Carne" data-preco="38.90">
-          <div class="card-img-wrap">
-            <div class="card-img" style="background: linear-gradient(135deg,#c0392b,#8e44ad);">
-              <span class="card-emoji">🥩</span>
-            </div>
-          </div>
-          <div class="card-body">
-            <h3 class="card-nome">Carpaccio de Carne</h3>
-            <p class="card-desc">Fatias finíssimas de filé mignon com rúcula, parmesão e molho especial</p>
-            <div class="card-footer">
-              <span class="card-preco">R$ 38,90</span>
-              <button class="btn-add" data-nome="Carpaccio de Carne" data-preco="38.90" data-emoji="🥩">+ Adicionar</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="card-produto" data-cat="entradas" data-nome="Caldo de Cana com Limão" data-preco="14.90">
-          <div class="card-img-wrap">
-            <div class="card-img" style="background: linear-gradient(135deg,#27ae60,#2ecc71);">
-              <span class="card-emoji">🧃</span>
-            </div>
-            <span class="card-tag novo">Novo</span>
-          </div>
-          <div class="card-body">
-            <h3 class="card-nome">Caldo de Cana c/ Limão</h3>
-            <p class="card-desc">Caldo de cana natural gelado com um toque de limão siciliano. Refrescante!</p>
-            <div class="card-footer">
-              <span class="card-preco">R$ 14,90</span>
-              <button class="btn-add" data-nome="Caldo de Cana c/ Limão" data-preco="14.90" data-emoji="🧃">+ Adicionar</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="card-produto" data-cat="entradas" data-nome="Salada Caesar" data-preco="29.90">
-          <div class="card-img-wrap">
-            <div class="card-img" style="background: linear-gradient(135deg,#a8e063,#56ab2f);">
-              <span class="card-emoji">🥬</span>
-            </div>
-          </div>
-          <div class="card-body">
-            <h3 class="card-nome">Salada Caesar</h3>
-            <p class="card-desc">Alface romana, croutons crocantes, parmesão e molho caesar da casa</p>
-            <div class="card-footer">
-              <span class="card-preco">R$ 29,90</span>
-              <button class="btn-add" data-nome="Salada Caesar" data-preco="29.90" data-emoji="🥬">+ Adicionar</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- PRATOS PRINCIPAIS -->
-    <section class="secao" data-secao="pratos">
-      <div class="secao-header">
-        <h2 class="secao-titulo"><span>🍖</span> Pratos Principais</h2>
-        <p class="secao-desc">O coração do nosso cardápio</p>
-      </div>
-      <div class="grid-produtos">
-        <div class="card-produto destaque" data-cat="pratos" data-nome="Picanha na Brasa" data-preco="89.90">
-          <div class="card-img-wrap">
-            <div class="card-img" style="background: linear-gradient(135deg,#d35400,#c0392b);">
-              <span class="card-emoji">🥩</span>
-            </div>
-            <span class="card-tag chef">Chef indica</span>
-          </div>
-          <div class="card-body">
-            <h3 class="card-nome">Picanha na Brasa</h3>
-            <p class="card-desc">300g de picanha grelhada na brasa com acompanhamento de arroz, farofa e vinagrete</p>
-            <div class="card-footer">
-              <span class="card-preco">R$ 89,90</span>
-              <button class="btn-add" data-nome="Picanha na Brasa" data-preco="89.90" data-emoji="🥩">+ Adicionar</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="card-produto" data-cat="pratos" data-nome="Frango Grelhado" data-preco="52.90">
-          <div class="card-img-wrap">
-            <div class="card-img" style="background: linear-gradient(135deg,#f7971e,#ffd200);">
-              <span class="card-emoji">🍗</span>
-            </div>
-          </div>
-          <div class="card-body">
-            <h3 class="card-nome">Frango Grelhado</h3>
-            <p class="card-desc">Peito de frango grelhado com ervas finas, arroz integral e legumes no vapor</p>
-            <div class="card-footer">
-              <span class="card-preco">R$ 52,90</span>
-              <button class="btn-add" data-nome="Frango Grelhado" data-preco="52.90" data-emoji="🍗">+ Adicionar</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="card-produto" data-cat="pratos" data-nome="Peixe ao Molho" data-preco="64.90">
-          <div class="card-img-wrap">
-            <div class="card-img" style="background: linear-gradient(135deg,#0575E6,#021B79);">
-              <span class="card-emoji">🐟</span>
-            </div>
-            <span class="card-tag">Popular</span>
-          </div>
-          <div class="card-body">
-            <h3 class="card-nome">Peixe ao Molho Cítrico</h3>
-            <p class="card-desc">Filé de tilápia com molho de laranja e gengibre, acompanha purê de batata</p>
-            <div class="card-footer">
-              <span class="card-preco">R$ 64,90</span>
-              <button class="btn-add" data-nome="Peixe ao Molho Cítrico" data-preco="64.90" data-emoji="🐟">+ Adicionar</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="card-produto" data-cat="pratos" data-nome="Risoto de Camarão" data-preco="74.90">
-          <div class="card-img-wrap">
-            <div class="card-img" style="background: linear-gradient(135deg,#f093fb,#f5576c);">
-              <span class="card-emoji">🍤</span>
-            </div>
-            <span class="card-tag chef">Chef indica</span>
-          </div>
-          <div class="card-body">
-            <h3 class="card-nome">Risoto de Camarão</h3>
-            <p class="card-desc">Arroz arbóreo cremoso com camarões salteados, vinho branco e manjericão</p>
-            <div class="card-footer">
-              <span class="card-preco">R$ 74,90</span>
-              <button class="btn-add" data-nome="Risoto de Camarão" data-preco="74.90" data-emoji="🍤">+ Adicionar</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- LANCHES -->
-    <section class="secao" data-secao="lanches">
-      <div class="secao-header">
-        <h2 class="secao-titulo"><span>🍔</span> Lanches</h2>
-        <p class="secao-desc">Artesanais, suculentos e irresistíveis</p>
-      </div>
-      <div class="grid-produtos">
-        <div class="card-produto" data-cat="lanches" data-nome="Smash Burger Clássico" data-preco="34.90">
-          <div class="card-img-wrap">
-            <div class="card-img" style="background: linear-gradient(135deg,#8B4513,#D2691E);">
-              <span class="card-emoji">🍔</span>
-            </div>
-            <span class="card-tag">Popular</span>
-          </div>
-          <div class="card-body">
-            <h3 class="card-nome">Smash Burger Clássico</h3>
-            <p class="card-desc">180g de blend de carne smashada, queijo americano, alface, tomate e maionese especial</p>
-            <div class="card-footer">
-              <span class="card-preco">R$ 34,90</span>
-              <button class="btn-add" data-nome="Smash Burger Clássico" data-preco="34.90" data-emoji="🍔">+ Adicionar</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="card-produto" data-cat="lanches" data-nome="X-Bacon Duplo" data-preco="42.90">
-          <div class="card-img-wrap">
-            <div class="card-img" style="background: linear-gradient(135deg,#c0392b,#e74c3c);">
-              <span class="card-emoji">🥓</span>
-            </div>
-          </div>
-          <div class="card-body">
-            <h3 class="card-nome">X-Bacon Duplo</h3>
-            <p class="card-desc">Dois discos de carne, bacon crocante, cheddar derretido e molho barbecue artesanal</p>
-            <div class="card-footer">
-              <span class="card-preco">R$ 42,90</span>
-              <button class="btn-add" data-nome="X-Bacon Duplo" data-preco="42.90" data-emoji="🥓">+ Adicionar</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="card-produto" data-cat="lanches" data-nome="Veggie Burger" data-preco="32.90">
-          <div class="card-img-wrap">
-            <div class="card-img" style="background: linear-gradient(135deg,#56ab2f,#a8e063);">
-              <span class="card-emoji">🥦</span>
-            </div>
-            <span class="card-tag novo">Novo</span>
-          </div>
-          <div class="card-body">
-            <h3 class="card-nome">Veggie Burger</h3>
-            <p class="card-desc">Hambúrguer de grão-de-bico e beterraba, queijo vegano, rúcula e maionese de ervas</p>
-            <div class="card-footer">
-              <span class="card-preco">R$ 32,90</span>
-              <button class="btn-add" data-nome="Veggie Burger" data-preco="32.90" data-emoji="🥦">+ Adicionar</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="card-produto" data-cat="lanches" data-nome="Misto Quente Gourmet" data-preco="22.90">
-          <div class="card-img-wrap">
-            <div class="card-img" style="background: linear-gradient(135deg,#f7971e,#ffd200);">
-              <span class="card-emoji">🥪</span>
-            </div>
-          </div>
-          <div class="card-body">
-            <h3 class="card-nome">Misto Quente Gourmet</h3>
-            <p class="card-desc">Pão de forma artesanal, presunto parma, queijo gruyère e mostarda dijon</p>
-            <div class="card-footer">
-              <span class="card-preco">R$ 22,90</span>
-              <button class="btn-add" data-nome="Misto Quente Gourmet" data-preco="22.90" data-emoji="🥪">+ Adicionar</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- PIZZAS -->
-    <section class="secao" data-secao="pizzas">
-      <div class="secao-header">
-        <h2 class="secao-titulo"><span>🍕</span> Pizzas</h2>
-        <p class="secao-desc">Massa fina e recheios generosos</p>
-      </div>
-      <div class="grid-produtos">
-        <div class="card-produto destaque" data-cat="pizzas" data-nome="Pizza Margherita" data-preco="54.90">
-          <div class="card-img-wrap">
-            <div class="card-img" style="background: linear-gradient(135deg,#e52d27,#b31217);">
-              <span class="card-emoji">🍕</span>
-            </div>
-            <span class="card-tag chef">Chef indica</span>
-          </div>
-          <div class="card-body">
-            <h3 class="card-nome">Pizza Margherita</h3>
-            <p class="card-desc">Molho de tomate San Marzano, mussarela de búfala, manjericão fresco e azeite</p>
-            <div class="card-footer">
-              <span class="card-preco">R$ 54,90</span>
-              <button class="btn-add" data-nome="Pizza Margherita" data-preco="54.90" data-emoji="🍕">+ Adicionar</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="card-produto" data-cat="pizzas" data-nome="Pizza Pepperoni" data-preco="62.90">
-          <div class="card-img-wrap">
-            <div class="card-img" style="background: linear-gradient(135deg,#d35400,#e74c3c);">
-              <span class="card-emoji">🍕</span>
-            </div>
-            <span class="card-tag">Popular</span>
-          </div>
-          <div class="card-body">
-            <h3 class="card-nome">Pizza Pepperoni</h3>
-            <p class="card-desc">Generosa quantidade de pepperoni importado, mussarela e orégano</p>
-            <div class="card-footer">
-              <span class="card-preco">R$ 62,90</span>
-              <button class="btn-add" data-nome="Pizza Pepperoni" data-preco="62.90" data-emoji="🍕">+ Adicionar</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="card-produto" data-cat="pizzas" data-nome="Pizza Quatro Queijos" data-preco="67.90">
-          <div class="card-img-wrap">
-            <div class="card-img" style="background: linear-gradient(135deg,#f7971e,#d4a017);">
-              <span class="card-emoji">🧀</span>
-            </div>
-          </div>
-          <div class="card-body">
-            <h3 class="card-nome">Pizza Quatro Queijos</h3>
-            <p class="card-desc">Mussarela, provolone, gorgonzola e parmesão. Para os amantes de queijo!</p>
-            <div class="card-footer">
-              <span class="card-preco">R$ 67,90</span>
-              <button class="btn-add" data-nome="Pizza Quatro Queijos" data-preco="67.90" data-emoji="🧀">+ Adicionar</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="card-produto" data-cat="pizzas" data-nome="Pizza Frango c/ Catupiry" data-preco="59.90">
-          <div class="card-img-wrap">
-            <div class="card-img" style="background: linear-gradient(135deg,#11998e,#38ef7d);">
-              <span class="card-emoji">🍗</span>
-            </div>
-          </div>
-          <div class="card-body">
-            <h3 class="card-nome">Pizza Frango c/ Catupiry</h3>
-            <p class="card-desc">Frango desfiado temperado, catupiry original, milho e azeitona verde</p>
-            <div class="card-footer">
-              <span class="card-preco">R$ 59,90</span>
-              <button class="btn-add" data-nome="Pizza Frango c/ Catupiry" data-preco="59.90" data-emoji="🍗">+ Adicionar</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- PETISCOS -->
-    <section class="secao" data-secao="petiscos">
-      <div class="secao-header">
-        <h2 class="secao-titulo"><span>🍟</span> Petiscos & Tira-gosto</h2>
-        <p class="secao-desc">Perfeitos para compartilhar</p>
-      </div>
-      <div class="grid-produtos">
-        <div class="card-produto" data-cat="petiscos" data-nome="Batata Frita Crocante" data-preco="28.90">
-          <div class="card-img-wrap">
-            <div class="card-img" style="background: linear-gradient(135deg,#f7971e,#ffd200);">
-              <span class="card-emoji">🍟</span>
-            </div>
-            <span class="card-tag">Popular</span>
-          </div>
-          <div class="card-body">
-            <h3 class="card-nome">Batata Frita Crocante</h3>
-            <p class="card-desc">Porção 300g de batata palito frita, temperada com sal e ervas. Acompanha molho especial</p>
-            <div class="card-footer">
-              <span class="card-preco">R$ 28,90</span>
-              <button class="btn-add" data-nome="Batata Frita Crocante" data-preco="28.90" data-emoji="🍟">+ Adicionar</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="card-produto" data-cat="petiscos" data-nome="Bolinho de Bacalhau" data-preco="36.90">
-          <div class="card-img-wrap">
-            <div class="card-img" style="background: linear-gradient(135deg,#d4a017,#8B7355);">
-              <span class="card-emoji">🫓</span>
-            </div>
-            <span class="card-tag chef">Chef indica</span>
-          </div>
-          <div class="card-body">
-            <h3 class="card-nome">Bolinho de Bacalhau</h3>
-            <p class="card-desc">8 unidades crocantes por fora, cremosos por dentro. Acompanha maionese de alho</p>
-            <div class="card-footer">
-              <span class="card-preco">R$ 36,90</span>
-              <button class="btn-add" data-nome="Bolinho de Bacalhau" data-preco="36.90" data-emoji="🫓">+ Adicionar</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="card-produto" data-cat="petiscos" data-nome="Frango na Chapa" data-preco="42.90">
-          <div class="card-img-wrap">
-            <div class="card-img" style="background: linear-gradient(135deg,#c0392b,#e74c3c);">
-              <span class="card-emoji">🍗</span>
-            </div>
-          </div>
-          <div class="card-body">
-            <h3 class="card-nome">Franguinho na Chapa</h3>
-            <p class="card-desc">Sobrecoxa de frango temperada e grelhada na chapa, crocante por fora</p>
-            <div class="card-footer">
-              <span class="card-preco">R$ 42,90</span>
-              <button class="btn-add" data-nome="Franguinho na Chapa" data-preco="42.90" data-emoji="🍗">+ Adicionar</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="card-produto" data-cat="petiscos" data-nome="Mandioca Frita" data-preco="24.90">
-          <div class="card-img-wrap">
-            <div class="card-img" style="background: linear-gradient(135deg,#a8e063,#f7971e);">
-              <span class="card-emoji">🌽</span>
-            </div>
-          </div>
-          <div class="card-body">
-            <h3 class="card-nome">Mandioca Frita</h3>
-            <p class="card-desc">Porção de mandioca cozida e frita, sequinha e temperada. Perfeita com limão</p>
-            <div class="card-footer">
-              <span class="card-preco">R$ 24,90</span>
-              <button class="btn-add" data-nome="Mandioca Frita" data-preco="24.90" data-emoji="🌽">+ Adicionar</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- BEBIDAS -->
-    <section class="secao" data-secao="bebidas">
-      <div class="secao-header">
-        <h2 class="secao-titulo"><span>🍺</span> Bebidas</h2>
-        <p class="secao-desc">Para acompanhar sua refeição</p>
-      </div>
-      <div class="grid-produtos">
-        <div class="card-produto" data-cat="bebidas" data-nome="Chopp Artesanal" data-preco="16.90">
-          <div class="card-img-wrap">
-            <div class="card-img" style="background: linear-gradient(135deg,#f7971e,#d4a017);">
-              <span class="card-emoji">🍺</span>
-            </div>
-            <span class="card-tag">Popular</span>
-          </div>
-          <div class="card-body">
-            <h3 class="card-nome">Chopp Artesanal</h3>
-            <p class="card-desc">400ml de chopp gelado de fabricação própria. Leve, encorpado e refrescante</p>
-            <div class="card-footer">
-              <span class="card-preco">R$ 16,90</span>
-              <button class="btn-add" data-nome="Chopp Artesanal" data-preco="16.90" data-emoji="🍺">+ Adicionar</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="card-produto" data-cat="bebidas" data-nome="Caipirinha Clássica" data-preco="22.90">
-          <div class="card-img-wrap">
-            <div class="card-img" style="background: linear-gradient(135deg,#a8e063,#56ab2f);">
-              <span class="card-emoji">🍋</span>
-            </div>
-            <span class="card-tag chef">Especial</span>
-          </div>
-          <div class="card-body">
-            <h3 class="card-nome">Caipirinha Clássica</h3>
-            <p class="card-desc">Limão tahiti fresco, cachaça premium, açúcar de cana e muito gelo</p>
-            <div class="card-footer">
-              <span class="card-preco">R$ 22,90</span>
-              <button class="btn-add" data-nome="Caipirinha Clássica" data-preco="22.90" data-emoji="🍋">+ Adicionar</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="card-produto" data-cat="bebidas" data-nome="Suco Natural" data-preco="12.90">
-          <div class="card-img-wrap">
-            <div class="card-img" style="background: linear-gradient(135deg,#f093fb,#f5576c);">
-              <span class="card-emoji">🥤</span>
-            </div>
-          </div>
-          <div class="card-body">
-            <h3 class="card-nome">Suco Natural 500ml</h3>
-            <p class="card-desc">Laranja, maracujá, manga, abacaxi ou melancia. Fresquinho e sem conservante</p>
-            <div class="card-footer">
-              <span class="card-preco">R$ 12,90</span>
-              <button class="btn-add" data-nome="Suco Natural 500ml" data-preco="12.90" data-emoji="🥤">+ Adicionar</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="card-produto" data-cat="bebidas" data-nome="Refrigerante Lata" data-preco="7.90">
-          <div class="card-img-wrap">
-            <div class="card-img" style="background: linear-gradient(135deg,#e74c3c,#c0392b);">
-              <span class="card-emoji">🥫</span>
-            </div>
-          </div>
-          <div class="card-body">
-            <h3 class="card-nome">Refrigerante Lata 350ml</h3>
-            <p class="card-desc">Coca-Cola, Pepsi, Guaraná Antarctica, Sprite ou Fanta. Gelado na hora</p>
-            <div class="card-footer">
-              <span class="card-preco">R$ 7,90</span>
-              <button class="btn-add" data-nome="Refrigerante Lata 350ml" data-preco="7.90" data-emoji="🥫">+ Adicionar</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="card-produto" data-cat="bebidas" data-nome="Água Mineral" data-preco="5.00">
-          <div class="card-img-wrap">
-            <div class="card-img" style="background: linear-gradient(135deg,#0575E6,#00F260);">
-              <span class="card-emoji">💧</span>
-            </div>
-          </div>
-          <div class="card-body">
-            <h3 class="card-nome">Água Mineral 500ml</h3>
-            <p class="card-desc">Água mineral natural com ou sem gás</p>
-            <div class="card-footer">
-              <span class="card-preco">R$ 5,00</span>
-              <button class="btn-add" data-nome="Água Mineral 500ml" data-preco="5.00" data-emoji="💧">+ Adicionar</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="card-produto destaque" data-cat="bebidas" data-nome="Vinho Tinto da Casa" data-preco="89.90">
-          <div class="card-img-wrap">
-            <div class="card-img" style="background: linear-gradient(135deg,#6D214F,#B33771);">
-              <span class="card-emoji">🍷</span>
-            </div>
-            <span class="card-tag chef">Especial</span>
-          </div>
-          <div class="card-body">
-            <h3 class="card-nome">Vinho Tinto da Casa</h3>
-            <p class="card-desc">Garrafa 750ml selecionada pelo nosso sommelier. Perfeito com carnes e massas</p>
-            <div class="card-footer">
-              <span class="card-preco">R$ 89,90</span>
-              <button class="btn-add" data-nome="Vinho Tinto da Casa" data-preco="89.90" data-emoji="🍷">+ Adicionar</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- SOBREMESAS -->
-    <section class="secao" data-secao="sobremesas">
-      <div class="secao-header">
-        <h2 class="secao-titulo"><span>🍰</span> Sobremesas</h2>
-        <p class="secao-desc">O final perfeito para sua refeição</p>
-      </div>
-      <div class="grid-produtos">
-        <div class="card-produto destaque" data-cat="sobremesas" data-nome="Petit Gâteau" data-preco="28.90">
-          <div class="card-img-wrap">
-            <div class="card-img" style="background: linear-gradient(135deg,#3d2b1f,#8B4513);">
-              <span class="card-emoji">🍫</span>
-            </div>
-            <span class="card-tag chef">Chef indica</span>
-          </div>
-          <div class="card-body">
-            <h3 class="card-nome">Petit Gâteau</h3>
-            <p class="card-desc">Bolinho de chocolate com interior derretido, servido com sorvete de baunilha</p>
-            <div class="card-footer">
-              <span class="card-preco">R$ 28,90</span>
-              <button class="btn-add" data-nome="Petit Gâteau" data-preco="28.90" data-emoji="🍫">+ Adicionar</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="card-produto" data-cat="sobremesas" data-nome="Pudim de Leite" data-preco="18.90">
-          <div class="card-img-wrap">
-            <div class="card-img" style="background: linear-gradient(135deg,#f7971e,#ffd200);">
-              <span class="card-emoji">🍮</span>
-            </div>
-            <span class="card-tag">Popular</span>
-          </div>
-          <div class="card-body">
-            <h3 class="card-nome">Pudim de Leite Condensado</h3>
-            <p class="card-desc">Pudim caseiro cremoso com calda de caramelo dourada. Receita da vovó!</p>
-            <div class="card-footer">
-              <span class="card-preco">R$ 18,90</span>
-              <button class="btn-add" data-nome="Pudim de Leite Condensado" data-preco="18.90" data-emoji="🍮">+ Adicionar</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="card-produto" data-cat="sobremesas" data-nome="Sorvete Artesanal" data-preco="22.90">
-          <div class="card-img-wrap">
-            <div class="card-img" style="background: linear-gradient(135deg,#f093fb,#f5576c);">
-              <span class="card-emoji">🍨</span>
-            </div>
-            <span class="card-tag novo">Novo</span>
-          </div>
-          <div class="card-body">
-            <h3 class="card-nome">Sorvete Artesanal 3 Bolas</h3>
-            <p class="card-desc">Escolha entre: chocolate belga, baunilha, morango, maracujá ou pistache</p>
-            <div class="card-footer">
-              <span class="card-preco">R$ 22,90</span>
-              <button class="btn-add" data-nome="Sorvete Artesanal 3 Bolas" data-preco="22.90" data-emoji="🍨">+ Adicionar</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- COMBOS -->
-    <section class="secao" data-secao="combos">
-      <div class="secao-header">
-        <h2 class="secao-titulo"><span>🎁</span> Combos Especiais</h2>
-        <p class="secao-desc">Mais por menos — combinações perfeitas</p>
-      </div>
-      <div class="grid-produtos grid-combos">
-        <div class="card-produto card-combo" data-cat="combos" data-nome="Combo Casal Clássico" data-preco="119.90">
-          <div class="card-img-wrap">
-            <div class="card-img" style="background: linear-gradient(135deg,#e52d27,#b31217);">
-              <span class="card-emoji">❤️</span>
-            </div>
-            <span class="card-tag">Econômico</span>
-          </div>
-          <div class="card-body">
-            <h3 class="card-nome">Combo Casal Clássico</h3>
-            <p class="card-desc">2 pratos principais + 2 sobremesas + 2 bebidas</p>
-            <ul class="combo-itens">
-              <li>✅ 2 Pratos à sua escolha</li>
-              <li>✅ 2 Refrigerantes ou Sucos</li>
-              <li>✅ 2 Sobremesas do dia</li>
-              <li>🎉 Economia de R$ 30,00</li>
-            </ul>
-            <div class="card-footer">
-              <div>
-                <span class="card-preco-old">R$ 149,90</span>
-                <span class="card-preco">R$ 119,90</span>
-              </div>
-              <button class="btn-add" data-nome="Combo Casal Clássico" data-preco="119.90" data-emoji="❤️">+ Adicionar</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="card-produto card-combo" data-cat="combos" data-nome="Combo Petisco + Chopp" data-preco="59.90">
-          <div class="card-img-wrap">
-            <div class="card-img" style="background: linear-gradient(135deg,#f7971e,#ffd200);">
-              <span class="card-emoji">🍻</span>
-            </div>
-            <span class="card-tag">Mais pedido</span>
-          </div>
-          <div class="card-body">
-            <h3 class="card-nome">Combo Petisco + Chopp</h3>
-            <p class="card-desc">2 petiscos + 2 chopps gelados</p>
-            <ul class="combo-itens">
-              <li>✅ Bolinho de Bacalhau (8 un)</li>
-              <li>✅ Batata Frita Crocante</li>
-              <li>✅ 2 Chopps Artesanais 400ml</li>
-              <li>🎉 Economia de R$ 15,00</li>
-            </ul>
-            <div class="card-footer">
-              <div>
-                <span class="card-preco-old">R$ 74,70</span>
-                <span class="card-preco">R$ 59,90</span>
-              </div>
-              <button class="btn-add" data-nome="Combo Petisco + Chopp" data-preco="59.90" data-emoji="🍻">+ Adicionar</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="card-produto card-combo" data-cat="combos" data-nome="Combo Família" data-preco="189.90">
-          <div class="card-img-wrap">
-            <div class="card-img" style="background: linear-gradient(135deg,#11998e,#38ef7d);">
-              <span class="card-emoji">👨‍👩‍👧‍👦</span>
-            </div>
-            <span class="card-tag chef">Especial</span>
-          </div>
-          <div class="card-body">
-            <h3 class="card-nome">Combo Família</h3>
-            <p class="card-desc">Serve até 4 pessoas com fartura</p>
-            <ul class="combo-itens">
-              <li>✅ 1 Pizza Grande à escolha</li>
-              <li>✅ 2 Porções de Petisco</li>
-              <li>✅ 4 Refrigerantes Lata</li>
-              <li>✅ 4 Sobremesas do dia</li>
-              <li>🎉 Economia de R$ 50,00</li>
-            </ul>
-            <div class="card-footer">
-              <div>
-                <span class="card-preco-old">R$ 239,90</span>
-                <span class="card-preco">R$ 189,90</span>
-              </div>
-              <button class="btn-add" data-nome="Combo Família" data-preco="189.90" data-emoji="👨‍👩‍👧‍👦">+ Adicionar</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-  </main>
+  <!-- MAIN — preenchido pelo app.js -->
+  <main class="main" id="main"></main>
 
   <!-- SEM RESULTADOS -->
   <div class="sem-resultados" id="semResultados" style="display:none;">
@@ -723,29 +76,49 @@
     </div>
   </div>
 
+  <!-- QR CODE -->
+  <section class="qr-section">
+    <div class="qr-inner">
+      <div class="qr-texto">
+        <h2>📱 Acesse pelo celular</h2>
+        <p>Aponte a câmera do celular para o QR Code e abra o cardápio na hora.</p>
+        <a href="https://chausselicita-lang.github.io/cardapio-digital/" class="qr-link" target="_blank">
+          chausselicita-lang.github.io/cardapio-digital
+        </a>
+      </div>
+      <div class="qr-img-wrap">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&color=1A0F00&bgcolor=ffffff&data=https://chausselicita-lang.github.io/cardapio-digital/&margin=10" alt="QR Code" class="qr-img" width="180" height="180" />
+        <span class="qr-caption">Escaneie e peça já!</span>
+      </div>
+    </div>
+  </section>
+
   <!-- FOOTER -->
   <footer class="footer">
     <div class="footer-inner">
       <div class="footer-logo">
-        <span>🍽️</span>
+        <span id="footer-emoji">🍽️</span>
         <div>
-          <strong>Sabor & Arte</strong>
-          <span>Bar & Restaurante</span>
+          <strong id="footer-nome">Sabor & Arte</strong>
+          <span id="footer-sub">Bar & Restaurante</span>
         </div>
       </div>
       <div class="footer-info">
-        <div class="footer-item"><span>📍</span> Rua das Flores, 123 — Centro</div>
-        <div class="footer-item"><span>📞</span> (11) 99999-9999</div>
-        <div class="footer-item"><span>🕐</span> Seg–Sex: 11h–23h | Sáb–Dom: 11h–00h</div>
+        <div class="footer-item"><span>📍</span> <span id="footer-end">Rua das Flores, 123 — Centro</span></div>
+        <div class="footer-item"><span>📞</span> <span id="footer-tel">(11) 99999-9999</span></div>
+        <div class="footer-item"><span>🕐</span> <span id="footer-hor">Seg–Sex: 11h–23h | Sáb–Dom: 11h–00h</span></div>
         <div class="footer-item"><span>📱</span> Pedidos via WhatsApp</div>
       </div>
       <div class="footer-social">
         <a href="#" class="social-btn">📘 Facebook</a>
         <a href="#" class="social-btn">📷 Instagram</a>
-        <a href="#" class="social-btn">💬 WhatsApp</a>
+        <a id="footer-whats" href="#" class="social-btn">💬 WhatsApp</a>
       </div>
     </div>
-    <div class="footer-copy">© 2026 Sabor & Arte — Todos os direitos reservados</div>
+    <div class="footer-copy">
+      © 2026 <span id="footer-copy-nome">Sabor & Arte</span> — Todos os direitos reservados &nbsp;|&nbsp;
+      <a href="admin.html" class="admin-link">⚙️ Admin</a>
+    </div>
   </footer>
 
   <!-- CARRINHO LATERAL -->
@@ -774,9 +147,10 @@
     </div>
   </aside>
 
-  <!-- TOAST DE NOTIFICAÇÃO -->
+  <!-- TOAST -->
   <div class="toast" id="toast"></div>
 
+  <script src="data.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
