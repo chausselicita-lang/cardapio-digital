@@ -204,8 +204,8 @@ body {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(160deg, rgba(26,15,0,0.84) 0%, rgba(220,60,10,0.55) 55%, rgba(26,15,0,0.90) 100%),
-    linear-gradient(180deg, transparent 55%, var(--surface2) 100%);
+    linear-gradient(160deg, rgba(4,2,0,0.80) 0%, rgba(255,107,0,0.18) 40%, rgba(4,2,0,0.85) 100%),
+    linear-gradient(180deg, transparent 60%, var(--surface2) 100%);
   pointer-events: none;
   z-index: 1;
 }
