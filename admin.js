@@ -559,7 +559,7 @@ async function carregarPedidos() {
     .order('created_at', { ascending: false });
 
   if (pedidosFiltroAtivo === 'ativos') {
-    query = query.not('status', 'in', '("entregue","fechado")');
+    query = query.neq('status', 'entregue').neq('status', 'fechado');
   } else if (pedidosFiltroAtivo === 'fechado') {
     query = query.eq('status', 'fechado');
   }

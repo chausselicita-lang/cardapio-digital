@@ -66,5 +66,8 @@ CREATE POLICY "pedidos_all"  ON cardapio_pedidos FOR ALL USING (true) WITH CHECK
 ALTER TABLE cardapio_items ADD COLUMN IF NOT EXISTS tag TEXT;
 
 -- Remove FK obrigatória (modo standalone sem tabela restaurantes)
-ALTER TABLE cardapio_items DROP CONSTRAINT IF EXISTS cardapio_items_restaurante_id_fkey;
-ALTER TABLE cardapio_items ALTER COLUMN restaurante_id DROP NOT NULL;
+ALTER TABLE cardapio_items   DROP CONSTRAINT IF EXISTS cardapio_items_restaurante_id_fkey;
+ALTER TABLE cardapio_items   ALTER COLUMN restaurante_id DROP NOT NULL;
+
+ALTER TABLE cardapio_pedidos DROP CONSTRAINT IF EXISTS cardapio_pedidos_restaurante_id_fkey;
+ALTER TABLE cardapio_pedidos ALTER COLUMN restaurante_id DROP NOT NULL;

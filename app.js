@@ -358,16 +358,15 @@ async function salvarPedidoSupabase(formaPagamento) {
   if (typeof db === 'undefined' || typeof SUPA_RID === 'undefined') return;
   const total = state.carrinho.reduce((s, i) => s + i.preco * i.qty, 0);
   const itens = state.carrinho.map(i => ({ nome: i.nome, qty: i.qty, preco: i.preco, emoji: i.emoji || '🍽️' }));
-  try {
-    await db.from('cardapio_pedidos').insert({
-      restaurante_id: SUPA_RID,
-      mesa: state.mesa || 'Balcão',
-      itens,
-      total,
-      forma_pagamento: formaPagamento,
-      status: 'novo'
-    });
-  } catch(e) { /* falha silenciosa — WhatsApp ainda envia */ }
+  const { error } = await db.from('cardapio_pedidos').insert({
+    restaurante_id: SUPA_RID,
+    mesa: state.mesa || 'Balcão',
+    itens,
+    total,
+    forma_pagamento: formaPagamento,
+    status: 'novo'
+  });
+  if (error) console.error('[Pedido Supabase]', error.message, error);
 }
 
 // ===== ENVIAR VIA WHATSAPP =====
