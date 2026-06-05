@@ -514,7 +514,99 @@ document.addEventListener('click', (e) => {
 
 btnCloseProduto.addEventListener('click', fecharDetalhe);
 
+// ===== CARDÁPIO DINÂMICO — SUPABASE =====
+const EMOJI_CAT = {
+  entradas:'🥗', pratos:'🍖', lanches:'🍔', pizzas:'🍕',
+  petiscos:'🍟', bebidas:'🍺', sobremesas:'🍰', combos:'🎁'
+};
+const TAG_LABELS = { popular:'Popular', novo:'Novo', chef:'Chef indica' };
+
+function criarCard(p) {
+  const emoji = EMOJI_CAT[p.categoria] || '🍽️';
+  const preco = parseFloat(p.preco).toLocaleString('pt-BR', { style:'currency', currency:'BRL' });
+  const tagClass = p.tag === 'novo' ? ' novo' : p.tag === 'chef' ? ' chef' : '';
+  const tagHTML  = p.tag ? `<span class="card-tag${tagClass}">${TAG_LABELS[p.tag] || p.tag}</span>` : '';
+
+  const card = document.createElement('div');
+  card.className = `card-produto${p.tag === 'chef' ? ' destaque' : ''}`;
+  card.dataset.cat   = p.categoria;
+  card.dataset.nome  = p.nome;
+  card.dataset.preco = p.preco;
+  card.innerHTML = `
+    <div class="card-img-wrap">
+      <div class="card-img">
+        ${p.foto_url
+          ? `<img src="${p.foto_url}" alt="${p.nome}" loading="lazy" />`
+          : `<span class="card-emoji">${emoji}</span>`}
+      </div>
+      ${tagHTML}
+    </div>
+    <div class="card-body">
+      <h3 class="card-nome">${p.nome}</h3>
+      <p class="card-desc">${p.descricao || ''}</p>
+      <div class="card-footer">
+        <span class="card-preco">${preco}</span>
+        <button class="btn-add"
+          data-nome="${p.nome}"
+          data-preco="${p.preco}"
+          data-emoji="${emoji}">+ Adicionar</button>
+      </div>
+    </div>`;
+  return card;
+}
+
+async function carregarCardapioSupabase() {
+  if (typeof db === 'undefined' || typeof SUPA_RID === 'undefined') return;
+
+  try {
+    const { data, error } = await db
+      .from('cardapio_items')
+      .select('*')
+      .eq('restaurante_id', SUPA_RID)
+      .eq('disponivel', true)
+      .order('ordem');
+
+    if (error || !data || data.length === 0) return;
+
+    // Agrupa por categoria
+    const porCat = {};
+    data.forEach(p => {
+      if (!porCat[p.categoria]) porCat[p.categoria] = [];
+      porCat[p.categoria].push(p);
+    });
+
+    // Substitui cards estáticos pelos do banco
+    $$('.secao').forEach(secao => {
+      const cat  = secao.dataset.secao;
+      const grid = secao.querySelector('.grid-produtos');
+      if (!grid) return;
+
+      const itens = porCat[cat];
+      if (!itens || itens.length === 0) {
+        secao.style.display = 'none';
+        return;
+      }
+
+      // Remove cards estáticos e insere os dinâmicos
+      secao.querySelectorAll('.card-produto').forEach(c => c.remove());
+      itens.forEach(p => grid.appendChild(criarCard(p)));
+      secao.style.display = '';
+    });
+
+    // Atualiza botões de categoria (oculta cats sem itens)
+    $$('.cat-btn[data-cat]').forEach(btn => {
+      const cat = btn.dataset.cat;
+      if (cat === 'todos') return;
+      if (!porCat[cat]) btn.style.display = 'none';
+    });
+
+  } catch (err) {
+    console.warn('Supabase indisponível, usando itens estáticos.', err);
+  }
+}
+
 // ===== INICIALIZAR =====
 atualizarCarrinho();
+carregarCardapioSupabase();
 console.log('%c🍽️ Cardápio Digital — Sabor & Arte', 'color:#E8420A;font-size:16px;font-weight:bold;');
 console.log('%cDesenvolvido com ❤️ para bares, lanchonetes e restaurantes', 'color:#888;font-size:12px;');

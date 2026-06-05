@@ -57,3 +57,14 @@ CREATE POLICY "restaurantes_select" ON restaurantes FOR SELECT USING (true);
 
 CREATE POLICY "items_all"    ON cardapio_items   FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "pedidos_all"  ON cardapio_pedidos FOR ALL USING (true) WITH CHECK (true);
+
+-- ============================================================
+-- MIGRAÇÃO — rodar se as tabelas já existem
+-- ============================================================
+
+-- Adiciona coluna tag (badge: popular, novo, chef)
+ALTER TABLE cardapio_items ADD COLUMN IF NOT EXISTS tag TEXT;
+
+-- Remove FK obrigatória (modo standalone sem tabela restaurantes)
+ALTER TABLE cardapio_items DROP CONSTRAINT IF EXISTS cardapio_items_restaurante_id_fkey;
+ALTER TABLE cardapio_items ALTER COLUMN restaurante_id DROP NOT NULL;

@@ -6,9 +6,9 @@ const $$ = sel => [...document.querySelectorAll(sel)];
 const CONFIG_KEY    = 'cardapio_config';
 const SENHA_PADRAO  = 'admin123';
 
-// Modo: 'supabase' se tiver ?rid na URL, 'local' caso contrário
-const rid  = new URLSearchParams(location.search).get('rid');
-const modo = rid ? 'supabase' : 'local';
+// Sempre usa Supabase com o ID fixo do restaurante
+const rid  = SUPA_RID;
+const modo = 'supabase';
 
 // ===== LIMITE POR PLANO =====
 let limiteQR = Infinity;
@@ -60,19 +60,11 @@ const senhaInput   = $('#senhaInput');
 const loginError   = $('#loginError');
 
 function verificarSessao() {
-  if (modo === 'supabase') {
-    if (sessionStorage.getItem('admin_auth') === '1' &&
-        sessionStorage.getItem('admin_rid')   === rid) {
-      carregarDadosRestaurante();
-      abrirTabCardapio();
-      return; // autenticado — overlay permanece oculto
-    }
-  } else {
-    if (sessionStorage.getItem('admin_auth') === '1') {
-      return; // autenticado — overlay permanece oculto
-    }
+  if (sessionStorage.getItem('admin_auth') === '1') {
+    carregarDadosRestaurante();
+    abrirTabCardapio();
+    return;
   }
-  // Não autenticado — exibe o overlay de login
   loginOverlay.style.display = 'flex';
 }
 
@@ -80,46 +72,19 @@ async function tentarLogin() {
   const senha = senhaInput.value;
   loginError.style.display = 'none';
 
-  if (modo === 'supabase') {
-    // Valida senha contra Supabase
-    try {
-      const { data, error } = await db
-        .from('restaurantes')
-        .select('id, nome_restaurante, senha_admin')
-        .eq('id', rid).single();
+  const config = carregarConfig();
+  const correta = config.senhaAdmin || SENHA_PADRAO;
 
-      if (error || !data) throw new Error();
-      if (data.senha_admin !== senha) throw new Error('senha errada');
-
-      sessionStorage.setItem('admin_auth', '1');
-      sessionStorage.setItem('admin_rid',  rid);
-      sessionStorage.setItem('admin_nome', data.nome_restaurante);
-      loginOverlay.style.display = 'none';
-      senhaInput.value = '';
-      carregarDadosRestaurante();
-      abrirTabCardapio();
-
-    } catch {
-      loginError.style.display = 'block';
-      senhaInput.value = '';
-      senhaInput.focus();
-    }
-
+  if (senha === correta) {
+    sessionStorage.setItem('admin_auth', '1');
+    loginOverlay.style.display = 'none';
+    senhaInput.value = '';
+    carregarDadosRestaurante();
+    abrirTabCardapio();
   } else {
-    // Modo local: compara com localStorage
-    const config = carregarConfig();
-    const correta = config.senhaAdmin || SENHA_PADRAO;
-    if (senha === correta) {
-      sessionStorage.setItem('admin_auth', '1');
-      loginOverlay.style.display = 'none';
-      senhaInput.value = '';
-      loginError.style.display = 'none';
-      abrirTabCardapio();
-    } else {
-      loginError.style.display = 'block';
-      senhaInput.value = '';
-      senhaInput.focus();
-    }
+    loginError.style.display = 'block';
+    senhaInput.value = '';
+    senhaInput.focus();
   }
 }
 
@@ -128,33 +93,18 @@ senhaInput.addEventListener('keydown', e => { if (e.key === 'Enter') tentarLogin
 
 $('#btnSair').addEventListener('click', () => {
   sessionStorage.removeItem('admin_auth');
-  sessionStorage.removeItem('admin_rid');
-  sessionStorage.removeItem('admin_nome');
   loginOverlay.style.display = 'flex';
   senhaInput.value = '';
   loginError.style.display = 'none';
-  // Se veio via Supabase, redireciona para login
-  if (modo === 'supabase') window.location.href = 'login.html';
-  else setTimeout(() => senhaInput.focus(), 100);
+  setTimeout(() => senhaInput.focus(), 100);
 });
 
-// ===== CARREGAR DADOS DO RESTAURANTE (modo Supabase) =====
-async function carregarDadosRestaurante() {
-  if (modo !== 'supabase' || !rid) return;
-  try {
-    const { data } = await db.from('restaurantes')
-      .select('nome_restaurante, tipo, telefone, email, endereco, horario, senha_admin, num_mesas, plano')
-      .eq('id', rid).single();
-    if (!data) return;
-
-    // Atualiza header do admin
-    const sub = document.querySelector('.admin-header-sub');
-    if (sub) sub.textContent = `| ${data.nome_restaurante}`;
-
-    // Configura limite de QR por plano
-    atualizarBadgePlano(data.num_mesas || 0, data.plano);
-
-  } catch {}
+// ===== CARREGAR DADOS DO RESTAURANTE =====
+function carregarDadosRestaurante() {
+  const config = carregarConfig();
+  const nome = config.nomeRestaurante || 'Sabor & Arte';
+  const sub = document.querySelector('.admin-header-sub');
+  if (sub) sub.textContent = `| ${nome}`;
 }
 
 // Verifica sessão ao carregar
@@ -227,10 +177,7 @@ async function salvarConfigItem(name) {
   const cfg = { ...carregarConfig(), [key]: val };
   salvarConfig(cfg);
 
-  // Senha também no Supabase
-  if (name === 'senha' && modo === 'supabase') {
-    await db.from('restaurantes').update({ senha_admin: val }).eq('id', rid);
-  }
+  // Senha salva apenas no localStorage
 
   document.getElementById(itemId).classList.remove('open');
   renderConfigList();
