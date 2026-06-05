@@ -500,6 +500,7 @@ function gerarQRCodes() {
     const card = document.createElement('div');
     card.className = 'qr-card';
     card.innerHTML = `
+      <div class="qr-card-titulo">🍽️ CARDÁPIO</div>
       <div class="qr-code" id="qr-mesa-${i}"></div>
       <div class="qr-card-info">
         <strong>Mesa ${i}</strong>

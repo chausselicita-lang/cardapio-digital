@@ -244,10 +244,21 @@
       transition: box-shadow 0.2s, border-color 0.2s;
     }
     .qr-card:hover { box-shadow: 0 4px 20px rgba(240,165,0,0.15); border-color: rgba(240,165,0,0.3); }
+    .qr-card-titulo {
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: var(--gold);
+      text-transform: uppercase;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(240,165,0,0.2);
+      width: 100%;
+      text-align: center;
+    }
     .qr-code img, .qr-code canvas { width: 160px !important; height: 160px !important; border-radius: 8px; }
     .qr-card-info strong {
       display: block;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
       color: #FFFFFF;
     }
@@ -407,10 +418,18 @@
         padding: 12px;
       }
       .qr-card {
-        border: 1px dashed #ccc;
+        border: 1px solid #ccc;
         page-break-inside: avoid;
         padding: 10px;
+        background: #fff !important;
+        color: #000 !important;
       }
+      .qr-card-titulo {
+        color: #b07800 !important;
+        border-bottom-color: #b07800 !important;
+      }
+      .qr-card-info strong { color: #000 !important; }
+      .qr-url { color: #666 !important; }
     }
 
     @media (max-width: 600px) {
