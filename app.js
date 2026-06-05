@@ -160,8 +160,14 @@ function fecharCarrinho() {
   }
 }
 
-// Seta "voltar" do browser fecha o carrinho em vez de sair da página
+// Seta "voltar" do browser — fecha detalhe primeiro, depois carrinho
 window.addEventListener('popstate', () => {
+  if (produtoModal.classList.contains('open')) {
+    produtoModal.classList.remove('open');
+    document.body.style.overflow = '';
+    detalhePushed = false;
+    return;
+  }
   if (cartPanel.classList.contains('open')) {
     cartPanel.classList.remove('open');
     cartOverlay.classList.remove('open');
@@ -195,9 +201,13 @@ document.addEventListener('click', (e) => {
   // Animação no botão
   btn.textContent = '✓ Adicionado';
   btn.style.background = '#27ae60';
+  btn.style.color = 'white';
+  btn.style.borderColor = '#27ae60';
   setTimeout(() => {
     btn.textContent = '+ Adicionar';
     btn.style.background = '';
+    btn.style.color = '';
+    btn.style.borderColor = '';
   }, 1400);
 });
 
@@ -401,6 +411,108 @@ window.addEventListener('scroll', () => {
     ? '0 4px 24px rgba(0,0,0,0.35)'
     : '0 2px 20px rgba(0,0,0,0.3)';
 }, { passive: true });
+
+// ===== DETALHE DO PRODUTO =====
+const produtoModal     = $('#produtoModal');
+const btnCloseProduto  = $('#btnCloseProduto');
+let detalhePushed = false;
+
+function abrirDetalhe(card) {
+  const nome       = card.dataset.nome;
+  const desc       = card.querySelector('.card-desc')?.textContent || '';
+  const preco      = card.querySelector('.card-preco')?.textContent || '';
+  const precoOld   = card.querySelector('.card-preco-old')?.textContent || '';
+  const imgEl      = card.querySelector('.card-img img');
+  const emojiEl    = card.querySelector('.card-emoji');
+  const badgeEl    = card.querySelector('.card-tag');
+  const btnOrig    = card.querySelector('.btn-add');
+
+  // Imagem ou emoji
+  const mImg = $('#produtoModalImgEl');
+  const mEmoji = $('#produtoModalEmojiEl');
+  if (imgEl) {
+    mImg.src = imgEl.src;
+    mImg.alt = nome;
+    mImg.style.display = 'block';
+    mEmoji.style.display = 'none';
+  } else {
+    mEmoji.textContent = emojiEl?.textContent || '🍽️';
+    mEmoji.style.display = 'flex';
+    mImg.style.display = 'none';
+  }
+
+  // Badge
+  const mBadge = $('#produtoModalBadge');
+  if (badgeEl) {
+    mBadge.textContent = badgeEl.textContent;
+    mBadge.className = 'card-tag produto-modal-badge' +
+      (badgeEl.classList.contains('novo')  ? ' novo'  :
+       badgeEl.classList.contains('chef')  ? ' chef'  : '');
+    mBadge.style.display = '';
+  } else {
+    mBadge.style.display = 'none';
+  }
+
+  // Textos
+  $('#produtoModalNome').textContent = nome;
+  $('#produtoModalDesc').textContent = desc;
+
+  const mPrecoOld = $('#produtoModalPrecoOld');
+  mPrecoOld.textContent = precoOld;
+  mPrecoOld.style.display = precoOld ? 'block' : 'none';
+  $('#produtoModalPreco').textContent = preco;
+
+  // Itens de combo (se houver)
+  const mCombos = $('#produtoModalCombos');
+  const comboItens = card.querySelectorAll('.combo-itens li');
+  mCombos.innerHTML = '';
+  if (comboItens.length) {
+    comboItens.forEach(li => {
+      const item = document.createElement('li');
+      item.textContent = li.textContent;
+      mCombos.appendChild(item);
+    });
+    mCombos.style.display = 'flex';
+  } else {
+    mCombos.style.display = 'none';
+  }
+
+  // Botão adicionar
+  const mBtn = $('#produtoModalBtnAdd');
+  mBtn.dataset.nome  = btnOrig.dataset.nome;
+  mBtn.dataset.preco = btnOrig.dataset.preco;
+  mBtn.dataset.emoji = btnOrig.dataset.emoji;
+  mBtn.textContent = '+ Adicionar';
+  mBtn.style.background = '';
+  mBtn.style.color = '';
+  mBtn.style.borderColor = '';
+
+  produtoModal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  history.pushState({ detail: true }, '');
+  detalhePushed = true;
+}
+
+function fecharDetalhe() {
+  if (!produtoModal.classList.contains('open')) return;
+  produtoModal.classList.remove('open');
+  document.body.style.overflow = '';
+  if (detalhePushed) {
+    detalhePushed = false;
+    history.back();
+  }
+}
+
+// Clique no card abre o detalhe (ignora clique no botão Adicionar)
+document.addEventListener('click', (e) => {
+  if (e.target.closest('.btn-add')) return;
+  if (e.target.closest('.produto-modal')) return;
+  const card = e.target.closest('.card-produto');
+  if (!card) return;
+  abrirDetalhe(card);
+});
+
+btnCloseProduto.addEventListener('click', fecharDetalhe);
 
 // ===== INICIALIZAR =====
 atualizarCarrinho();

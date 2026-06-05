@@ -6,7 +6,7 @@
   <title>Cardápio Digital — Bar & Restaurante</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=8" />
+  <link rel="stylesheet" href="style.css?v=9" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
 </head>
@@ -875,7 +875,30 @@
     </div>
   </div>
 
-  <script src="app.js?v=4"></script>
+  <!-- MODAL DETALHE DO PRODUTO -->
+  <div class="produto-modal" id="produtoModal">
+    <div class="produto-modal-img-wrap">
+      <div class="produto-modal-img-overlay"></div>
+      <img id="produtoModalImgEl" src="" alt="" />
+      <div class="produto-modal-emoji-el" id="produtoModalEmojiEl"></div>
+      <button class="produto-modal-back" id="btnCloseProduto">← Voltar</button>
+      <span class="card-tag produto-modal-badge" id="produtoModalBadge" style="display:none;"></span>
+    </div>
+    <div class="produto-modal-body">
+      <h2 class="produto-modal-nome" id="produtoModalNome"></h2>
+      <p class="produto-modal-desc" id="produtoModalDesc"></p>
+      <ul class="combo-itens produto-modal-combos" id="produtoModalCombos"></ul>
+    </div>
+    <div class="produto-modal-footer">
+      <div>
+        <span class="produto-modal-preco-old" id="produtoModalPrecoOld"></span>
+        <span class="produto-modal-preco" id="produtoModalPreco"></span>
+      </div>
+      <button class="btn-add" id="produtoModalBtnAdd" data-nome="" data-preco="" data-emoji="">+ Adicionar</button>
+    </div>
+  </div>
+
+  <script src="app.js?v=5"></script>
   <script>
     // Carrega dados do restaurante se vier via ?rid=
     (async () => {
