@@ -358,13 +358,17 @@ async function salvarPedidoSupabase(formaPagamento) {
   if (typeof db === 'undefined' || typeof SUPA_RID === 'undefined') return;
   const total = state.carrinho.reduce((s, i) => s + i.preco * i.qty, 0);
   const itens = state.carrinho.map(i => ({ nome: i.nome, qty: i.qty, preco: i.preco, emoji: i.emoji || '🍽️' }));
+  const payment_status = ['Dinheiro', 'Vale Refeição'].includes(formaPagamento)
+    ? 'presencial'
+    : 'pendente';
   const { error } = await db.from('cardapio_pedidos').insert({
     restaurante_id: SUPA_RID,
     mesa: state.mesa || 'Balcão',
     itens,
     total,
     forma_pagamento: formaPagamento,
-    status: 'novo'
+    status: 'novo',
+    payment_status
   });
   if (error) console.error('[Pedido Supabase]', error.message, error);
 }

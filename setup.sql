@@ -71,3 +71,16 @@ ALTER TABLE cardapio_items   ALTER COLUMN restaurante_id DROP NOT NULL;
 
 ALTER TABLE cardapio_pedidos DROP CONSTRAINT IF EXISTS cardapio_pedidos_restaurante_id_fkey;
 ALTER TABLE cardapio_pedidos ALTER COLUMN restaurante_id DROP NOT NULL;
+
+-- ============================================================
+-- PAGAMENTO — rastreamento de confirmação pelo dono
+-- ============================================================
+
+-- Adiciona coluna de status de pagamento
+ALTER TABLE cardapio_pedidos ADD COLUMN IF NOT EXISTS payment_status TEXT DEFAULT 'pendente';
+
+-- Marca pedidos presenciais existentes como confirmados automaticamente
+UPDATE cardapio_pedidos
+SET payment_status = 'presencial'
+WHERE forma_pagamento IN ('Dinheiro', 'Vale Refeição')
+  AND (payment_status IS NULL OR payment_status = 'pendente');

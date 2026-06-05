@@ -209,7 +209,7 @@ $$('.tab-btn').forEach(btn => {
     btn.classList.add('active');
     $(`#tab-${btn.dataset.tab}`).style.display = 'block';
     if (btn.dataset.tab === 'cardapio') carregarCardapio();
-    if (btn.dataset.tab === 'pedidos')  carregarPedidos();
+    if (btn.dataset.tab === 'pedidos') { carregarPedidos(); iniciarRealtimePedidos(); }
   });
 });
 
@@ -595,6 +595,12 @@ const STATUS_LABEL = {
   fechado:     '💰 Conta Fechada',
 };
 
+const PAG_STATUS_LABEL = {
+  pendente:    '⏳ Aguardando pagamento',
+  confirmado:  '✅ Pago',
+  presencial:  '💵 Presencial',
+};
+
 function renderPedidos(pedidos) {
   const lista = $('#pedidosLista');
   lista.innerHTML = '';
@@ -610,14 +616,20 @@ function renderPedidos(pedidos) {
       `<div class="pedido-linha-item">${it.emoji || '•'} <strong>${it.nome}</strong> x${it.qty} — ${parseFloat(it.preco * it.qty).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</div>`
     ).join('');
 
+    const payStatus = p.payment_status || 'pendente';
+
     const botoesStatus = [];
+    // Botão de confirmação de pagamento — aparece para PIX/Cartão ainda pendentes
+    if (payStatus === 'pendente' && status !== 'fechado') {
+      botoesStatus.push(`<button class="btn-ped btn-ped-confirmar-pag" onclick="confirmarPagamento('${p.id}')">✅ Confirmar Pag.</button>`);
+    }
     if (status === 'novo')       botoesStatus.push(`<button class="btn-ped btn-ped-preparo" onclick="mudarStatusPedido('${p.id}','em_preparo')">👨‍🍳 Em Preparo</button>`);
     if (status === 'em_preparo') botoesStatus.push(`<button class="btn-ped btn-ped-pronto"  onclick="mudarStatusPedido('${p.id}','pronto')">✅ Pronto</button>`);
     if (status === 'pronto')     botoesStatus.push(`<button class="btn-ped btn-ped-entregue" onclick="mudarStatusPedido('${p.id}','entregue')">🚀 Entregue</button>`);
     if (status !== 'fechado')    botoesStatus.push(`<button class="btn-ped btn-ped-fechar"  onclick="fecharContaPedido('${p.id}')">💰 Fechar Conta</button>`);
 
     const card = document.createElement('div');
-    card.className = `pedido-card status-${status}`;
+    card.className = `pedido-card status-${status}${payStatus === 'pendente' ? ' pag-pendente' : ''}`;
     card.id = `pedido-${p.id}`;
     card.innerHTML = `
       <div class="pedido-header">
@@ -627,9 +639,10 @@ function renderPedidos(pedidos) {
       </div>
       <div class="pedido-itens">${linhasItens}</div>
       <div class="pedido-footer">
-        <div>
+        <div class="pedido-footer-left">
           <span class="pedido-total">${total}</span>
           <span class="pedido-pag">· ${p.forma_pagamento || ''}</span>
+          <span class="pedido-pag-badge chip-pag-${payStatus}">${PAG_STATUS_LABEL[payStatus] || payStatus}</span>
         </div>
         <div class="pedido-acoes">${botoesStatus.join('')}</div>
       </div>`;
@@ -651,6 +664,30 @@ async function fecharContaPedido(id) {
   if (error) { mostrarToast('❌ Erro ao fechar conta'); return; }
   mostrarToast('💰 Conta fechada!');
   carregarPedidos();
+}
+
+async function confirmarPagamento(id) {
+  if (typeof db === 'undefined') return;
+  const { error } = await db.from('cardapio_pedidos').update({ payment_status: 'confirmado' }).eq('id', id);
+  if (error) { mostrarToast('❌ Erro ao confirmar pagamento'); return; }
+  mostrarToast('✅ Pagamento confirmado!');
+  carregarPedidos();
+}
+
+// ===== REALTIME — PEDIDOS =====
+let pedidosRealtime = null;
+
+function iniciarRealtimePedidos() {
+  if (pedidosRealtime || typeof db === 'undefined') return;
+  pedidosRealtime = db.channel('pedidos-realtime')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'cardapio_pedidos' }, () => {
+      mostrarToast('🆕 Novo pedido recebido!');
+      carregarPedidos();
+    })
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'cardapio_pedidos' }, () => {
+      carregarPedidos();
+    })
+    .subscribe();
 }
 
 // ===== TOAST =====
