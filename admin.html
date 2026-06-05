@@ -632,56 +632,66 @@
     .pratos-vazio .vazio-icon { font-size: 48px; margin-bottom: 12px; }
     .pratos-vazio p { font-size: 14px; margin-bottom: 16px; }
 
-    .pratos-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 16px;
-    }
-    .prato-card {
-      background: var(--surface2);
-      border: 1.5px solid var(--border);
+    /* ── LISTA VERTICAL DE PRATOS ── */
+    .pratos-lista {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      background: rgba(255,255,255,0.04);
       border-radius: 12px;
       overflow: hidden;
-      transition: box-shadow 0.2s;
+      border: 1px solid rgba(255,255,255,0.06);
     }
-    .prato-card:hover { box-shadow: 0 4px 24px rgba(240,165,0,0.12); border-color: rgba(240,165,0,0.25); }
-    .prato-card.indisponivel { opacity: 0.5; }
-    .prato-foto {
-      width: 100%;
-      height: 140px;
-      object-fit: cover;
-      background: rgba(255,255,255,0.05);
-      display: block;
-    }
-    .prato-foto-placeholder {
-      width: 100%;
-      height: 140px;
-      background: linear-gradient(135deg, #1a1a1a, #242424);
+    .prato-item {
       display: flex;
       align-items: center;
-      justify-content: center;
-      font-size: 40px;
+      gap: 14px;
+      padding: 14px 16px;
+      background: #161616;
+      transition: background 0.15s;
     }
-    .prato-body {
-      padding: 14px;
+    .prato-item:hover { background: #1c1c1c; }
+    .prato-item.indisponivel { opacity: 0.5; }
+    .prato-item-foto {
+      width: 72px;
+      height: 72px;
+      border-radius: 10px;
+      overflow: hidden;
+      flex-shrink: 0;
     }
-    .prato-top {
+    .prato-item-foto img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .prato-item-foto-ph {
+      width: 72px; height: 72px;
+      background: #222;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px;
+      flex-shrink: 0;
+    }
+    .prato-item-info { flex: 1; min-width: 0; }
+    .prato-item-top {
       display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
+      align-items: center;
       gap: 8px;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
     .prato-nome {
       font-size: 14px;
       font-weight: 700;
       color: #FFFFFF;
       line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .prato-badge {
       font-size: 10px;
       font-weight: 700;
-      padding: 2px 8px;
+      padding: 2px 7px;
       border-radius: 5px;
       white-space: nowrap;
       flex-shrink: 0;
@@ -689,52 +699,205 @@
     .prato-badge.popular { background: rgba(240,165,0,0.18); color: var(--gold); }
     .prato-badge.novo    { background: rgba(16,185,129,0.18); color: #10b981; }
     .prato-badge.chef    { background: rgba(232,66,10,0.15);  color: #f07050; }
-    .prato-desc {
-      font-size: 12px;
-      color: var(--text3);
-      line-height: 1.5;
-      margin-bottom: 10px;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-    .prato-footer {
+    .prato-item-meta {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 4px;
     }
-    .prato-preco {
-      font-size: 16px;
-      font-weight: 800;
-      color: var(--gold);
-    }
-    .prato-acoes {
-      display: flex;
-      gap: 6px;
-    }
-    .btn-prato-acao {
-      background: #1a1a1a;
-      border: 1.5px solid rgba(255,255,255,0.1);
-      border-radius: 7px;
-      padding: 5px 10px;
-      font-size: 12px;
-      cursor: pointer;
-      font-family: var(--font);
-      font-weight: 600;
-      transition: all 0.15s;
-    }
-    .btn-prato-editar { color: var(--text2); }
-    .btn-prato-editar:hover { border-color: var(--gold); color: var(--gold); }
-    .btn-prato-excluir { color: #ff6b6b; }
-    .btn-prato-excluir:hover { background: rgba(231,76,60,0.12); border-color: #e74c3c; color: #e74c3c; }
     .prato-cat-tag {
       font-size: 10px;
       color: var(--text3);
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      margin-bottom: 6px;
+    }
+    .prato-preco {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--gold);
+    }
+    .prato-desc {
+      font-size: 12px;
+      color: var(--text3);
+      line-height: 1.4;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .prato-item-acoes {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .btn-editar-prato {
+      background: transparent;
+      border: 1.5px solid var(--gold);
+      color: var(--gold);
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .btn-editar-prato:hover { background: var(--gold); color: #0a0a0a; }
+    .btn-excluir-prato {
+      background: transparent;
+      border: 1.5px solid rgba(231,76,60,0.4);
+      color: #ff6b6b;
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all 0.15s;
+    }
+    .btn-excluir-prato:hover { background: rgba(231,76,60,0.12); border-color: #e74c3c; }
+
+    /* ── PEDIDOS ── */
+    .pedidos-topo {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .pedidos-filtros {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .ped-filtro {
+      background: #1a1a1a;
+      border: 1.5px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 7px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text2);
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all 0.15s;
+    }
+    .ped-filtro:hover { border-color: var(--gold); color: var(--gold); }
+    .ped-filtro.active { background: var(--gold); border-color: var(--gold); color: #0a0a0a; }
+    .pedidos-lista { display: flex; flex-direction: column; gap: 12px; }
+    .pedido-card {
+      background: #1a1a1a;
+      border: 1.5px solid rgba(255,255,255,0.07);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .pedido-card.status-novo      { border-left: 4px solid #e74c3c; }
+    .pedido-card.status-em_preparo{ border-left: 4px solid #F0A500; }
+    .pedido-card.status-pronto    { border-left: 4px solid #10b981; }
+    .pedido-card.status-entregue  { border-left: 4px solid rgba(255,255,255,0.2); }
+    .pedido-card.status-fechado   { border-left: 4px solid rgba(255,255,255,0.1); opacity: 0.55; }
+    .pedido-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .pedido-mesa {
+      font-size: 16px;
+      font-weight: 800;
+      color: #FFFFFF;
+    }
+    .pedido-status-chip {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+    .chip-novo       { background: rgba(231,76,60,0.18);  color: #ff6b6b; }
+    .chip-em_preparo { background: rgba(240,165,0,0.18);  color: var(--gold); }
+    .chip-pronto     { background: rgba(16,185,129,0.18); color: #10b981; }
+    .chip-entregue   { background: rgba(255,255,255,0.08);color: var(--text2); }
+    .chip-fechado    { background: rgba(255,255,255,0.05);color: var(--text3); }
+    .pedido-hora {
+      margin-left: auto;
+      font-size: 12px;
+      color: var(--text3);
+    }
+    .pedido-itens { padding: 12px 16px; }
+    .pedido-linha-item {
+      font-size: 13px;
+      color: var(--text2);
+      padding: 3px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .pedido-linha-item:last-child { border-bottom: none; }
+    .pedido-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .pedido-total {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--gold);
+    }
+    .pedido-pag {
+      font-size: 12px;
+      color: var(--text3);
+      margin-left: 8px;
+    }
+    .pedido-acoes {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .btn-ped {
+      border: none;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all 0.15s;
+    }
+    .btn-ped-preparo  { background: rgba(240,165,0,0.15);  color: var(--gold);   border: 1.5px solid rgba(240,165,0,0.3); }
+    .btn-ped-preparo:hover  { background: var(--gold); color: #0a0a0a; }
+    .btn-ped-pronto   { background: rgba(16,185,129,0.15); color: #10b981;       border: 1.5px solid rgba(16,185,129,0.3); }
+    .btn-ped-pronto:hover   { background: #10b981; color: #fff; }
+    .btn-ped-entregue { background: rgba(255,255,255,0.07); color: var(--text2); border: 1.5px solid rgba(255,255,255,0.12); }
+    .btn-ped-entregue:hover { border-color: var(--gold); color: var(--gold); }
+    .btn-ped-fechar   { background: rgba(240,165,0,0.9); color: #0a0a0a;        border: 1.5px solid var(--gold); }
+    .btn-ped-fechar:hover   { background: var(--gold); }
+    .pedidos-vazio {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--text3);
+    }
+    .pedidos-vazio .vazio-icon { font-size: 48px; margin-bottom: 12px; }
+    .pedidos-contador {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #e74c3c;
+      color: white;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 10px;
+      font-weight: 700;
+      margin-left: 4px;
+      vertical-align: middle;
     }
 
     /* ── MODAL ADD/EDIT PRATO ── */
@@ -932,6 +1095,7 @@
   <nav class="admin-tabs">
     <button class="tab-btn active" data-tab="configuracoes">⚙️ Configurações</button>
     <button class="tab-btn" data-tab="cardapio">🍽️ Cardápio</button>
+    <button class="tab-btn" data-tab="pedidos">📋 Pedidos <span class="pedidos-contador" id="pedidosContador" style="display:none">0</span></button>
     <button class="tab-btn" data-tab="qrcodes">📱 QR Codes</button>
   </nav>
 
@@ -1063,7 +1227,33 @@
           <button class="btn-primary" onclick="abrirModalPrato()">+ Adicionar Primeiro Prato</button>
         </div>
 
-        <div class="pratos-grid" id="pratosGrid"></div>
+        <div class="pratos-lista" id="pratosGrid"></div>
+      </div>
+    </div>
+
+    <!-- TAB: Pedidos -->
+    <div class="tab-content" id="tab-pedidos" style="display:none;">
+      <div class="admin-section">
+        <div class="pedidos-topo">
+          <div>
+            <h2>📋 Pedidos em Tempo Real</h2>
+            <p class="section-desc">Acompanhe os pedidos de todas as mesas. Atualiza a cada 20 segundos.</p>
+          </div>
+          <button class="btn-secondary" id="btnAtualizarPedidos">↺ Atualizar</button>
+        </div>
+
+        <div class="pedidos-filtros">
+          <button class="ped-filtro active" data-status="ativos">🔴 Ativos</button>
+          <button class="ped-filtro" data-status="todos">Todos</button>
+          <button class="ped-filtro" data-status="fechado">✅ Fechados</button>
+        </div>
+
+        <div id="pedidosLoading" style="text-align:center;padding:40px;color:var(--text3)">⏳ Carregando pedidos...</div>
+        <div class="pedidos-vazio" id="pedidosVazio" style="display:none;">
+          <div class="vazio-icon">📭</div>
+          <p>Nenhum pedido encontrado.</p>
+        </div>
+        <div class="pedidos-lista" id="pedidosLista"></div>
       </div>
     </div>
 
@@ -1219,6 +1409,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script src="admin.js?v=11"></script>
+  <script src="admin.js?v=12"></script>
 </body>
 </html>

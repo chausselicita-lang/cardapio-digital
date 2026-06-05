@@ -325,37 +325,50 @@ $('#btnCopiarPix').addEventListener('click', () => {
 });
 
 $('#btnConfirmarPix').addEventListener('click', () => {
-  enviarWhatsApp('PIX');
-  fecharPagamento();
-  fecharCarrinho();
+  confirmarPedido('PIX');
 });
 
 // Cartão
 $('#btnCartao').addEventListener('click', () => {
   const config = carregarConfig();
-  if (config.linkCartao) {
-    window.open(config.linkCartao, '_blank');
-  } else {
-    mostrarToast('⚠️ Link do cartão não configurado');
-  }
-  enviarWhatsApp('Cartão (Mercado Pago)');
-  fecharPagamento();
-  fecharCarrinho();
+  if (config.linkCartao) window.open(config.linkCartao, '_blank');
+  else mostrarToast('⚠️ Link do cartão não configurado');
+  confirmarPedido('Cartão (Mercado Pago)');
 });
 
 // Dinheiro
 $('#btnDinheiro').addEventListener('click', () => {
-  enviarWhatsApp('Dinheiro');
-  fecharPagamento();
-  fecharCarrinho();
+  confirmarPedido('Dinheiro');
 });
 
 // Vale Refeição
 $('#btnVale').addEventListener('click', () => {
-  enviarWhatsApp('Vale Refeição (Alelo / Sodexo / VR)');
+  confirmarPedido('Vale Refeição');
+});
+
+// ===== CONFIRMAR PEDIDO — salva no Supabase + envia WhatsApp =====
+async function confirmarPedido(formaPagamento) {
+  await salvarPedidoSupabase(formaPagamento);
+  enviarWhatsApp(formaPagamento);
   fecharPagamento();
   fecharCarrinho();
-});
+}
+
+async function salvarPedidoSupabase(formaPagamento) {
+  if (typeof db === 'undefined' || typeof SUPA_RID === 'undefined') return;
+  const total = state.carrinho.reduce((s, i) => s + i.preco * i.qty, 0);
+  const itens = state.carrinho.map(i => ({ nome: i.nome, qty: i.qty, preco: i.preco, emoji: i.emoji || '🍽️' }));
+  try {
+    await db.from('cardapio_pedidos').insert({
+      restaurante_id: SUPA_RID,
+      mesa: state.mesa || 'Balcão',
+      itens,
+      total,
+      forma_pagamento: formaPagamento,
+      status: 'novo'
+    });
+  } catch(e) { /* falha silenciosa — WhatsApp ainda envia */ }
+}
 
 // ===== ENVIAR VIA WHATSAPP =====
 function enviarWhatsApp(formaPagamento) {

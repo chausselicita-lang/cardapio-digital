@@ -209,6 +209,7 @@ $$('.tab-btn').forEach(btn => {
     btn.classList.add('active');
     $(`#tab-${btn.dataset.tab}`).style.display = 'block';
     if (btn.dataset.tab === 'cardapio') carregarCardapio();
+    if (btn.dataset.tab === 'pedidos')  carregarPedidos();
   });
 });
 
@@ -260,7 +261,7 @@ async function carregarCardapio() {
   renderPratos();
 }
 
-// --- Renderizar grid ---
+// --- Renderizar lista vertical ---
 function renderPratos() {
   const grid  = $('#pratosGrid');
   const vazio = $('#pratosVazio');
@@ -283,39 +284,38 @@ function renderPratos() {
     const foto  = p.foto_url || p.foto || '';
     const disponivel = p.disponivel !== false;
 
-    const card = document.createElement('div');
-    card.className = `prato-card${disponivel ? '' : ' indisponivel'}`;
-    card.dataset.id = p.id;
-    card.innerHTML = `
+    const item = document.createElement('div');
+    item.className = `prato-item${disponivel ? '' : ' indisponivel'}`;
+    item.dataset.id = p.id;
+    item.innerHTML = `
       ${foto
-        ? `<img class="prato-foto" src="${foto}" alt="${p.nome}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="prato-foto-placeholder" style="display:none">🍽️</div>`
-        : `<div class="prato-foto-placeholder">🍽️</div>`}
-      <div class="prato-body">
-        <div class="prato-cat-tag">${cat}${!disponivel ? ' · <em>Indisponível</em>' : ''}</div>
-        <div class="prato-top">
+        ? `<div class="prato-item-foto"><img src="${foto}" alt="${p.nome}" onerror="this.parentElement.innerHTML='<div style=\\'width:72px;height:72px;background:#222;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:26px\\'>🍽️</div>'" /></div>`
+        : `<div class="prato-item-foto-ph">🍽️</div>`}
+      <div class="prato-item-info">
+        <div class="prato-item-top">
           <div class="prato-nome">${p.nome}</div>
           ${badge}
         </div>
-        ${p.descricao ? `<div class="prato-desc">${p.descricao}</div>` : ''}
-        <div class="prato-footer">
-          <div class="prato-preco">${preco}</div>
-          <div class="prato-acoes">
-            <button class="btn-prato-acao btn-prato-editar" data-id="${p.id}">✏️ Editar</button>
-            <button class="btn-prato-acao btn-prato-excluir" data-id="${p.id}" data-nome="${p.nome}">🗑️</button>
-          </div>
+        <div class="prato-item-meta">
+          <span class="prato-cat-tag">${cat}${!disponivel ? ' · Indisponível' : ''}</span>
+          <span class="prato-preco">${preco}</span>
         </div>
+        ${p.descricao ? `<div class="prato-desc">${p.descricao}</div>` : ''}
+      </div>
+      <div class="prato-item-acoes">
+        <button class="btn-editar-prato" data-id="${p.id}">✏️ Editar Prato</button>
+        <button class="btn-excluir-prato" data-id="${p.id}" data-nome="${p.nome}">🗑️ Excluir</button>
       </div>`;
-    grid.appendChild(card);
+    grid.appendChild(item);
   });
 
-  // Eventos nos botões
-  $$('.btn-prato-editar').forEach(btn => {
+  $$('.btn-editar-prato').forEach(btn => {
     btn.addEventListener('click', () => {
       const prato = pratosCache.find(p => String(p.id) === btn.dataset.id);
       if (prato) abrirModalPrato(prato);
     });
   });
-  $$('.btn-prato-excluir').forEach(btn => {
+  $$('.btn-excluir-prato').forEach(btn => {
     btn.addEventListener('click', () => confirmarExcluir(btn.dataset.id, btn.dataset.nome));
   });
 }
@@ -522,6 +522,136 @@ function gerarQRCodes() {
 
 // ===== IMPRIMIR =====
 $('#btnImprimirQR').addEventListener('click', () => window.print());
+
+// ===== PEDIDOS =====
+let pedidosFiltroAtivo = 'ativos';
+let pedidosAutoTimer = null;
+
+$$('.ped-filtro').forEach(btn => {
+  btn.addEventListener('click', () => {
+    $$('.ped-filtro').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    pedidosFiltroAtivo = btn.dataset.status;
+    carregarPedidos();
+  });
+});
+
+$('#btnAtualizarPedidos')?.addEventListener('click', carregarPedidos);
+
+async function carregarPedidos() {
+  const loading = $('#pedidosLoading');
+  const vazio   = $('#pedidosVazio');
+  const lista   = $('#pedidosLista');
+  if (!loading) return;
+
+  loading.style.display = 'block';
+  vazio.style.display   = 'none';
+  lista.innerHTML       = '';
+
+  if (typeof db === 'undefined') {
+    loading.textContent = '⚠️ Supabase não configurado.';
+    return;
+  }
+
+  let query = db.from('cardapio_pedidos')
+    .select('*')
+    .eq('restaurante_id', rid)
+    .order('created_at', { ascending: false });
+
+  if (pedidosFiltroAtivo === 'ativos') {
+    query = query.not('status', 'in', '("entregue","fechado")');
+  } else if (pedidosFiltroAtivo === 'fechado') {
+    query = query.eq('status', 'fechado');
+  }
+
+  const { data, error } = await query.limit(80);
+  loading.style.display = 'none';
+
+  if (error || !data || data.length === 0) {
+    vazio.style.display = 'block';
+    atualizarContadorPedidos(0);
+    return;
+  }
+
+  renderPedidos(data);
+  atualizarContadorPedidos(data.filter(p => p.status === 'novo').length);
+
+  clearTimeout(pedidosAutoTimer);
+  pedidosAutoTimer = setTimeout(carregarPedidos, 20000);
+}
+
+function atualizarContadorPedidos(n) {
+  const el = $('#pedidosContador');
+  if (!el) return;
+  if (n > 0) { el.textContent = n; el.style.display = 'inline-flex'; }
+  else { el.style.display = 'none'; }
+}
+
+const STATUS_LABEL = {
+  novo:        '🔴 Novo',
+  em_preparo:  '🟡 Em Preparo',
+  pronto:      '🟢 Pronto',
+  entregue:    '✅ Entregue',
+  fechado:     '💰 Conta Fechada',
+};
+
+function renderPedidos(pedidos) {
+  const lista = $('#pedidosLista');
+  lista.innerHTML = '';
+
+  pedidos.forEach(p => {
+    const hora  = new Date(p.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    const data  = new Date(p.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+    const total = parseFloat(p.total || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    const status = p.status || 'novo';
+    const itens  = Array.isArray(p.itens) ? p.itens : [];
+
+    const linhasItens = itens.map(it =>
+      `<div class="pedido-linha-item">${it.emoji || '•'} <strong>${it.nome}</strong> x${it.qty} — ${parseFloat(it.preco * it.qty).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</div>`
+    ).join('');
+
+    const botoesStatus = [];
+    if (status === 'novo')       botoesStatus.push(`<button class="btn-ped btn-ped-preparo" onclick="mudarStatusPedido('${p.id}','em_preparo')">👨‍🍳 Em Preparo</button>`);
+    if (status === 'em_preparo') botoesStatus.push(`<button class="btn-ped btn-ped-pronto"  onclick="mudarStatusPedido('${p.id}','pronto')">✅ Pronto</button>`);
+    if (status === 'pronto')     botoesStatus.push(`<button class="btn-ped btn-ped-entregue" onclick="mudarStatusPedido('${p.id}','entregue')">🚀 Entregue</button>`);
+    if (status !== 'fechado')    botoesStatus.push(`<button class="btn-ped btn-ped-fechar"  onclick="fecharContaPedido('${p.id}')">💰 Fechar Conta</button>`);
+
+    const card = document.createElement('div');
+    card.className = `pedido-card status-${status}`;
+    card.id = `pedido-${p.id}`;
+    card.innerHTML = `
+      <div class="pedido-header">
+        <span class="pedido-mesa">🪑 Mesa ${p.mesa || 'Balcão'}</span>
+        <span class="pedido-status-chip chip-${status}">${STATUS_LABEL[status] || status}</span>
+        <span class="pedido-hora">${data} ${hora}</span>
+      </div>
+      <div class="pedido-itens">${linhasItens}</div>
+      <div class="pedido-footer">
+        <div>
+          <span class="pedido-total">${total}</span>
+          <span class="pedido-pag">· ${p.forma_pagamento || ''}</span>
+        </div>
+        <div class="pedido-acoes">${botoesStatus.join('')}</div>
+      </div>`;
+    lista.appendChild(card);
+  });
+}
+
+async function mudarStatusPedido(id, novoStatus) {
+  if (typeof db === 'undefined') return;
+  const { error } = await db.from('cardapio_pedidos').update({ status: novoStatus }).eq('id', id);
+  if (error) { mostrarToast('❌ Erro ao atualizar status'); return; }
+  mostrarToast(`✅ Status: ${STATUS_LABEL[novoStatus]}`);
+  carregarPedidos();
+}
+
+async function fecharContaPedido(id) {
+  if (typeof db === 'undefined') return;
+  const { error } = await db.from('cardapio_pedidos').update({ status: 'fechado' }).eq('id', id);
+  if (error) { mostrarToast('❌ Erro ao fechar conta'); return; }
+  mostrarToast('💰 Conta fechada!');
+  carregarPedidos();
+}
 
 // ===== TOAST =====
 let toastTimer;
