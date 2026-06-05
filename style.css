@@ -28,7 +28,7 @@ html { scroll-behavior: smooth; font-size: 16px; }
 
 body {
   font-family: var(--font);
-  background: var(--surface2);
+  background: #111111;
   color: var(--text);
   min-height: 100vh;
   padding-bottom: 80px;
@@ -205,7 +205,7 @@ body {
   inset: 0;
   background:
     linear-gradient(160deg, rgba(4,2,0,0.80) 0%, rgba(255,107,0,0.18) 40%, rgba(4,2,0,0.85) 100%),
-    linear-gradient(180deg, transparent 60%, var(--surface2) 100%);
+    linear-gradient(180deg, transparent 60%, #111111 100%);
   pointer-events: none;
   z-index: 1;
 }
@@ -288,9 +288,9 @@ body {
   position: sticky;
   top: var(--header-h);
   z-index: 90;
-  background: var(--surface);
-  border-bottom: 2px solid var(--border);
-  box-shadow: 0 2px 12px var(--shadow);
+  background: #1a1a1a;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.4);
 }
 
 .categorias-scroll {
@@ -308,12 +308,12 @@ body {
 .cat-btn {
   flex-shrink: 0;
   background: none;
-  border: 2px solid var(--border);
+  border: 1.5px solid rgba(255,255,255,0.12);
   border-radius: 50px;
   padding: 7px 16px;
   font-size: 13px;
   font-weight: 500;
-  color: var(--text2);
+  color: rgba(255,255,255,0.6);
   cursor: pointer;
   transition: all 0.2s;
   font-family: var(--font);
@@ -381,7 +381,7 @@ body {
 .secao-header {
   margin-bottom: 20px;
   padding-bottom: 14px;
-  border-bottom: 2px solid var(--border);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
   display: flex;
   align-items: baseline;
   gap: 12px;
@@ -391,7 +391,7 @@ body {
   font-family: var(--font2);
   font-size: 22px;
   font-weight: 700;
-  color: var(--dark);
+  color: #FFFFFF;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -401,7 +401,7 @@ body {
 
 .secao-desc {
   font-size: 13px;
-  color: var(--text3);
+  color: rgba(255,255,255,0.4);
 }
 
 /* ===== GRID DE PRODUTOS ===== */
@@ -952,9 +952,9 @@ body {
 
 /* ===== SCROLLBAR ===== */
 ::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: var(--surface2); }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 5px; }
-::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+::-webkit-scrollbar-track { background: #111111; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 5px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
 
 /* ===== MESA BADGE NO HEADER ===== */
 .mesa-badge-header {
