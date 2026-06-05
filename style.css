@@ -417,23 +417,24 @@ body {
 
 /* ===== CARD DE PRODUTO ===== */
 .card-produto {
-  background: var(--surface);
+  background: #161616;
+  border: 1px solid rgba(255,255,255,0.06);
   border-radius: var(--radius);
   overflow: hidden;
-  box-shadow: 0 2px 12px var(--shadow);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.4);
   transition: transform 0.25s ease, box-shadow 0.25s ease;
   cursor: pointer;
   position: relative;
 }
 
 .card-produto:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 28px var(--shadow-md);
+  transform: scale(1.02);
+  box-shadow: 0 8px 32px rgba(240,165,0,0.18);
 }
 
 .card-produto.destaque {
-  border: 2px solid var(--primary);
-  box-shadow: 0 2px 12px var(--shadow-lg);
+  border: 2px solid var(--gold);
+  box-shadow: 0 2px 12px rgba(240,165,0,0.2);
 }
 
 .card-img-wrap { position: relative; }
@@ -445,7 +446,10 @@ body {
   justify-content: center;
   position: relative;
   overflow: hidden;
-  background: #e8d5c8;
+  background: #222222;
+  border-radius: 12px;
+  margin: 8px 8px 0;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
 }
 
 .card-img::after {
@@ -481,8 +485,8 @@ body {
   position: absolute;
   top: 10px;
   left: 10px;
-  background: var(--primary);
-  color: white;
+  background: var(--gold);
+  color: #1A0F00;
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
@@ -492,7 +496,7 @@ body {
   z-index: 2;
 }
 
-.card-tag.novo { background: #27ae60; }
+.card-tag.novo { background: #10b981; color: white; }
 .card-tag.chef { background: var(--gold); color: var(--dark); }
 
 .card-body { padding: 16px; }
@@ -500,14 +504,14 @@ body {
 .card-nome {
   font-size: 15px;
   font-weight: 700;
-  color: var(--dark);
+  color: #FFFFFF;
   margin-bottom: 6px;
   line-height: 1.3;
 }
 
 .card-desc {
   font-size: 12.5px;
-  color: var(--text2);
+  color: rgba(255,255,255,0.55);
   line-height: 1.5;
   margin-bottom: 14px;
   display: -webkit-box;
@@ -524,39 +528,44 @@ body {
 }
 
 .card-preco {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--gold);
 }
 
 .card-preco-old {
   font-size: 12px;
-  color: var(--text3);
+  color: rgba(255,255,255,0.35);
   text-decoration: line-through;
   display: block;
   margin-bottom: 2px;
 }
 
 .btn-add {
-  background: var(--primary);
-  color: white;
-  border: none;
+  background: #1a1a1a;
+  color: var(--gold);
+  border: 1.5px solid var(--gold);
   border-radius: 50px;
   padding: 8px 16px;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.18s ease;
   font-family: var(--font);
   white-space: nowrap;
 }
 
 .btn-add:hover {
-  background: var(--primary-dark);
+  background: var(--gold);
+  color: #1A0F00;
   transform: scale(1.05);
 }
 
-.btn-add:active { transform: scale(0.97); }
+.btn-add:active {
+  transform: scale(0.95);
+  background: #d4920a;
+  border-color: #d4920a;
+}
 
 /* ===== CARD COMBO ===== */
 .card-combo .card-img { height: 130px; }
@@ -571,10 +580,10 @@ body {
 
 .combo-itens li {
   font-size: 12px;
-  color: var(--text2);
+  color: rgba(255,255,255,0.6);
 }
 
-.combo-itens li:last-child { color: #27ae60; font-weight: 600; }
+.combo-itens li:last-child { color: #10b981; font-weight: 600; }
 
 /* ===== SEM RESULTADOS ===== */
 .sem-resultados {
