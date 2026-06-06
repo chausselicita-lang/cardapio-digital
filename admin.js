@@ -929,11 +929,82 @@ async function renderRelatorios() {
 }
 
 function exportarPDF() {
-  const config = carregarConfig();
-  document.getElementById('rel-print-nome').textContent = config.nomeRestaurante || 'Cardápio Digital';
-  document.getElementById('rel-print-data').textContent =
-    'Relatório gerado em ' + new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
-  window.print();
+  const content = document.getElementById('rel-content');
+  if (!content || !content.innerHTML.trim()) {
+    mostrarToast('⚠️ Aguarde o relatório carregar');
+    return;
+  }
+
+  const config     = carregarConfig();
+  const nomeEstab  = config.nomeRestaurante || 'Cardápio Digital';
+  const tipoEstab  = config.tipoEstab       || 'Bar & Restaurante';
+  const dataGerada = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+
+  const pw = window.open('', '_blank', 'width=960,height=720');
+  if (!pw) { mostrarToast('⚠️ Permita pop-ups para exportar o PDF'); return; }
+
+  pw.document.write(`<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Relatório — ${nomeEstab}</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Helvetica Neue',Arial,sans-serif;background:#fff;color:#111;padding:28px 32px;font-size:13px}
+    .ph{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:22px;padding-bottom:12px;border-bottom:2px solid #e5e7eb}
+    .ph-nome{font-size:20px;font-weight:800}
+    .ph-tipo{font-size:12px;color:#777;margin-top:2px}
+    .ph-data{font-size:11px;color:#9ca3af;text-align:right}
+    .rel-section{margin-bottom:24px}
+    .sec-hdr{font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #e5e7eb}
+    .rel-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .rel-card{background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:14px}
+    .rel-card.wide{grid-column:span 3}
+    .rel-card-lbl{font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+    .rel-card-val{font-size:20px;font-weight:800;color:#111}
+    .rel-card-val.green{color:#065f46}
+    .rel-card-val.accent{color:#92400e}
+    .rel-card-sub{font-size:11px;color:#9ca3af;margin-top:4px}
+    .rel-chart-wrap{background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:16px 14px 8px}
+    .rel-chart{display:flex;align-items:flex-end;gap:4px;height:90px}
+    .chart-col{flex:1;display:flex;align-items:flex-end;justify-content:center}
+    .chart-bar{width:100%;border-radius:3px 3px 0 0;background:rgba(0,0,0,0.1);min-height:2px}
+    .chart-bar.nonzero{background:rgba(0,0,0,0.4)}
+    .chart-bar.today{background:#374151}
+    .chart-days{display:flex;gap:4px;margin-top:5px}
+    .chart-day{flex:1;text-align:center;font-size:10px;color:#9ca3af}
+    .chart-day.today{color:#374151;font-weight:700}
+    .pag-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #e5e7eb;font-size:13px}
+    .pag-row:last-child{border-bottom:none}
+    .pag-nome{color:#374151}
+    .pag-total{font-weight:700;color:#374151}
+    .pag-cnt{font-size:11px;color:#9ca3af;margin-left:6px}
+    .rank-item{padding:7px 0;border-bottom:1px solid #e5e7eb}
+    .rank-item:last-child{border-bottom:none}
+    .rank-item-hdr{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+    .rank-pos{font-size:11px;color:#9ca3af;width:22px;flex-shrink:0}
+    .rank-nome{flex:1;font-size:13px;font-weight:600;color:#111}
+    .rank-val{font-size:12px;color:#6b7280;white-space:nowrap}
+    .rank-track{height:4px;background:#e5e7eb;border-radius:4px;overflow:hidden}
+    .rank-fill{height:100%;background:#374151;border-radius:4px}
+    .btn-imprimir{position:fixed;bottom:20px;right:20px;background:#E8420A;color:#fff;border:none;border-radius:10px;padding:11px 22px;font-size:14px;font-weight:700;cursor:pointer;font-family:sans-serif;box-shadow:0 4px 16px rgba(232,66,10,0.4)}
+    @media print{@page{size:A4;margin:15mm 14mm}body{padding:0}.btn-imprimir{display:none}}
+  </style>
+</head>
+<body>
+  <div class="ph">
+    <div>
+      <div class="ph-nome">🍽️ ${nomeEstab}</div>
+      <div class="ph-tipo">${tipoEstab}</div>
+    </div>
+    <div class="ph-data">Relatório de Faturamento<br>${dataGerada}</div>
+  </div>
+  ${content.innerHTML}
+  <button class="btn-imprimir" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+</body>
+</html>`);
+  pw.document.close();
+  setTimeout(() => pw.print(), 600);
 }
 
 // ===== TOAST =====
