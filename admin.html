@@ -30,32 +30,44 @@
       color: var(--text);
       min-height: 100vh;
       padding-bottom: 60px;
+      overflow-x: hidden;
     }
 
     /* HEADER */
     .admin-header {
       background: #0a0a0a;
       color: white;
-      padding: 0 24px;
+      padding: 0 20px;
       height: 60px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 12px;
       position: sticky;
       top: 0;
       z-index: 100;
       box-shadow: 0 2px 16px rgba(0,0,0,0.6);
       border-bottom: 1px solid rgba(255,255,255,0.06);
+      min-width: 0;
     }
     .admin-header-logo {
       display: flex;
       align-items: center;
       gap: 10px;
-      font-size: 16px;
-      font-weight: 700;
+      min-width: 0;
+      flex-shrink: 1;
+      overflow: hidden;
     }
-    .admin-header-logo span { font-size: 22px; }
-    .admin-header-sub { font-size: 11px; color: rgba(255,255,255,0.4); margin-left: 4px; }
+    .admin-header-logo > span { font-size: 22px; flex-shrink: 0; }
+    .admin-header-logo-text { display: flex; flex-direction: column; min-width: 0; }
+    .admin-header-nome {
+      font-size: 15px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .admin-header-sub { font-size: 11px; color: rgba(255,255,255,0.38); }
     .btn-ver-cardapio {
       background: transparent;
       color: var(--gold);
@@ -79,34 +91,44 @@
       background: #161616;
       border-bottom: 1px solid rgba(255,255,255,0.07);
       display: flex;
-      padding: 0 24px;
-      gap: 4px;
+      padding: 0 16px;
+      gap: 0;
       position: sticky;
       top: 60px;
       z-index: 99;
       box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
     }
+    .admin-tabs::-webkit-scrollbar { display: none; }
     .tab-btn {
       background: none;
       border: none;
       border-bottom: 3px solid transparent;
-      padding: 14px 20px;
-      font-size: 14px;
+      padding: 14px 16px;
+      font-size: 13px;
       font-weight: 600;
       color: var(--text3);
       cursor: pointer;
       font-family: var(--font);
-      transition: all 0.2s;
-      margin-bottom: -2px;
+      transition: color 0.2s, border-color 0.2s;
+      margin-bottom: -1px;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
-    .tab-btn:hover { color: var(--gold); }
+    .tab-btn:hover { color: var(--text2); }
     .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
 
     /* CONTEÚDO */
     .admin-content {
       max-width: 860px;
       margin: 0 auto;
-      padding: 32px 24px;
+      padding: 24px 16px;
+      overflow-x: hidden;
+    }
+    @media (min-width: 600px) {
+      .admin-content { padding: 32px 24px; }
     }
     .admin-section {
       background: #161616;
@@ -1226,11 +1248,13 @@
   <header class="admin-header">
     <div class="admin-header-logo">
       <span>🍽️</span>
-      Sabor & Arte
-      <span class="admin-header-sub">| Painel Admin</span>
+      <div class="admin-header-logo-text">
+        <span class="admin-header-nome" id="adminNomeEstab">Cardápio Digital</span>
+        <span class="admin-header-sub">Painel Administrativo</span>
+      </div>
     </div>
-    <div style="display:flex;gap:8px;align-items:center;">
-      <a href="index.html" class="btn-ver-cardapio">↗ Ver Cardápio</a>
+    <div style="display:flex;gap:8px;align-items:center;flex-shrink:0;">
+      <a href="index.html" class="btn-ver-cardapio" id="linkVerCardapio">↗ Cardápio</a>
       <button class="btn-sair" id="btnSair">Sair</button>
     </div>
   </header>

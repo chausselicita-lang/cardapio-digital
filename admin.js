@@ -102,9 +102,9 @@ $('#btnSair').addEventListener('click', () => {
 // ===== CARREGAR DADOS DO RESTAURANTE =====
 function carregarDadosRestaurante() {
   const config = carregarConfig();
-  const nome = config.nomeRestaurante || 'Sabor & Arte';
-  const sub = document.querySelector('.admin-header-sub');
-  if (sub) sub.textContent = `| ${nome}`;
+  const nome = config.nomeRestaurante || 'Cardápio Digital';
+  const el = document.getElementById('adminNomeEstab');
+  if (el) el.textContent = nome;
 }
 
 // Verifica sessão ao carregar
