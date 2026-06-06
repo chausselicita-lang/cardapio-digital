@@ -426,34 +426,6 @@
       font-size: 13px;
     }
 
-    /* IMPRESSÃO */
-    @media print {
-      body * { visibility: hidden; }
-      .qr-grid, .qr-grid * { visibility: visible; }
-      .qr-grid {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 8px;
-        padding: 12px;
-      }
-      .qr-card {
-        border: 1px solid #ccc;
-        page-break-inside: avoid;
-        padding: 10px;
-        background: #fff !important;
-        color: #000 !important;
-      }
-      .qr-card-titulo {
-        color: #b07800 !important;
-        border-bottom-color: #b07800 !important;
-      }
-      .qr-card-info strong { color: #000 !important; }
-      .qr-url { color: #666 !important; }
-    }
-
     @media (max-width: 600px) {
       .admin-content { padding: 20px 16px; }
       .admin-section { padding: 20px; }

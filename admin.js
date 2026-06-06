@@ -538,8 +538,52 @@ function gerarQRCodes() {
   setTimeout(() => $('#qrActionsWrap').scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
 }
 
-// ===== IMPRIMIR =====
-$('#btnImprimirQR').addEventListener('click', () => window.print());
+// ===== IMPRIMIR QR CODES =====
+$('#btnImprimirQR').addEventListener('click', () => {
+  const cards = document.querySelectorAll('.qr-card');
+  if (!cards.length) { mostrarToast('⚠️ Gere os QR Codes primeiro'); return; }
+
+  const cardsHtml = Array.from(cards).map(card => {
+    const titulo  = card.querySelector('.qr-card-titulo')?.textContent || '';
+    const canvas  = card.querySelector('.qr-code canvas');
+    const mesa    = card.querySelector('.qr-card-info strong')?.textContent || '';
+    const url     = card.querySelector('.qr-url')?.textContent || '';
+    const imgSrc  = canvas ? canvas.toDataURL('image/png') : '';
+    return `<div class="qr-card">
+      <div class="qr-titulo">${titulo}</div>
+      ${imgSrc ? `<img src="${imgSrc}" width="150" height="150" />` : ''}
+      <div class="qr-info"><strong>${mesa}</strong><span class="qr-url">${url}</span></div>
+    </div>`;
+  }).join('');
+
+  const pw = window.open('', '_blank', 'width=960,height=720');
+  if (!pw) { mostrarToast('⚠️ Permita pop-ups para imprimir'); return; }
+
+  pw.document.write(`<!DOCTYPE html><html lang="pt-BR"><head>
+<meta charset="UTF-8">
+<title>QR Codes — Cardápio Digital</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Helvetica Neue',Arial,sans-serif;background:#fff;padding:20px}
+  h2{text-align:center;font-size:16px;color:#555;margin-bottom:16px;font-weight:400}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .qr-card{border:1px solid #ddd;border-radius:10px;padding:12px;text-align:center;break-inside:avoid;background:#fff}
+  .qr-titulo{font-size:9px;font-weight:700;color:#b07800;text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #e5e7eb}
+  .qr-card img{display:block;margin:0 auto 8px;border-radius:4px}
+  .qr-info strong{display:block;font-size:13px;color:#111;margin-bottom:3px}
+  .qr-url{font-size:8px;color:#aaa;word-break:break-all}
+  .btn-imprimir{position:fixed;bottom:20px;right:20px;background:#E8420A;color:#fff;border:none;border-radius:10px;padding:11px 22px;font-size:14px;font-weight:700;cursor:pointer;font-family:sans-serif;z-index:9}
+  @media print{@page{size:A4;margin:12mm}.btn-imprimir{display:none!important}.grid{grid-template-columns:repeat(4,1fr)}}
+  @media(max-width:600px){.grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head><body>
+<h2>QR Codes — Mesas</h2>
+<div class="grid">${cardsHtml}</div>
+<button class="btn-imprimir" onclick="window.print()">🖨️ Imprimir QR Codes</button>
+</body></html>`);
+  pw.document.close();
+  setTimeout(() => pw.print(), 600);
+});
 
 // ===== PEDIDOS =====
 let pedidosFiltroAtivo = 'ativos';
