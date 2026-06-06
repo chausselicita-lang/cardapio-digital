@@ -881,6 +881,42 @@
     .btn-ped-fechar:hover   { background: var(--gold); }
     .btn-ped-confirmar-pag  { background: rgba(16,185,129,0.15); color: #10b981; border: 1.5px solid rgba(16,185,129,0.35); }
     .btn-ped-confirmar-pag:hover { background: #10b981; color: #fff; }
+    .btn-ped-print { background: rgba(255,255,255,0.06); color: var(--text2); border: 1.5px solid rgba(255,255,255,0.1); padding: 8px 11px; }
+    .btn-ped-print:hover { background: rgba(255,255,255,0.12); color: #fff; }
+
+    /* Toggle WhatsApp comprovante */
+    .config-toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .config-toggle-row:last-child { border-bottom: none; }
+    .config-toggle-label { display: flex; align-items: center; gap: 12px; }
+    .config-toggle-label .config-item-icon { font-size: 20px; }
+    .config-toggle-text .config-item-label { font-size: 13px; color: var(--text); font-weight: 600; }
+    .config-toggle-text .config-item-val   { font-size: 12px; color: var(--text3); margin-top: 1px; }
+    .toggle-switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute; inset: 0;
+      background: rgba(255,255,255,0.12);
+      border-radius: 24px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .toggle-slider:before {
+      content: '';
+      position: absolute;
+      width: 18px; height: 18px;
+      left: 3px; bottom: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: 0.2s;
+    }
+    .toggle-switch input:checked + .toggle-slider { background: var(--success); }
+    .toggle-switch input:checked + .toggle-slider:before { transform: translateX(20px); }
 
     /* Badge de status de pagamento */
     .pedido-footer-left { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; }
@@ -1131,6 +1167,44 @@
         <div class="config-list">
 
           <!-- PIX -->
+          <div class="config-item" id="ci-nome">
+            <div class="config-item-main" onclick="toggleConfig('nomeEstab')">
+              <div class="config-item-icon">🏪</div>
+              <div class="config-item-body">
+                <div class="config-item-label">Nome do Estabelecimento</div>
+                <div class="config-item-val" id="val-nome">Não configurado</div>
+              </div>
+              <button class="btn-config-edit">✏️ Editar</button>
+            </div>
+            <div class="config-edit-panel">
+              <input type="text" id="inp-nome" placeholder="Ex: Sabor & Arte" />
+              <small>Aparece no cabeçalho do comprovante.</small>
+              <div class="config-edit-actions">
+                <button class="btn-secondary btn-sm" onclick="fecharConfig('nomeEstab')">Cancelar</button>
+                <button class="btn-primary btn-sm" onclick="salvarConfigItem('nomeEstab')">💾 Salvar</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="config-item" id="ci-tipo">
+            <div class="config-item-main" onclick="toggleConfig('tipoEstab')">
+              <div class="config-item-icon">🍴</div>
+              <div class="config-item-body">
+                <div class="config-item-label">Tipo do Estabelecimento</div>
+                <div class="config-item-val" id="val-tipo">Não configurado</div>
+              </div>
+              <button class="btn-config-edit">✏️ Editar</button>
+            </div>
+            <div class="config-edit-panel">
+              <input type="text" id="inp-tipo" placeholder="Ex: Bar & Restaurante" />
+              <small>Linha de subtítulo no comprovante.</small>
+              <div class="config-edit-actions">
+                <button class="btn-secondary btn-sm" onclick="fecharConfig('tipoEstab')">Cancelar</button>
+                <button class="btn-primary btn-sm" onclick="salvarConfigItem('tipoEstab')">💾 Salvar</button>
+              </div>
+            </div>
+          </div>
+
           <div class="config-item" id="ci-pix">
             <div class="config-item-main" onclick="toggleConfig('pix')">
               <div class="config-item-icon">💳</div>
@@ -1208,6 +1282,20 @@
                 <button class="btn-primary btn-sm" onclick="salvarConfigItem('senha')">💾 Salvar</button>
               </div>
             </div>
+          </div>
+
+          <div class="config-toggle-row">
+            <div class="config-toggle-label">
+              <div class="config-item-icon">💬</div>
+              <div class="config-toggle-text">
+                <div class="config-item-label">Botão WhatsApp no Comprovante</div>
+                <div class="config-item-val">Exibir botão "Enviar via WhatsApp" para o cliente</div>
+              </div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="toggleWhatsRecibo" checked onchange="salvarToggleWhats()" />
+              <span class="toggle-slider"></span>
+            </label>
           </div>
 
         </div>

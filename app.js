@@ -346,22 +346,22 @@ $('#btnVale').addEventListener('click', () => {
   confirmarPedido('Vale Refeição');
 });
 
-// ===== CONFIRMAR PEDIDO — salva no Supabase + envia WhatsApp =====
+// ===== CONFIRMAR PEDIDO — salva no Supabase + exibe comprovante =====
 async function confirmarPedido(formaPagamento) {
-  await salvarPedidoSupabase(formaPagamento);
-  enviarWhatsApp(formaPagamento);
+  const pedido = await salvarPedidoSupabase(formaPagamento);
   fecharPagamento();
   fecharCarrinho();
+  mostrarRecibo(formaPagamento, pedido?.id);
 }
 
 async function salvarPedidoSupabase(formaPagamento) {
-  if (typeof db === 'undefined' || typeof SUPA_RID === 'undefined') return;
+  if (typeof db === 'undefined' || typeof SUPA_RID === 'undefined') return null;
   const total = state.carrinho.reduce((s, i) => s + i.preco * i.qty, 0);
   const itens = state.carrinho.map(i => ({ nome: i.nome, qty: i.qty, preco: i.preco, emoji: i.emoji || '🍽️' }));
   const payment_status = ['Dinheiro', 'Vale Refeição'].includes(formaPagamento)
     ? 'presencial'
     : 'pendente';
-  const { error } = await db.from('cardapio_pedidos').insert({
+  const { data, error } = await db.from('cardapio_pedidos').insert({
     restaurante_id: SUPA_RID,
     mesa: state.mesa || 'Balcão',
     itens,
@@ -369,8 +369,9 @@ async function salvarPedidoSupabase(formaPagamento) {
     forma_pagamento: formaPagamento,
     status: 'novo',
     payment_status
-  });
+  }).select().single();
   if (error) console.error('[Pedido Supabase]', error.message, error);
+  return data || null;
 }
 
 // ===== ENVIAR VIA WHATSAPP =====
@@ -620,6 +621,119 @@ async function carregarCardapioSupabase() {
     console.warn('Supabase indisponível, usando itens estáticos.', err);
   }
 }
+
+// ===== COMPROVANTE =====
+let reciboFormaPag = '';
+
+function mostrarRecibo(formaPagamento, pedidoId) {
+  const config = carregarConfig();
+
+  const num = pedidoId
+    ? '#' + pedidoId.replace(/-/g, '').slice(0, 6).toUpperCase()
+    : '#' + Date.now().toString().slice(-4);
+
+  const agora = new Date();
+  const dataHora = agora.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })
+    + ' ' + agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+  const total = state.carrinho.reduce((s, i) => s + i.preco * i.qty, 0);
+
+  document.getElementById('rcNome').textContent = config.nomeRestaurante || 'Sabor & Arte';
+  document.getElementById('rcSub').textContent  = config.tipoEstab || 'Bar & Restaurante';
+  document.getElementById('rcNumero').textContent   = num;
+  document.getElementById('rcMesa').textContent     = state.mesa ? `Mesa ${state.mesa}` : 'Balcão';
+  document.getElementById('rcData').textContent     = dataHora;
+  document.getElementById('rcTotal').textContent    = formatarPreco(total);
+  document.getElementById('rcPagamento').textContent = formaPagamento;
+
+  document.getElementById('rcItens').innerHTML = state.carrinho.map(it => `
+    <div class="rc-item">
+      <div class="rc-item-nome">${it.emoji} ${it.nome}<span class="rc-item-qty"> x${it.qty}</span></div>
+      <div class="rc-item-preco">${formatarPreco(it.preco * it.qty)}</div>
+    </div>`).join('');
+
+  reciboFormaPag = formaPagamento;
+  const mostrarWhats = config.mostrarWhatsRecibo !== false;
+  document.getElementById('rcBtnWhats').style.display = mostrarWhats ? '' : 'none';
+
+  document.getElementById('rcOverlay').classList.add('open');
+  document.getElementById('rcModal').classList.add('open');
+}
+
+function fecharRecibo() {
+  document.getElementById('rcOverlay').classList.remove('open');
+  document.getElementById('rcModal').classList.remove('open');
+  state.carrinho = [];
+  atualizarCarrinho();
+  mostrarToast('✅ Pedido registrado com sucesso!');
+}
+
+function imprimirRecibo() {
+  const config = carregarConfig();
+  const nomeEstab = document.getElementById('rcNome').textContent;
+  const subEstab  = document.getElementById('rcSub').textContent;
+  const numero    = document.getElementById('rcNumero').textContent;
+  const mesa      = document.getElementById('rcMesa').textContent;
+  const dataHora  = document.getElementById('rcData').textContent;
+  const total     = document.getElementById('rcTotal').textContent;
+  const pagamento = document.getElementById('rcPagamento').textContent;
+  const itensHtml = document.getElementById('rcItens').innerHTML;
+
+  const pw = window.open('', '_blank', 'width=400,height=680');
+  pw.document.write(`<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Comprovante ${numero}</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Courier New',Courier,monospace;background:#fff;color:#111;padding:20px 24px;max-width:300px;margin:0 auto;font-size:13px}
+    .rc-header{text-align:center;margin-bottom:10px}
+    .rc-icon{font-size:28px;display:block;margin-bottom:6px}
+    .rc-estab-nome{font-size:16px;font-weight:bold}
+    .rc-estab-sub{font-size:11px;color:#666;margin-top:2px}
+    .rc-dots{text-align:center;color:#bbb;letter-spacing:3px;font-size:10px;margin:10px 0}
+    .rc-meta-row{display:flex;justify-content:space-between;padding:3px 0;font-size:12px;color:#333}
+    .rc-meta-row span:first-child{color:#888}
+    .rc-meta-row strong{font-weight:700;color:#111}
+    .rc-item{display:flex;justify-content:space-between;align-items:flex-start;padding:5px 0;border-bottom:1px dotted #ddd;font-size:12px}
+    .rc-item:last-child{border-bottom:none}
+    .rc-item-nome{flex:1;line-height:1.4}
+    .rc-item-qty{color:#aaa;font-size:11px}
+    .rc-item-preco{font-weight:700;margin-left:10px;white-space:nowrap}
+    .rc-total-row{display:flex;justify-content:space-between;font-weight:bold;font-size:15px;padding:5px 0}
+    .rc-pag-row{display:flex;justify-content:space-between;font-size:11px;color:#777;padding:2px 0}
+    .rc-thanks{text-align:center;font-size:11px;color:#aaa;margin-top:14px}
+    @media print{body{padding:0;max-width:100%}}
+  </style>
+</head>
+<body>
+  <div class="rc-header">
+    <span class="rc-icon">🍽️</span>
+    <div class="rc-estab-nome">${nomeEstab}</div>
+    <div class="rc-estab-sub">${subEstab}</div>
+  </div>
+  <div class="rc-dots">· · · · · · · · · · · ·</div>
+  <div class="rc-meta-row"><span>Pedido</span><strong>${numero}</strong></div>
+  <div class="rc-meta-row"><span>Mesa</span><span>${mesa}</span></div>
+  <div class="rc-meta-row"><span>Data / Hora</span><span>${dataHora}</span></div>
+  <div class="rc-dots">· · · · · · · · · · · ·</div>
+  ${itensHtml}
+  <div class="rc-dots">· · · · · · · · · · · ·</div>
+  <div class="rc-total-row"><span>TOTAL</span><span>${total}</span></div>
+  <div class="rc-pag-row"><span>Pagamento</span><span>${pagamento}</span></div>
+  <div class="rc-dots">· · · · · · · · · · · ·</div>
+  <p class="rc-thanks">Obrigado pela preferência! 🙏</p>
+</body>
+</html>`);
+  pw.document.close();
+  setTimeout(() => { pw.print(); }, 450);
+}
+
+document.getElementById('rcBtnPrint').addEventListener('click', imprimirRecibo);
+document.getElementById('rcBtnWhats').addEventListener('click', () => enviarWhatsApp(reciboFormaPag));
+document.getElementById('rcBtnFechar').addEventListener('click', fecharRecibo);
+document.getElementById('rcOverlay').addEventListener('click', fecharRecibo);
 
 // ===== INICIALIZAR =====
 atualizarCarrinho();

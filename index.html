@@ -6,7 +6,7 @@
   <title>Cardápio Digital — Bar & Restaurante</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=9" />
+  <link rel="stylesheet" href="style.css?v=10" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
 </head>
@@ -898,7 +898,39 @@
     </div>
   </div>
 
-  <script src="app.js?v=8"></script>
+  <!-- COMPROVANTE DO PEDIDO -->
+  <div class="rc-overlay" id="rcOverlay"></div>
+  <div class="rc-modal" id="rcModal">
+    <div class="rc-wrap">
+      <div class="rc-content" id="rcContent">
+        <div class="rc-header">
+          <span class="rc-icon">🍽️</span>
+          <div class="rc-estab-nome" id="rcNome">Sabor &amp; Arte</div>
+          <div class="rc-estab-sub" id="rcSub">Bar &amp; Restaurante</div>
+        </div>
+        <div class="rc-dots">· · · · · · · · · · · · · ·</div>
+        <div class="rc-meta">
+          <div class="rc-meta-row"><span>Pedido</span><strong id="rcNumero">#—</strong></div>
+          <div class="rc-meta-row"><span>Mesa</span><span id="rcMesa">—</span></div>
+          <div class="rc-meta-row"><span>Data / Hora</span><span id="rcData">—</span></div>
+        </div>
+        <div class="rc-dots">· · · · · · · · · · · · · ·</div>
+        <div class="rc-itens" id="rcItens"></div>
+        <div class="rc-dots">· · · · · · · · · · · · · ·</div>
+        <div class="rc-total-row"><span>TOTAL</span><strong id="rcTotal">—</strong></div>
+        <div class="rc-pag-row"><span>Pagamento</span><span id="rcPagamento">—</span></div>
+        <div class="rc-dots">· · · · · · · · · · · · · ·</div>
+        <p class="rc-thanks">Obrigado pela preferência! 🙏</p>
+      </div>
+      <div class="rc-acoes">
+        <button class="rc-btn rc-btn-print" id="rcBtnPrint">🖨️ Imprimir Comprovante</button>
+        <button class="rc-btn rc-btn-whats" id="rcBtnWhats">💬 Enviar via WhatsApp</button>
+        <button class="rc-btn rc-btn-fechar" id="rcBtnFechar">✓ Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js?v=9"></script>
   <script>
     // Carrega dados do restaurante se vier via ?rid=
     (async () => {

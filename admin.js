@@ -115,10 +115,12 @@ const autoUrl = window.location.href.replace(/[?#].*$/, '').replace(/admin\.html
 
 // Mapeamento: chave interna → { storageKey, inputId, valId, itemId, label }
 const CONFIG_MAP = {
-  pix:      { key: 'chavePix',   inputId: 'inp-pix',      valId: 'val-pix',      itemId: 'ci-pix'      },
-  cartao:   { key: 'linkCartao', inputId: 'inp-cartao',   valId: 'val-cartao',   itemId: 'ci-cartao'   },
-  whatsapp: { key: 'whatsapp',   inputId: 'inp-whatsapp', valId: 'val-whatsapp', itemId: 'ci-whatsapp' },
-  senha:    { key: 'senhaAdmin', inputId: 'inp-senha',    valId: 'val-senha',    itemId: 'ci-senha'    },
+  nomeEstab:{ key: 'nomeRestaurante', inputId: 'inp-nome',     valId: 'val-nome',     itemId: 'ci-nome'     },
+  tipoEstab:{ key: 'tipoEstab',       inputId: 'inp-tipo',     valId: 'val-tipo',     itemId: 'ci-tipo'     },
+  pix:      { key: 'chavePix',        inputId: 'inp-pix',      valId: 'val-pix',      itemId: 'ci-pix'      },
+  cartao:   { key: 'linkCartao',      inputId: 'inp-cartao',   valId: 'val-cartao',   itemId: 'ci-cartao'   },
+  whatsapp: { key: 'whatsapp',        inputId: 'inp-whatsapp', valId: 'val-whatsapp', itemId: 'ci-whatsapp' },
+  senha:    { key: 'senhaAdmin',      inputId: 'inp-senha',    valId: 'val-senha',    itemId: 'ci-senha'    },
 };
 
 function renderConfigList() {
@@ -181,11 +183,26 @@ async function salvarConfigItem(name) {
 
   document.getElementById(itemId).classList.remove('open');
   renderConfigList();
-  mostrarToast('✅ ' + ({ pix:'Chave PIX', cartao:'Link do Cartão', whatsapp:'WhatsApp', senha:'Senha' }[name]) + ' salvo!');
+  mostrarToast('✅ ' + ({ nomeEstab:'Nome', tipoEstab:'Tipo', pix:'Chave PIX', cartao:'Link do Cartão', whatsapp:'WhatsApp', senha:'Senha' }[name]) + ' salvo!');
 }
 
 // Inicializa lista ao carregar
 renderConfigList();
+
+// Toggle: mostrar WhatsApp no comprovante do cliente
+function renderToggleWhats() {
+  const cfg = carregarConfig();
+  const el = document.getElementById('toggleWhatsRecibo');
+  if (el) el.checked = cfg.mostrarWhatsRecibo !== false;
+}
+function salvarToggleWhats() {
+  const el = document.getElementById('toggleWhatsRecibo');
+  if (!el) return;
+  const cfg = { ...carregarConfig(), mostrarWhatsRecibo: el.checked };
+  salvarConfig(cfg);
+  mostrarToast(el.checked ? '✅ Botão WhatsApp ativado no comprovante' : '✅ Botão WhatsApp oculto no comprovante');
+}
+renderToggleWhats();
 
 // URL base e num mesas para o tab de QR
 $('#urlBase').value  = carregarConfig().urlBase  || (rid ? `${autoUrl}?rid=${rid}` : autoUrl);
@@ -526,6 +543,7 @@ $('#btnImprimirQR').addEventListener('click', () => window.print());
 // ===== PEDIDOS =====
 let pedidosFiltroAtivo = 'ativos';
 let pedidosAutoTimer = null;
+let pedidosCache = [];
 
 $$('.ped-filtro').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -573,6 +591,7 @@ async function carregarPedidos() {
     return;
   }
 
+  pedidosCache = data;
   renderPedidos(data);
   atualizarContadorPedidos(data.filter(p => p.status === 'novo').length);
 
@@ -627,6 +646,7 @@ function renderPedidos(pedidos) {
     if (status === 'em_preparo') botoesStatus.push(`<button class="btn-ped btn-ped-pronto"  onclick="mudarStatusPedido('${p.id}','pronto')">✅ Pronto</button>`);
     if (status === 'pronto')     botoesStatus.push(`<button class="btn-ped btn-ped-entregue" onclick="mudarStatusPedido('${p.id}','entregue')">🚀 Entregue</button>`);
     if (status !== 'fechado')    botoesStatus.push(`<button class="btn-ped btn-ped-fechar"  onclick="fecharContaPedido('${p.id}')">💰 Fechar Conta</button>`);
+    botoesStatus.push(`<button class="btn-ped btn-ped-print" onclick="imprimirPedidoAdmin('${p.id}')" title="Imprimir nota">🖨️</button>`);
 
     const card = document.createElement('div');
     card.className = `pedido-card status-${status}${payStatus === 'pendente' ? ' pag-pendente' : ''}`;
@@ -672,6 +692,78 @@ async function confirmarPagamento(id) {
   if (error) { mostrarToast('❌ Erro ao confirmar pagamento'); return; }
   mostrarToast('✅ Pagamento confirmado!');
   carregarPedidos();
+}
+
+function imprimirPedidoAdmin(id) {
+  const p = pedidosCache.find(x => x.id === id);
+  if (!p) return;
+
+  const config     = carregarConfig();
+  const nomeEstab  = config.nomeRestaurante || 'Sabor & Arte';
+  const subEstab   = config.tipoEstab       || 'Bar & Restaurante';
+  const num        = '#' + p.id.replace(/-/g, '').slice(0, 6).toUpperCase();
+  const agora      = new Date(p.created_at);
+  const dataHora   = agora.toLocaleDateString('pt-BR') + ' ' + agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  const total      = parseFloat(p.total || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const itens      = Array.isArray(p.itens) ? p.itens : [];
+
+  const itensHtml = itens.map(it => `
+    <div class="rc-item">
+      <div class="rc-item-nome">${it.emoji || '•'} ${it.nome}<span class="rc-item-qty"> x${it.qty}</span></div>
+      <div class="rc-item-preco">${parseFloat(it.preco * it.qty).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</div>
+    </div>`).join('');
+
+  const pw = window.open('', '_blank', 'width=400,height=680');
+  pw.document.write(`<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Nota ${num} — ${nomeEstab}</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Courier New',Courier,monospace;background:#fff;color:#111;padding:20px 24px;max-width:300px;margin:0 auto;font-size:13px}
+    .rc-header{text-align:center;margin-bottom:10px}
+    .rc-icon{font-size:28px;display:block;margin-bottom:6px}
+    .rc-estab-nome{font-size:16px;font-weight:bold}
+    .rc-estab-sub{font-size:11px;color:#666;margin-top:2px}
+    .rc-dots{text-align:center;color:#bbb;letter-spacing:3px;font-size:10px;margin:10px 0}
+    .rc-meta-row{display:flex;justify-content:space-between;padding:3px 0;font-size:12px;color:#333}
+    .rc-meta-row span:first-child{color:#888}
+    .rc-meta-row strong{font-weight:700;color:#111}
+    .rc-item{display:flex;justify-content:space-between;align-items:flex-start;padding:5px 0;border-bottom:1px dotted #ddd;font-size:12px}
+    .rc-item:last-child{border-bottom:none}
+    .rc-item-nome{flex:1;line-height:1.4}
+    .rc-item-qty{color:#aaa;font-size:11px}
+    .rc-item-preco{font-weight:700;margin-left:10px;white-space:nowrap}
+    .rc-total-row{display:flex;justify-content:space-between;font-weight:bold;font-size:15px;padding:5px 0}
+    .rc-pag-row{display:flex;justify-content:space-between;font-size:11px;color:#777;padding:2px 0}
+    .rc-status-row{text-align:center;font-size:11px;color:#555;margin-top:6px}
+    .rc-thanks{text-align:center;font-size:11px;color:#aaa;margin-top:14px}
+    @media print{body{padding:0;max-width:100%}}
+  </style>
+</head>
+<body>
+  <div class="rc-header">
+    <span class="rc-icon">🍽️</span>
+    <div class="rc-estab-nome">${nomeEstab}</div>
+    <div class="rc-estab-sub">${subEstab}</div>
+  </div>
+  <div class="rc-dots">· · · · · · · · · · · ·</div>
+  <div class="rc-meta-row"><span>Pedido</span><strong>${num}</strong></div>
+  <div class="rc-meta-row"><span>Mesa</span><span>${p.mesa || 'Balcão'}</span></div>
+  <div class="rc-meta-row"><span>Data / Hora</span><span>${dataHora}</span></div>
+  <div class="rc-dots">· · · · · · · · · · · ·</div>
+  ${itensHtml}
+  <div class="rc-dots">· · · · · · · · · · · ·</div>
+  <div class="rc-total-row"><span>TOTAL</span><span>${total}</span></div>
+  <div class="rc-pag-row"><span>Pagamento</span><span>${p.forma_pagamento || '—'}</span></div>
+  <div class="rc-status-row">Status: ${STATUS_LABEL[p.status] || p.status}</div>
+  <div class="rc-dots">· · · · · · · · · · · ·</div>
+  <p class="rc-thanks">Obrigado pela preferência! 🙏</p>
+</body>
+</html>`);
+  pw.document.close();
+  setTimeout(() => { pw.print(); }, 450);
 }
 
 // ===== REALTIME — PEDIDOS =====
