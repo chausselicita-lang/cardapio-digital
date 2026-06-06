@@ -225,8 +225,9 @@ $$('.tab-btn').forEach(btn => {
     $$('.tab-content').forEach(t => t.style.display = 'none');
     btn.classList.add('active');
     $(`#tab-${btn.dataset.tab}`).style.display = 'block';
-    if (btn.dataset.tab === 'cardapio') carregarCardapio();
-    if (btn.dataset.tab === 'pedidos') { carregarPedidos(); iniciarRealtimePedidos(); }
+    if (btn.dataset.tab === 'cardapio')   carregarCardapio();
+    if (btn.dataset.tab === 'pedidos')   { carregarPedidos(); iniciarRealtimePedidos(); }
+    if (btn.dataset.tab === 'relatorios') renderRelatorios();
   });
 });
 
@@ -780,6 +781,159 @@ function iniciarRealtimePedidos() {
       carregarPedidos();
     })
     .subscribe();
+}
+
+// ===== RELATÓRIOS =====
+async function renderRelatorios() {
+  const loading = document.getElementById('rel-loading');
+  const content = document.getElementById('rel-content');
+  if (!loading || !content) return;
+
+  loading.style.display = 'block';
+  content.innerHTML = '';
+
+  const today     = new Date();
+  const todayStr  = today.toISOString().split('T')[0];
+  const weekAgo   = new Date(today); weekAgo.setDate(today.getDate() - 6); weekAgo.setHours(0,0,0,0);
+  const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+  const queryFrom  = weekAgo < monthStart ? weekAgo : monthStart;
+
+  let pedidos = [];
+  try {
+    const { data, error } = await db
+      .from('cardapio_pedidos')
+      .select('*')
+      .eq('restaurante_id', rid)
+      .gte('created_at', queryFrom.toISOString())
+      .order('created_at', { ascending: false })
+      .limit(2000);
+    if (!error) pedidos = data || [];
+  } catch { }
+
+  loading.style.display = 'none';
+
+  const R       = n => n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const isToday = p => p.created_at.startsWith(todayStr);
+  const isWeek  = p => new Date(p.created_at) >= weekAgo;
+  const isMonth = p => new Date(p.created_at) >= monthStart;
+  const isPago  = p => ['confirmado', 'presencial'].includes(p.payment_status);
+
+  const fatDay   = pedidos.filter(p => isToday(p) && isPago(p)).reduce((s,p) => s + parseFloat(p.total||0), 0);
+  const fatWeek  = pedidos.filter(p => isWeek(p)  && isPago(p)).reduce((s,p) => s + parseFloat(p.total||0), 0);
+  const fatMonth = pedidos.filter(p => isMonth(p) && isPago(p)).reduce((s,p) => s + parseFloat(p.total||0), 0);
+
+  const cntDay   = pedidos.filter(p => isToday(p)).length;
+  const cntWeek  = pedidos.filter(p => isWeek(p)).length;
+  const cntMonth = pedidos.filter(p => isMonth(p)).length;
+  const pendentes = pedidos.filter(p => isMonth(p) && p.payment_status === 'pendente').length;
+  const fechados  = pedidos.filter(p => isMonth(p) && p.status === 'fechado').length;
+
+  // Gráfico últimos 7 dias
+  const DAYS = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  const days7 = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today); d.setDate(today.getDate() - i);
+    const ds = d.toISOString().split('T')[0];
+    const fat = pedidos.filter(p => p.created_at.startsWith(ds) && isPago(p))
+      .reduce((s,p) => s + parseFloat(p.total||0), 0);
+    const cnt = pedidos.filter(p => p.created_at.startsWith(ds)).length;
+    days7.push({ ds, fat, cnt, lbl: DAYS[d.getDay()], isToday: ds === todayStr });
+  }
+  const maxFat = Math.max(...days7.map(d => d.fat), 1);
+  const BAR_MAX = 90;
+
+  const chartBars = days7.map(d => {
+    const h = d.fat > 0 ? Math.max(Math.round((d.fat / maxFat) * BAR_MAX), 3) : 0;
+    const cls = ['chart-bar', d.isToday ? 'today' : '', d.fat > 0 ? 'nonzero' : ''].filter(Boolean).join(' ');
+    return `<div class="chart-col"><div class="${cls}" style="height:${h}px" title="${R(d.fat)}"></div></div>`;
+  }).join('');
+  const chartDays = days7.map(d =>
+    `<div class="chart-day${d.isToday ? ' today' : ''}">${d.lbl}</div>`).join('');
+
+  // Formas de pagamento (mês)
+  const pagMap = {};
+  pedidos.filter(p => isMonth(p) && isPago(p)).forEach(p => {
+    const f = p.forma_pagamento || 'Outros';
+    if (!pagMap[f]) pagMap[f] = { cnt: 0, total: 0 };
+    pagMap[f].cnt++;
+    pagMap[f].total += parseFloat(p.total || 0);
+  });
+  const pagRows = Object.entries(pagMap).sort((a,b) => b[1].total - a[1].total).map(([nome, v]) =>
+    `<div class="pag-row">
+       <span class="pag-nome">${nome}</span>
+       <span><span class="pag-total">${R(v.total)}</span><span class="pag-cnt">${v.cnt} pedido${v.cnt !== 1 ? 's' : ''}</span></span>
+     </div>`
+  ).join('') || '<div style="color:var(--text3);font-size:13px;padding:8px 0">Nenhum pagamento confirmado este mês</div>';
+
+  // Pratos mais pedidos (mês)
+  const pratoMap = {};
+  pedidos.filter(p => isMonth(p)).forEach(p => {
+    (Array.isArray(p.itens) ? p.itens : []).forEach(it => {
+      pratoMap[it.nome] = (pratoMap[it.nome] || 0) + (it.qty || 1);
+    });
+  });
+  const topPratos = Object.entries(pratoMap).sort((a,b) => b[1]-a[1]).slice(0, 8);
+  const maxPrato  = topPratos[0]?.[1] || 1;
+
+  const pratoRows = topPratos.length > 0
+    ? topPratos.map(([nome, cnt], i) => `
+        <div class="rank-item">
+          <div class="rank-item-hdr">
+            <span class="rank-pos">#${i+1}</span>
+            <span class="rank-nome">${nome}</span>
+            <span class="rank-val">${cnt} vendido${cnt !== 1 ? 's' : ''}</span>
+          </div>
+          <div class="rank-track"><div class="rank-fill" style="width:${Math.round((cnt/maxPrato)*100)}%"></div></div>
+        </div>`).join('')
+    : '<div style="color:var(--text3);font-size:13px;padding:8px 0">Nenhum pedido este mês</div>';
+
+  content.innerHTML = `
+    <div class="rel-section">
+      <div class="sec-hdr">💰 Faturamento Confirmado</div>
+      <div class="rel-cards">
+        <div class="rel-card">
+          <div class="rel-card-lbl">Hoje</div>
+          <div class="rel-card-val green">${R(fatDay)}</div>
+          <div class="rel-card-sub">${cntDay} pedido${cntDay !== 1 ? 's' : ''}</div>
+        </div>
+        <div class="rel-card">
+          <div class="rel-card-lbl">Últimos 7 dias</div>
+          <div class="rel-card-val">${R(fatWeek)}</div>
+          <div class="rel-card-sub">${cntWeek} pedido${cntWeek !== 1 ? 's' : ''}</div>
+        </div>
+        <div class="rel-card wide">
+          <div class="rel-card-lbl">Este mês</div>
+          <div class="rel-card-val accent">${R(fatMonth)}</div>
+          <div class="rel-card-sub">${cntMonth} pedidos · ${pendentes} aguard. pagamento · ${fechados} fechados</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rel-section">
+      <div class="sec-hdr">📊 Faturamento — Últimos 7 dias</div>
+      <div class="rel-chart-wrap">
+        <div class="rel-chart">${chartBars}</div>
+        <div class="chart-days">${chartDays}</div>
+      </div>
+    </div>
+
+    <div class="rel-section">
+      <div class="sec-hdr">💳 Por Forma de Pagamento — Este mês</div>
+      <div class="pag-breakdown">${pagRows}</div>
+    </div>
+
+    <div class="rel-section">
+      <div class="sec-hdr">🍽️ Pratos Mais Pedidos — Este mês</div>
+      ${pratoRows}
+    </div>`;
+}
+
+function exportarPDF() {
+  const config = carregarConfig();
+  document.getElementById('rel-print-nome').textContent = config.nomeRestaurante || 'Cardápio Digital';
+  document.getElementById('rel-print-data').textContent =
+    'Relatório gerado em ' + new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+  window.print();
 }
 
 // ===== TOAST =====
